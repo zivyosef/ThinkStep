@@ -49,7 +49,18 @@ button {
   background: #3d7a5f;
   color: white;
   border-radius: 25px;
+  font-size: 20px;
+  text-align: center;
+  justify-content: center;
+   font-weight: bold;
 }
+.success{
+display: flex;
+justify-content: flex-end;
+text-align: right;
+font-weight: bold;  
+} 
+
 </style>
 </head>
 
@@ -60,12 +71,12 @@ button {
   <!-- שורה עליונה -->
   <div class="row">
     <input id="subject" placeholder="מקצוע">
-    <input id="topic" placeholder="נושא">
+    <input id="topic" placeholder="נושא העבודה">
   </div>
 
   <!-- שורה תחתונה -->
   <div class="row">
-    <input id="pages" placeholder="מספכ">
+    <input id="pages" placeholder="מספר עמודים">
     <input id="date" type="date">
   </div>
 
@@ -77,14 +88,15 @@ button {
 <div class="summary">
   <h3>סיכום:</h3>
   <p id="out"></p>
+  <p1 class="success">!בהצלחה</p1>
 </div>
 
 <script>
 function show() {
   document.getElementById("out").innerHTML =
-    "מקצוע: " + document.getElementById("subject").value + "<br>" +
-    "נושא: " + document.getElementById("topic").value + "<br>" +
-    "עמודים: " + document.getElementById("pages").value + "<br>" +
+    "מקצוע: " + document.getElementById("subject").value + "   " +
+    "נושא: " + document.getElementById("topic").value + "    " +
+    "עמודים: " + document.getElementById("pages").value + " <br> " +
     "תאריך: " + document.getElementById("date").value;
 }
 </script>
