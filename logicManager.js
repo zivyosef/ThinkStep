@@ -2,146 +2,162 @@
  * ============================================================
  *  logicManager.js  —  צוות C: אלון ומאיר
  * ============================================================
- *
- *  מה האחריות שלכם?
- *  -----------------
- *  אתם ה"מנהלים" של האתר. אתם לא מצייר כלום על המסך (זה צוות B),
- *  ואתם לא מדברים עם ה-AI ישירות (זה צוות D).
- *  אתם באמצע — מקבלים מידע מהמשתמש, מחליטים מה לעשות איתו,
- *  ושולחים לכל מי שצריך.
- *
- *  תחשבו על עצמכם כמו מנהל משרד:
- *    - הלקוח (המשתמש) אומר לכם מה הוא רוצה
- *    - אתם בודקים אם זה הגיוני
- *    - אם צריך AI — אתם שולחים לצוות D ומחכים לתשובה
- *    - אתם שומרים הכל ב-localStorage כדי שלא יאבד
- *    - אתם מעבירים את התוצאה לצוות B שיציג אותה
- *
- *  הקבצים שאתם משתמשים בהם:
- *    - aiService.js (צוות D) — לכל מה שקשור ל-AI
- *    - main.js (צוות A) — הם קוראים לפונקציות שלכם
- *
- *  איך תריצו את הקוד?
- *    פתחו את index.html עם Live Server ב-VS Code.
- *    פתחו את כלי המפתחים (F12) ולחצו על "Console"
- *    כדי לראות הודעות שגיאה ותוצאות.
- *
- * ============================================================
  */
-
-// ============================================================
-//  חיבור לצוות D
-//  אנחנו "מייבאים" את הפונקציה הראשית של צוות D.
-//  זה אומר: כשנרצה לשאול את ה-AI משהו,
-//  נשתמש בפונקציה aiService.sendQuery(...)
-// ============================================================
-
-// שימו לב: הקובץ aiService.js חייב להיות נטען לפני הקובץ הזה ב-HTML!
-// צוות A ידאג לסדר הנכון ב-index.html
-
-// ============================================================
-//  מפתח השמירה ב-localStorage
-//  זהו השם תחתיו נשמור את כל המידע של האפליקציה.
-//  אסור לשנות את השם הזה — כל הצוותות משתמשים בו!
-// ============================================================
 const STORAGE_KEY = "decompose_app_state";
+const MIN_INITIAL_TEXT_LENGTH = 10;
+const MAX_INITIAL_TEXT_LENGTH = 4000;
+
 
 
 // ============================================================
 //  פונקציה 1: initProject
 // ============================================================
-/**
- * מה היא עושה?
- * -------------
- * זו הפונקציה הראשונה שרצה כשהמשתמש מגיש את המשימה שלו.
- * היא מקבלת את המשפט שהמשתמש כתב ויוצרת את ה"מקבץ" (Chunk)
- * הראשי של הפרויקט.
- *
- * קלט:
- *   rawText (string) — המשפט שהמשתמש כתב, למשל:
- *   "יש לי עבודה בהיסטוריה על המהפכה הצרפתית"
- *
- * פלט צפוי (object):
- *   {
- *     mainChunk: { title: "...", description: "..." },
- *     subTasks:  [ { id, title, description }, ... ],
- *     status:    "ready"
- *   }
- *
- * מי קורא לה?
- *   צוות A קורא לפונקציה הזו כשהמשתמש לוחץ על כפתור "שמור משימה"
- */
+const TASK_PG_ERROR_MSG = "שגיאה: לא הוזן מספר עמודים. אנא כתוב את המשימה שלך לפני השמירה.";
+const TASK_ERROR_MSG = "שגיאה: לא הוזן טקסט. אנא כתוב את המשימה שלך לפני השמירה.";
+
+function createNewState() {
+    return {
+    rawText: null,
+    subject: null,
+    assignmentType: null,
+    topic: null,
+    pgNumberScope: null,
+    dueDate: null,
+    chunkLabel: null,
+    chunkSummary: null
+    };
+}
 async function initProject(rawText) {
+  // בדיקה ראשונית - האם הטקסט ריק?
+  if (typeof rawText !== "string") {
+    handleError(TASK_ERROR_MSG);
+    return null;
+  }
 
-  // TODO שלב 1: בדקו שהקלט אינו ריק
-  // אם rawText ריק, החזירו null והדפיסו שגיאה ל-console
-  // דוגמה:
-  //   if (!rawText || rawText.trim() === "") {
-  //     console.error("שגיאה: לא הוזן טקסט");
-  //     return null;
-  //   }
+  const normalizedText = rawText.trim().replace(/\s+/g, " ");
 
-  // TODO שלב 2: שלחו בקשה לצוות D לפרק את המשימה
-  // השתמשו בפונקציה sendQuery שצוות D כתבו.
-  // הכוונה היא: "היי AI, פרק לי את המשימה הזו לחלקים"
-  // דוגמה:
-  //   const aiResult = await aiService.sendQuery("DECOMPOSE_INITIAL", rawText);
+  if (!normalizedText) {
+    handleError(TASK_ERROR_MSG);
+    return null;
+  }
 
-  // TODO שלב 3: בנו את אובייקט ה-State הראשוני
-  // State זה "המצב" של האפליקציה — כל המידע שמגדיר מה קורה עכשיו
-  // דוגמה לאיך הוא צריך להיראות:
-  //   const newState = {
-  //     mainChunk: { title: rawText, description: aiResult.summary },
-  //     subTasks:  aiResult.chunks,   // מה שצוות D החזיר
-  //     createdAt: new Date().toISOString()
-  //   };
+  if (normalizedText.length < MIN_INITIAL_TEXT_LENGTH) {
+    handleError(`הטקסט קצר מדי. כתוב לפחות ${MIN_INITIAL_TEXT_LENGTH} תווים.`);
+    return null;
+  }
 
-  // TODO שלב 4: שמרו את ה-State ב-localStorage
-  // קראו לפונקציה syncStateToStorage שכתבתם למטה
-  // דוגמה:
-  //   syncStateToStorage(newState);
+  if (normalizedText.length > MAX_INITIAL_TEXT_LENGTH) {
+    handleError(`הטקסט ארוך מדי. נסה לקצר ל-${MAX_INITIAL_TEXT_LENGTH} תווים או פחות.`);
+    return null;
+  }
 
-  // TODO שלב 5: החזירו את ה-State כדי שצוות B יוכל להציג אותו
-  //   return newState;
+  const newState = createNewState();
+  newState.rawText = normalizedText;
+  
+  try {
+    // שליחת השאילתה ל-AI
+    const currentState = await aiService.sendQuery("DECOMPOSE_INITIAL", normalizedText, newState);
+
+    if (!currentState) {
+      handleError("לא התקבלה תגובה מהשרת. נסה שוב.");
+      return null;
+    }
+
+    // בדיקת שדות חובה - אם חסרים, אפשר להחזיר את ה-State בכל זאת
+    // כדי שהמשתמש ימלא את החסר בטופס הוויזואלי
+    const missingFields = [];
+    if (!currentState.subject) missingFields.push("מקצוע");
+    if (!currentState.topic) missingFields.push("נושא");
+
+    if (missingFields.length > 0) {
+      console.warn(`שים לב: לא הצלחנו לזהות אוטומטית: ${missingFields.join(", ")}`);
+    }
+
+    return currentState;
+
+  } catch (error) {
+    handleError("שגיאה בתקשורת עם ה-AI. בדוק את החיבור לאינטרנט.");
+    console.error("AI Service Error:", error);
+    return null;
+  }
+}
+
+function validatePageCount(pageCount) {
+  if (pageCount === null || pageCount === undefined || pageCount === "") {
+    // need to create an alternative - infinte num of pages
+    return null;
+  }
+
+  const parsedPageCount = typeof pageCount === "number" ? pageCount : Number(pageCount);
+
+  if (!Number.isFinite(parsedPageCount) || !Number.isInteger(parsedPageCount)) {
+    handleError("מספר העמודים חייב להיות מספר שלם תקין.");
+    return null;
+  }
+
+  return parsedPageCount;
+}
+
+function validateDueDate(dueDate) {
+  if (dueDate === null || dueDate === undefined || dueDate === "") {
+    // need to create an alternative - infinte num of days
+    return null;
+  }
+
+  const parsedDate = dueDate instanceof Date ? new Date(dueDate.getTime()) : new Date(dueDate);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    handleError("תאריך ההגשה אינו תקין.");
+    return null;
+  }
+
+  return parsedDate;
+}
+
+
+function handleError(msg) {
+  alert(msg); // maybe change to a nicer UI element later
+  console.error(msg);
 }
 
 
 // ============================================================
 //  פונקציה 2: analyzeActionability
 // ============================================================
-/**
- * מה היא עושה?
- * -------------
- * "הרמזור" של האתר — בודקת אם משימה ספציפית ניתנת לביצוע
- * או שהיא רחבה מדי.
- * זו פונקציה שלא צריכה AI — היא עובדת עם כללים פשוטים.
- *
- * קלט:
- *   taskText (string) — טקסט המשימה, למשל "לכתוב את כל העבודה"
- *
- * פלט צפוי (object):
- *   {
- *     score:      "red" | "yellow" | "green",
- *     label:      "רחב מדי" | "בינוני" | "מוכן לביצוע",
- *     suggestion: "נסה לחלק את המשימה ל..."
- *   }
- *
- * מי קורא לה?
- *   הפונקציה handleTaskValidation קוראת לה (ראו למטה)
- */
 function analyzeActionability(taskText) {
+let score = 0;
+if (taskText.length >= 20 && taskText.length > 0 ) {score += 1;}
+if (taskText.length >= 50 && taskText.length > 20) {score += 5;}
+if (taskText.length >= 100 && taskText.length > 50) {score += 10;}
+// מילים שמעידות על משימה רחבה מדי (אדום):
+// 🔴 Red words (too broad)
+  const redWords = [
+    "finish","write body","do project","study everything","work on assignment","write all","complete paper",
+    "הכל","לסיים","לעשות","כולו","כל העבודה","לטפל בזה","להכין עבודה","ללמוד הכל"
+  ];
 
-  // TODO שלב 1: הגדירו רשימות של מילות מפתח
-  // מילים שמעידות על משימה רחבה מדי (אדום):
-  //   const redWords = ["הכל", "לסיים", "לעשות", "כולו", "כל העבודה"];
-  //
-  // מילים שמעידות על משימה קטנה וברורה (ירוק):
-  //   const greenWords = ["לכתוב פסקה", "לקרוא מקור", "לחפש 2", "לסכם"];
+  // 🟠 Medium words (not specific enough)
+  const mediumWords = [
+    "write about","learn about","read about","research","analyze","explore",
+    "לכתוב על","ללמוד על","לקרוא על","לחקור","לנתח","להסביר"
+  ];
+
+  // 🟢 Green words (actionable)
+  const greenWords = [
+    "1 paragraph","one paragraph","2 sources","two sources","summarize","outline","find","compare","list 3","3 events","one cause",
+    "לכתוב פסקה","לקרוא מקור","לחפש 2","לסכם","למצוא מקור","להשוות בין","לכתוב מבוא","לנסח שאלה","לבנות ראשי פרקים","לכתוב 3 נקודות"
+  ];
+
+  // 🟢🟢 Strong words (high value)
+  const strongWords = [
+    "paragraph","question","source","claim","example","comparison","cause","event","outline",
+    "פסקה","שאלה","מקור","טענה","דוגמה","השוואה","סיבה","אירוע","מתווה"
+  ];
+
 
   // TODO שלב 2: עברו על המילים ובדקו אם הטקסט מכיל אותן
   // טיפ: השתמשו ב-taskText.includes("מילה") לבדיקה
-  // דוגמה:
-  //   const text = taskText.toLowerCase();
+  // לפני שאתה בודק את הטקסט - מומלץ להשתמש בטקסט המנורמל שיצרת ב-current state
   //
   //   for (let word of redWords) {
   //     if (text.includes(word)) {
@@ -370,6 +386,8 @@ function loadStateFromStorage() {
 // ============================================================
 const logicManager = {
   initProject,
+  validatePageCount,
+  validateDueDate,
   analyzeActionability,
   handleTaskValidation,
   calculateBackwardTimeline,
