@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>Socratic Bot</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #f3f4f6;
+      direction: rtl;
+    }
+
+    .wrapper {
+      width: 700px;
+      margin: 50px auto;
+      background: #e9ecef;
+      padding: 25px;
+      border-radius: 15px;
+    }
+
+    .header p {
+      color: gray;
+      margin-bottom: 20px;
+    }
+
+    .chat-box {
+      background: #f8f9fa;
+      border-radius: 15px;
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bot-message {
+      background: #e5e7eb;
+      padding: 12px;
+      border-radius: 12px;
+      max-width: 80%;
+      align-self: flex-start;
+    }
+
+    .user-message {
+      background: #6c4cf1;
+      color: white;
+      padding: 12px;
+      border-radius: 12px;
+      max-width: 80%;
+      align-self: flex-end;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .input-area input:focus {
+      outline: none;
+      border: 1px solid #6c4cf1;
+    }
+
+    .input-area button {
+      background: #6c4cf1;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .input-area button:hover {
+      background: #5a3ee0;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+  <div class="header">
+    <h2>Socratic Bot</h2>
+    <p>הבוט שואל שאלות מנחות במקום לענות ישירות</p>
+  </div>
+
+  <div class="chat-box">
+
+    <div class="messages" id="messages">
+      <div class="bot-message">
+        מה הכי קשה לך עכשיו: למצוא מקורות, לבחור מבנה, או להתחיל את הפסקה הראשונה?
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input type="text" id="input" placeholder="תשאל/י משהו..." />
+      <button onclick="sendMessage()">שלח</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function sendMessage() {
+    const input = document.getElementById("input");
+    const messages = document.getElementById("messages");
+
+    const text = input.value.trim();
+    if (text === "") return;
+
+    // הודעת משתמש
+    const userMsg = document.createElement("div");
+    userMsg.className = "user-message";
+    userMsg.textContent = text;
+    messages.appendChild(userMsg);
+
+    input.value = "";
+
+    // גלילה למטה
+    messages.scrollTop = messages.scrollHeight;
+
+    // תגובת בוט (סתם דוגמה)
+    setTimeout(() => {
+      const botMsg = document.createElement("div");
+      botMsg.className = "bot-message";
+      botMsg.textContent = "מעניין... מה כבר ניסית לעשות עד עכשיו?";
+      messages.appendChild(botMsg);
+
+      messages.scrollTop = messages.scrollHeight;
+    }, 800);
+  }
+
+  // שליחה עם Enter
+  document.getElementById("input").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  });
+</script>
+
+</body>
+</html>
+```
+
