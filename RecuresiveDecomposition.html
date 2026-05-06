@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+<style>
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #0e3c72 0%, #2a9d8f 100%);
+    color: #0f2a44;
+    font-family: Arial, sans-serif;
+}
+
+#part1 {
+    width: 520px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: 30px 32px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    text-align: center;
+
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 14px;
+    margin: 10px 0;
+    border: 1px solid #a8d0e6;
+    border-radius: 12px;
+    background: #f4fbff;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 12px 22px;
+    background-color: #2a9d8f;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    background-color: #227c6f;
+}
+
+#quality_meter {
+    margin: 24px 0 10px;
+    padding: 18px 16px;
+    background: #e9f7f6;
+    border: 1px solid #bbe1df;
+    border-radius: 18px;
+}
+
+#quality_meter p,
+#quality_meter label {
+    margin: 12px 0 6px;
+    display: block;
+    font-weight: 600;
+}
+
+#score_bar_wrapper {
+    width: 100%;
+    height: 12px;
+    background: #d8edf0;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 14px;
+}
+
+#score_bar {
+    height: 100%;
+    width: 50%;
+    border-radius: 999px;
+    transition: width 0.3s ease, background 0.3s ease;
+    background: linear-gradient(90deg, #2a9d8f, #1d6f63);
+}
+
+#score_label {
+    margin-top: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f2a44;
+}
+
+#prompt_output {
+    margin-top: 50px;
+    background: #f1fcfb;
+    border: 1px solid #b5e5db;
+    border-radius: 16px;
+    padding: 14px 16px;
+    text-align: right;
+    white-space: pre-wrap;
+    color: #0f2a44;
+}
+
+</style>
+
+</head>
+<body>
+   
+   <div id="part1">
+<h1>חלק ראשון</h1>
+<input id="topic" type="text" placeholder="נושא העבודה">
+
+<br>
+
+<input id="background" type="text" placeholder="רקע על העבודה">
+
+<div id="quality_meter">
+
+<p>כמה הרקע טוב</p>
+
+<div id="score_bar_wrapper">
+  <div id="score_bar"></div>
+</div>
+
+<p id="score_label">50%</p>
+
+<button type="button" onclick="updateQualityMeter()">הפעל מד איכות</button>
+
+<p>כמעט שם</p>
+
+</div>
+<button type="button" onclick="submitPrompt()">להפוך לפרומפט</button>
+
+<p>פרומט מתוקן:</p>
+<div id="prompt_output"></div>
+   </div>
+<script>
+
+
+
+
+function updateQualityMeter() {
+  let topic = document.getElementById('topic').value.trim();
+  let background = document.getElementById('background').value.trim();
+  let score = 50;
+
+  if (!topic && !background) { score = 10;
+  } else {
+    if (topic) score += 15;
+    if (background) score += 15;
+    score += Math.min(20, Math.floor((topic.length + background.length) / 20));
+  }
+
+  score = Math.max(0, Math.min(100, score));
+  let scoreBar = document.getElementById('score_bar');
+  scoreBar.style.width = score + '%';
+  scoreBar.style.background = score < 33 ? '#e74c3c' : (score <= 66 ? '#f1c40f' : '#2ecc71');
+  document.getElementById('score_label').textContent = score + '%';
+}
+
+function submitPrompt() {
+  let topic = document.getElementById('topic').value.trim();
+  let background = document.getElementById('background').value.trim();
+  if (!topic && !background) {
+    document.getElementById('prompt_output').textContent = 'יש להזין נושא ורקע כדי ליצור פרומפט.';
+    return;
+  }
+  let promptText = 'נושא העבודה: ' + (topic || 'לא הוזן') + '\n' +
+                   'רקע על העבודה: ' + (background || 'לא הוזן');
+  document.getElementById('prompt_output').textContent = promptText;
+}
+</script>
+</body>
+</html>
