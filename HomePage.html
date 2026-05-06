@@ -5,68 +5,162 @@
 
 <style>
 body {
-  font-family: Arial;
+  font-family: 'Segoe UI', Arial, sans-serif;
   direction: rtl;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8f1ed 100%);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+#main-start-work {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  gap: 8px;
 }
 
 .box {
   width: 90%;
   max-width: 500px;
-  margin: 20px auto;
+  margin: 10px auto;
   padding: 20px;
   background: #5ea07e;
-  border-radius: 25px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
 }
 
 .row {
   display: flex;
-  gap: 20px;
-  margin-bottom: 15px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 input {
   width: 100%;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
   border: none;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: #f9f9f9;
 }
 
 button {
   width: 100%;
   padding: 12px;
-  background: black;
+  background: #2c2c2c;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+button:hover{
+  background-color: #4a7c5e;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 .summary {
   width: 90%;
   max-width: 500px;
-  margin: 20px auto;
+  margin: 10px auto;
   padding: 20px;
-  background: #3d7a5f;
+  background: #4a8c6e;
   color: white;
-  border-radius: 25px;
-  font-size: 20px;
+  border-radius: 15px;
+  font-size: 16px;
   text-align: center;
   justify-content: center;
-   font-weight: bold;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
+.summary h3 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+.summary p {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
 .success{
-display: flex;
-justify-content: flex-end;
-text-align: right;
-font-weight: bold;  
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 14px;
 } 
+.top-section {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+  direction: ltr;
+}
+
+.box, .text-box {
+  background: #5ea07e;
+  padding: 20px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  direction: rtl;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#free-text {
+  width: 95%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  resize: vertical;
+  min-height: 50px;
+  max-height: 120px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  margin: 0 auto;
+  display: block;
+}
+
+#free-text:focus {
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: #f9f9f9;
+}
+
+
+
 
 </style>
 </head>
 
 <body>
-
+  <div id="main-start-work">
+<div class="text-box">
+ <textarea id="free-text" placeholder="מה אתה רוצה לכתוב?"></textarea> 
+</div>
 <div class="box">
+
 
   <!-- שורה עליונה -->
   <div class="row">
@@ -80,7 +174,7 @@ font-weight: bold;
     <input id="date" type="date">
   </div>
 
-  <button onclick="show()">בוא נתחיל</button>
+  <button id="button_work" onclick="show()">בוא נתחיל</button>
 
 </div>
 
@@ -88,7 +182,8 @@ font-weight: bold;
 <div class="summary">
   <h3>סיכום:</h3>
   <p id="out"></p>
-  <p1 class="success">!בהצלחה</p1>
+  <p class="success">בהצלחה!</p>
+</div>
 </div>
 
 <script>
