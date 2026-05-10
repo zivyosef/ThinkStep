@@ -2,215 +2,119 @@
  * ============================================================
  *  aiService.js  —  צוות D: יהודה ואביתר
  * ============================================================
- *
- *  מה האחריות שלכם?
- *  -----------------
- *  אתם ה"מוח" של האתר. כל שאלה שצוות C שולח לכם —
- *  אתם מטפלים בה, מנסחים תשובה חכמה, ומחזירים אותה.
- *
- *  הרעיון המרכזי — ניהול "הקשר" (Context):
- *  בניגוד ל-AI אמיתי, אתם זוכרים מה קרה קודם!
- *  אתם שומרים היסטוריה ב-localStorage ומשתמשים בה
- *  כדי שהתשובות יהיו רלוונטיות למשתמש הספציפי.
- *
- *  דוגמה: אם המשתמש כבר פירק את הפרק הראשון,
- *  ה-AI שלכם יכול לומר "ראיתי שכבר עבדת על חלק א' —
- *  האם הקושי הוא במציאת מקורות או בניסוח?"
- *
- *  הקבצים שקוראים לכם:
- *    - logicManager.js (צוות C) — שולחים לכם sendQuery(...)
- *
- *  איך תריצו את הקוד?
- *    פתחו את index.html עם Live Server ב-VS Code.
- *    פתחו את כלי המפתחים (F12) → Console
- *    כדי לראות תוצאות ובדוק שהפונקציות עובדות.
- *
- * ============================================================
  */
 
-// ============================================================
-//  מפתח השמירה של היסטוריית ה-AI
-//  שמירה נפרדת מה-State הכללי של צוות C
-// ============================================================
-const AI_HISTORY_KEY = "decompose_ai_history";
-
+import { GoogleGenAI } from "@google/genai";
+const AI_HISTORY_KEY = 'my_ai_app_history';
+const MAX_HISTORY = 10; // שומר רק את 10 האינטראקציות האחרונות
+const ai = new GoogleGenAI({});
 
 // ============================================================
-//  מאגר הנתונים שלכם (Dictionaries)
-//  -------------------------------------------------------
-//  במקום לכתוב תשובות קשיחות, השתמשו במאגרים גדולים.
-//  ככל שהמאגר גדול יותר — ה-AI יראה יותר "אמיתי".
-//  הוסיפו כמה שיותר דוגמאות!
+//  this is the main function that call gemini - need to understand whre to call it and how to use it in the project
 // ============================================================
+async function main() {
+  const chat = ai.chats.create({
+    model: "gemini-3-flash-preview",
+    history: [ // example of how to set up the initial history of the chat, can be modified as needed
+      // here we send the historu that evutar made in load history
+      {
+        role: "user",
+        parts: [{ text: "Hello" }],
+      },
+      {
+        role: "model",
+        parts: [{ text: "Great to meet you. What would you like to know?" }],
+      },
+    ],
+  });
 
-// זוויות חשיבה לפי תחום לימוד
-const ANGLES_BY_SUBJECT = {
-  "היסטוריה": [
-    { angle: "כרונולוגי", description: "סדר את האירועים לפי זמן — מה קרה ראשון ומה גרם למה?" },
-    { angle: "חברתי", description: "מי היו האנשים שהושפעו? מה השתנה בחייהם?" },
-    { angle: "פוליטי", description: "אילו כוחות וממשלות היו מעורבים? איך השתנה השלטון?" },
-  ],
-  "מדע": [
-    { angle: "ניסיוני", description: "מה השערת הניסוי? מה הוכח ומה לא?" },
-    { angle: "יישומי", description: "איפה אנחנו רואים את זה בחיי היומיום?" },
-    { angle: "השוואתי", description: "השווה בין שתי תיאוריות או תוצאות שונות" },
-  ],
-  "ספרות": [
-    { angle: "דמויות", description: "מה מניע את הדמות הראשית? כיצד היא מתפתחת?" },
-    { angle: "נושאים", description: "מהם הרעיונות הגדולים שהמחבר מעביר?" },
-    { angle: "סגנון", description: "כיצד שפת הכתיבה תורמת למשמעות?" },
-  ],
-  // TODO הוסיפו עוד תחומים: מתמטיקה, אזרחות, גיאוגרפיה וכו'
-};
+  const response1 = await chat.sendMessage({
+    message: "I have 2 dogs in my house.",
+  });
+  console.log("Chat response 1:", response1.text);
 
-// תגובות סוקרטיות לפי מילות מפתח
-const SOCRATIC_RESPONSES = {
-  "תקוע": "ראיתי את ההתקדמות שלך עד עכשיו — מה הדבר האחד שמרגיש הכי מבלבל?",
-  "לא מבין": "מה כן ברור לך עד עכשיו? נתחיל ממה שאתה יודע ונתקדם משם.",
-  "קשה": "מה הדבר הקשה ביותר — מציאת המידע, או ניסוח המחשבות?",
-  "מקורות": "כמה מקורות כבר מצאת? האם הם עונים על השאלה המרכזית שלך?",
-  "לא יודע": "אם היית צריך לנחש — מה היית אומר? לפעמים הניחוש הראשון הוא הכי טוב.",
-  "עזרה": "איזה חלק ספציפי הוא הכי קשה? אפשר לפרק את הבעיה לצעדים קטנים יותר?",
-  // TODO הוסיפו עוד מצבים ותגובות מתאימות
-};
+  const response2 = await chat.sendMessage({
+    message: "How many paws are in my house?",
+  });
+  console.log("Chat response 2:", response2.text);
+}
 
-// ניסוחים משופרים לפי סוג הבעיה
-const IMPROVEMENT_TEMPLATES = {
-  "רחב מדי": {
-    prefix: "נסה לצמצם: במקום '{{original}}', נסח כך:",
-    suggestion: "מצא {{number}} דוגמאות ספציפיות ל-{{topic}}",
-    explanation: "משימה ספציפית יותר קל יותר להתחיל ולסיים."
-  },
-  "לא ברור": {
-    prefix: "נסה לנסח כשאלת מחקר: במקום '{{original}}', שאל:",
-    suggestion: "מה הקשר בין {{topic}} לבין {{context}}?",
-    explanation: "שאלת מחקר עוזרת לך לדעת בדיוק מה לחפש."
-  },
-  // TODO הוסיפו עוד סוגי בעיות
-};
+await main();
 
-
-// ============================================================
-//  פונקציה 1: sendQuery  ← זו הפונקציה הכי חשובה!
-// ============================================================
-/**
- * מה היא עושה?
- * -------------
- * זו הפונקציה היחידה שצוות C קורא לה.
- * היא מקבלת "כוונה" (intent) ומידע (data),
- * ומחליטה איזו פונקציה פנימית להפעיל.
- *
- * קלט:
- *   intent (string) — סוג הבקשה, אחת מהאפשרויות:
- *     "DECOMPOSE_INITIAL"  — פרק משימה לחלקים
- *     "SUGGEST_IMPROVEMENT"— שפר משימה אדומה
- *     "SOCRATIC_CHAT"      — תגובה לצ'אט
- *     "GET_ANGLES"         — קבל זוויות חשיבה
- *
- *   data (any) — המידע הרלוונטי לבקשה
- *
- * פלט צפוי: Promise<object> — תמיד מחזיר אובייקט JSON מסודר
- *
- * מי קורא לה?
- *   רק צוות C — מתוך logicManager.js
- *
- * ⚠️ חשוב: הפונקציה הזו חייבת להיות async
- *    כי היא קוראת לפונקציות שלוקחות זמן
- */
 async function sendQuery(intent, rawData, userDescription) {
 
-  // TODO שלב 1: הדפיסו ל-console כדי לדעת שהפונקציה נקראה
-  //   console.log("🤖 aiService קיבל בקשה:", intent, data);
+  console.log(`🤖 aiService קיבל בקשה מסוג: ${intent}`);
 
-  // TODO שלב 2: טענו את היסטוריית השיחה (לשימוש בתגובות)
-  //   const history = loadAIHistory();
+  // שלב 1: טעינת היסטוריה
+  const history = loadAIHistory();
+  let result = null;
 
-  // TODO שלב 3: בחרו מה לעשות לפי ה-intent
-  // השתמשו ב-if/else כדי לנתב לפונקציה הנכונה:
-  //
-  if (intent === "DECOMPOSE_INITIAL") {
-    result = await generateSmartDecomposition(rawData, userDescription);
-  } else if (intent === "SUGGEST_IMPROVEMENT") {
-    result = await generateRefinedPrompt(rawData, userDescription);
-  } else if (intent === "SOCRATIC_CHAT") {
-    result = getSocraticResponse(rawData, userDescription, history);
-  } else if (intent === "STUCK_ADVISOR") {
-    result = getThinkingModels(rawData);
-  }
-  else {
-    console.error("❌ intent לא מוכר:", intent);
+  try {
+    // שלב 2: ניתוב לפי Intent
+    if (intent === "DECOMPOSE_INITIAL") {
+      // משימה חד פעמית לחילוץ נתונים - לא צריכה היסטוריה
+      // userDescription מכיל כאן את ה-newState שצריך למלא
+      result = await generateSmartDecomposition(rawData, userDescription);
+
+    } else if (intent === "SUGGEST_IMPROVEMENT") {
+      result = await generateRefinedPrompt(rawData, userDסescription);
+
+    } else if (intent === "SOCRATIC_CHAT") {
+      // שיחה מונחית - כאן ההיסטוריה קריטית כדי שה-AI יזכור על מה דיברתם
+      result = await getSocraticResponse(rawData, userDescription, history);
+
+    } else if (intent === "STUCK_ADVISOR") {
+      result = await getThinkingModels(rawData);
+
+    } else {
+      console.error("❌ intent לא מוכר:", intent);
+      return null;
+    }
+
+    // שלב 3: שמירת ההיסטוריה (רק אם יש תוצאה תקינה)
+    if (result) {
+      updateContext(intent, rawData, result);
+    }
+
+    return result;
+
+  } catch (error) {
+    console.error(`❌ שגיאה בביצוע ${intent}:`, error);
     return null;
   }
-
-  // TODO שלב 4: שמרו את השיחה בהיסטוריה
-  updateContext({ intent, rawData, result });
-
-  // TODO שלב 5: החזירו את התוצאה
-  return result;
 }
 
-
-// ============================================================
-//  פונקציה 2: updateContext
-// ============================================================
-/**
- * מה היא עושה?
- * -------------
- * שומרת כל אינטראקציה ב-localStorage כדי שה-AI
- * "יזכור" מה קרה קודם ויתן תגובות רלוונטיות יותר.
- *
- * קלט:
- *   interaction (object):
- *   {
- *     intent:    "DECOMPOSE_INITIAL",
- *     data:      "...",          (מה צוות C שלח)
- *     result:    { ... },        (מה ה-AI החזיר)
- *     timestamp: "2025-01-01"   (מתי זה קרה)
- *   }
- *
- * פלט: אין (void) — רק שמירה
- */
-function updateContext(interaction) {
-
-  // TODO שלב 1: הוסיפו timestamp לאינטראקציה
-  //   interaction.timestamp = new Date().toISOString();
-
-  // TODO שלב 2: טענו את ההיסטוריה הקיימת
-  //   const history = loadAIHistory();
-
-  // TODO שלב 3: הוסיפו את האינטראקציה החדשה למערך
-  //   history.push(interaction);
-
-  // TODO שלב 4: שמרו בחזרה ל-localStorage
-  //   localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(history));
-
-  // TODO שלב 5: הדפיסו הודעת אישור
-  //   console.log("📝 היסטוריית AI עודכנה. סה״כ:", history.length, "אינטראקציות");
-}
-
-
-// ============================================================
-//  פונקציה פנימית: loadAIHistory
-//  (פנימית = רק לשימוש בתוך הקובץ הזה)
-// ============================================================
-/**
- * מה היא עושה?
- * -------------
- * טוענת את היסטוריית האינטראקציות מ-localStorage.
- * אם אין היסטוריה — מחזירה מערך ריק.
- *
- * פלט: array
- */
 function loadAIHistory() {
+  const saved = localStorage.getItem(AI_HISTORY_KEY);
+  if (!saved) return [];
+  try {
+    return JSON.parse(saved);
+  } catch (e) {
+    console.error("Failed to parse history", e);
+    return [];
+  }
+}
 
-  // TODO שלב 1: קראו מ-localStorage
-  //   const saved = localStorage.getItem(AI_HISTORY_KEY);
+// שיניתי את הפונקציה לקבל פרמטרים ברורים יותר
+function updateContext(intent, userText, aiResponse) {
+  const history = loadAIHistory();
 
-  // TODO שלב 2: אם אין כלום — החזירו מערך ריק
-  //   if (!saved) return [];
+  const interaction = {
+    timestamp: new Date().toISOString(),
+    intent: intent,
+    user: userText,
+    assistant: aiResponse // נשמור את התשובה כדי שה-AI יוכל לזכור מה הוא אמר
+  };
 
-  // TODO שלב 3: פרסו ל-JSON והחזירו
-  //   return JSON.parse(saved);
+  history.push(interaction);
+
+  // חלון גולש: אם יש יותר מדי הודעות, מוחקים את הישנות ביותר
+  if (history.length > MAX_HISTORY) {
+    history.shift();
+  }
+
+  localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(history));
+  console.log(`📝 היסטוריית AI עודכנה. סה״כ: ${history.length} אינטראקציות`);
 }
 
 
