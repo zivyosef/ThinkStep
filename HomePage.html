@@ -100,6 +100,76 @@ button:hover{
   line-height: 1.6;
 }
 
+.timeline-panel {
+  width: 90%;
+  max-width: 500px;
+  margin: 10px auto 24px;
+  padding: 20px;
+  background: #f8fbf8;
+  border-radius: 15px;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.timeline-panel h3 {
+  margin: 0 0 8px 0;
+  color: #1f2a24;
+}
+
+.timeline-panel p {
+  margin: 0 0 16px 0;
+  color: #4b5b53;
+  line-height: 1.5;
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr auto;
+  gap: 10px;
+  align-items: center;
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #d8e3dc;
+}
+
+.timeline-item strong {
+  color: #214235;
+}
+
+.timeline-item input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.timeline-item button {
+  width: auto;
+  margin-top: 0;
+  padding: 10px 12px;
+}
+
+.timeline-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.timeline-actions button {
+  flex: 1;
+}
+
+.timeline-empty {
+  color: #6d7f75;
+  text-align: center;
+  padding: 10px 0 2px;
+}
+
 .success{
   display: flex;
   justify-content: flex-end;
@@ -184,15 +254,117 @@ button:hover{
   <p id="out"></p>
   <p class="success">בהצלחה!</p>
 </div>
+
+<div class="timeline-panel">
+  <h3>לוח זמנים מותאם אישית</h3>
+  <p>המערכת בונה לך תוכנית לפי תאריך ההגשה, ואפשר לשנות כל שלב ידנית אם צריך יותר זמן או פחות.</p>
+  <div id="timeline-list" class="timeline-list">
+    <div class="timeline-empty">עדיין לא נבנה לוח זמנים.</div>
+  </div>
+  <div class="timeline-actions">
+    <button type="button" onclick="rebuildTimeline()">בנה לוח זמנים</button>
+    <button type="button" onclick="resetTimeline()">אפס שינויים</button>
+  </div>
+</div>
 </div>
 
 <script>
+const MILESTONES = [
+  { name: "הבנת המשימה ובחירת מבנה", percentFromStart: 0.10 },
+  { name: "בחירת מקורות", percentFromStart: 0.30 },
+  { name: "איסוף מקורות", percentFromStart: 0.50 },
+  { name: "כתיבת פסקה ראשונה", percentFromStart: 0.70 },
+  { name: "עריכה וסיכום", percentFromStart: 0.90 },
+  { name: "הגשה סופית", percentFromStart: 1.00 }
+];
+
+let currentTimeline = [];
+
 function show() {
   document.getElementById("out").innerHTML =
     "מקצוע: " + document.getElementById("subject").value + "   " +
     "נושא: " + document.getElementById("topic").value + "    " +
     "עמודים: " + document.getElementById("pages").value + " <br> " +
     "תאריך: " + document.getElementById("date").value;
+
+  rebuildTimeline();
+}
+
+function calculateBackwardTimeline(dueDate) {
+  const finalDate = new Date(dueDate);
+
+  if (Number.isNaN(finalDate.getTime())) {
+    return [];
+  }
+
+  const today = new Date();
+  const millisecondsPerDay = 1000 * 60 * 60 * 24;
+  const totalDays = Math.max(
+    0,
+    Math.round((finalDate - today) / millisecondsPerDay)
+  );
+
+  return MILESTONES.map((milestone) => {
+    const daysFromNow = Math.round(totalDays * milestone.percentFromStart);
+    const milestoneDate = new Date(today);
+    milestoneDate.setDate(today.getDate() + daysFromNow);
+
+    return {
+      milestone: milestone.name,
+      date: milestoneDate.toISOString().split("T")[0]
+    };
+  });
+}
+
+function rebuildTimeline() {
+  const dueDate = document.getElementById("date").value;
+  const timelineList = document.getElementById("timeline-list");
+
+  if (!dueDate) {
+    timelineList.innerHTML = '<div class="timeline-empty">צריך לבחור תאריך הגשה כדי לבנות תוכנית.</div>';
+    currentTimeline = [];
+    return;
+  }
+
+  currentTimeline = calculateBackwardTimeline(dueDate);
+
+  if (currentTimeline.length === 0) {
+    timelineList.innerHTML = '<div class="timeline-empty">לא הצלחנו לבנות לוח זמנים. בדוק את תאריך ההגשה.</div>';
+    return;
+  }
+
+  timelineList.innerHTML = currentTimeline.map((item, index) => `
+    <div class="timeline-item">
+      <strong>${item.milestone}</strong>
+      <input type="date" value="${item.date}" aria-label="${item.milestone}">
+      <button type="button" onclick="updateMilestoneDate(${index}, this.previousElementSibling.value)">שמור</button>
+    </div>
+  `).join("");
+}
+
+function updateMilestoneDate(index, newDate) {
+  if (!currentTimeline[index]) {
+    return;
+  }
+
+  currentTimeline[index].date = newDate;
+  renderSavedSummary();
+}
+
+function renderSavedSummary() {
+  const timelineList = document.getElementById("timeline-list");
+
+  timelineList.innerHTML = currentTimeline.map((item, index) => `
+    <div class="timeline-item">
+      <strong>${item.milestone}</strong>
+      <input type="date" value="${item.date}" aria-label="${item.milestone}">
+      <button type="button" onclick="updateMilestoneDate(${index}, this.previousElementSibling.value)">שמור</button>
+    </div>
+  `).join("");
+}
+
+function resetTimeline() {
+  rebuildTimeline();
 }
 </script>
 

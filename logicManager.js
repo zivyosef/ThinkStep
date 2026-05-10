@@ -251,14 +251,11 @@ function analyzeActionability(taskText) {
     return false;
   }
 
+  if (!normalizedText.includes(" ")) {
+    return false;
+  }
+
   return score >= 5;
-if (!normalizedText.includes(" ")) {
-  return {
-    valid: false,
-    reason: "no_spaces",
-    message: "נראה שהטקסט נכתב בלי רווחים. נסה לכתוב אותו בצורה ברורה."
-  };
-}
 }
 
 
@@ -287,122 +284,149 @@ if (!normalizedText.includes(" ")) {
  *   צוות A קורא לה כשהמשתמש לוחץ "בדוק משימה"
  */
 async function handleTaskValidation(taskId, taskText) {
+  const normalizedTaskText = typeof taskText === "string" ? taskText.trim() : "";
+  const isActionable = analyzeActionability(normalizedTaskText);
 
-  // TODO שלב 1: קראו ל-analyzeActionability וקבלו את הציון
-  //   const analysis = analyzeActionability(taskText);
+  let analysis;
+  if (isActionable === true) {
+    analysis = {
+      score: "green",
+      label: "ממוקד ובר ביצוע"
+    };
+  } else {
+    analysis = {
+      score: "red",
+      label: "רחב מדי"
+    };
+  }
 
-  // TODO שלב 2: אם הציון הוא "red" — בקשו עזרה מצוות D
-  //   if (analysis.score === "red") {
-  //     const aiSuggestion = await aiService.sendQuery("SUGGEST_IMPROVEMENT", {
-  //       taskText: taskText,
-  //       reason:   analysis.label
-  //     });
-  //   }
+  let aiSuggestion = null;
 
-  // TODO שלב 3: בנו אובייקט תוצאה מסודר וחזירו אותו
-  //   return {
-  //     taskId:       taskId,
-  //     score:        analysis.score,
-  //     label:        analysis.label,
-  //     aiSuggestion: aiSuggestion || null   // null אם לא היה צריך AI
-  //   };
+  if (analysis.score === "red") {
+    try {
+      aiSuggestion = await aiService.sendQuery("SUGGEST_IMPROVEMENT", {
+        taskText: normalizedTaskText,
+        reason: analysis.label
+      });
+    } catch (error) {
+      console.error("שגיאה בקבלת הצעת שיפור מה-AI:", error);
+      aiSuggestion = null;
+    }
+  }
+
+  return {
+    taskId: taskId,
+    score: analysis.score,
+    label: analysis.label,
+    aiSuggestion: aiSuggestion || null
+  };
 }
 
 
 // ============================================================
 //  פונקציה 4: calculateBackwardTimeline
 // ============================================================
-/**
- * מה היא עושה?
- * -------------
- * מחשבת לוח זמנים "לאחור" — מתאריך ההגשה לאחור.
- * למשל: "אם ההגשה ב-1 ביוני, עד מתי צריך לסיים את המחקר?"
- * זו פונקציה שלא צריכה AI — רק חישוב תאריכים.
- *
- * קלט:
- *   dueDate (Date) — תאריך ההגשה הסופי
- *
- * פלט צפוי (array):
- *   [
- *     { milestone: "הבנת המשימה",   date: "2025-05-01" },
- *     { milestone: "איסוף מקורות", date: "2025-05-08" },
- *     { milestone: "כתיבת טיוטה",  date: "2025-05-20" },
- *     { milestone: "עריכה סופית",  date: "2025-05-28" }
- *   ]
- *
- * מי קורא לה?
- *   צוות A קורא לה כשהמשתמש לוחץ "בנה לוח זמנים"
- */
+
 function calculateBackwardTimeline(dueDate) {
+  const finalDate = dueDate instanceof Date ? new Date(dueDate.getTime()) : new Date(dueDate);
 
-  // TODO שלב 1: חשבו כמה ימים נשארו מהיום עד ההגשה
-  // דוגמה:
-  //   const today     = new Date();
-  //   const totalDays = Math.round((dueDate - today) / (1000 * 60 * 60 * 24));
+  if (Number.isNaN(finalDate.getTime())) {
+    handleError("תאריך ההגשה אינו תקין.");
+    return [];
+  }
 
-  // TODO שלב 2: הגדירו את אבני הדרך לפי אחוזים מהזמן הכולל
-  // דוגמה: מחקר = 20% ראשונים, כתיבה = 50% הבאים, עריכה = 30% הנותרים
-  //   const milestones = [
-  //     { name: "הבנת המשימה ובחירת מבנה", percentFromStart: 0.10 },
-  //     { name: "איסוף מקורות",             percentFromStart: 0.30 },
-  //     { name: "כתיבת טיוטה ראשונה",       percentFromStart: 0.70 },
-  //     { name: "עריכה וסיכום",             percentFromStart: 0.90 },
-  //     { name: "הגשה סופית",              percentFromStart: 1.00 },
-  //   ];
+  const today = new Date();
+  const millisecondsPerDay = 1000 * 60 * 60 * 24;
+  const totalDays = Math.round((finalDate - today) / millisecondsPerDay);
 
-  // TODO שלב 3: לכל אבן דרך — חשבו את התאריך המדויק
-  // דוגמה:
-  //   const timeline = milestones.map(m => {
-  //     const daysFromNow    = Math.round(totalDays * m.percentFromStart);
-  //     const milestoneDate  = new Date(today);
-  //     milestoneDate.setDate(today.getDate() + daysFromNow);
-  //
-  //     return {
-  //       milestone: m.name,
-  //       date:      milestoneDate.toISOString().split("T")[0]  // פורמט YYYY-MM-DD
-  //     };
-  //   });
+  if (totalDays < 0) {
+    handleError("תאריך ההגשה כבר עבר.");
+    return [];
+  }
 
-  // TODO שלב 4: החזירו את המערך
-  //   return timeline;
+  const milestones = [
+    { name: "הבנת המשימה ובחירת מבנה", percentFromStart: 0.10 },
+    { name: "בחירת מקורות", percentFromStart: 0.30 },
+    { name: "איסוף מקורות", percentFromStart: 0.50 },
+    { name: "כתיבת פסקה ראשונה", percentFromStart: 0.70 },
+    { name: "עריכה וסיכום", percentFromStart: 0.90 },
+    { name: "הגשה סופית", percentFromStart: 1.00 }
+  ];
+
+  const timeline = milestones.map((milestone) => {
+    const daysFromNow = Math.round(totalDays * milestone.percentFromStart);
+    const milestoneDate = new Date(today);
+    milestoneDate.setDate(today.getDate() + daysFromNow);
+
+    return {
+      milestone: milestone.name,
+      date: milestoneDate.toISOString().split("T")[0]
+    };
+  });
+
+  return timeline;
+}
+
+function normalizeTimelineDate(dateValue) {
+  const parsedDate = dateValue instanceof Date ? new Date(dateValue.getTime()) : new Date(dateValue);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return parsedDate.toISOString().split("T")[0];
+}
+
+function updateTimelineMilestone(timeline, milestoneIndex, newDate) {
+  if (!Array.isArray(timeline)) {
+    return [];
+  }
+
+  const normalizedDate = normalizeTimelineDate(newDate);
+  if (!normalizedDate || milestoneIndex < 0 || milestoneIndex >= timeline.length) {
+    return timeline;
+  }
+
+  return timeline.map((milestone, index) => {
+    if (index !== milestoneIndex) {
+      return milestone;
+    }
+
+    return {
+      ...milestone,
+      date: normalizedDate
+    };
+  });
+}
+
+function createEditableTimelinePlan(dueDate) {
+  return calculateBackwardTimeline(dueDate).map((milestone) => ({
+    ...milestone,
+    editable: true
+  }));
 }
 
 
-// ============================================================
-//  פונקציה 5: requestAIAngles
-// ============================================================
-/**
- * מה היא עושה?
- * -------------
- * מבקשת מצוות D "זוויות מחקר" — דרכים שונות לגשת לנושא.
- * למשל, עבור "המהפכה הצרפתית": זווית כלכלית, חברתית, פוליטית.
- *
- * קלט:
- *   topic (string) — נושא המשימה הגדולה
- *
- * פלט צפוי (array):
- *   [
- *     { angle: "כלכלי",  description: "בדוק את המשבר הכלכלי שקדם..." },
- *     { angle: "חברתי",  description: "בחן את אי-השוויון בחברה..." },
- *     { angle: "פוליטי", description: "ניתח את כישלון המלוכה..." }
- *   ]
- *
- * מי קורא לה?
- *   צוות A קורא לה כשהמשתמש לוחץ "קבל זוויות חשיבה"
- */
 async function requestAIAngles(topic) {
+  const normalizedTopic = typeof topic === "string" ? topic.trim() : "";
 
-  // TODO שלב 1: שלחו בקשה לצוות D עם הנושא
-  //   const result = await aiService.sendQuery("GET_ANGLES", topic);
+  if (!normalizedTopic) {
+    return [];
+  }
 
-  // TODO שלב 2: וודאו שקיבלתם מערך עם 3 זוויות לפחות
-  //   if (!result || !Array.isArray(result) || result.length === 0) {
-  //     console.error("צוות D לא החזיר זוויות — בדקו את aiService.js");
-  //     return [];
-  //   }
+  try {
+    const result = await aiService.sendQuery("GET_ANGLES", normalizedTopic);
 
-  // TODO שלב 3: החזירו את התוצאה
-  //   return result;
+    if (!result || !Array.isArray(result) || result.length === 0) {
+      console.error("צוות D לא החזיר זוויות — בדקו את aiService.js");
+      return [];
+    }
+
+    return result;
+  } catch (error) {
+    console.error("שגיאה בקבלת זוויות חשיבה מה-AI:", error);
+    return [];
+  }
 }
 
 
@@ -424,15 +448,13 @@ async function requestAIAngles(topic) {
  *   כל פונקציה שמשנה את ה-state — כמו initProject
  */
 function syncStateToStorage(state) {
-
-  // TODO שלב 1: המירו את האובייקט למחרוזת JSON ושמרו
-  // localStorage יכול לשמור רק מחרוזות טקסט, לכן צריך JSON.stringify
-  // דוגמה:
-  //   const stateAsText = JSON.stringify(state);
-  //   localStorage.setItem(STORAGE_KEY, stateAsText);
-
-  // TODO שלב 2: הדפיסו הודעה ל-console כדי לדעת שהשמירה הצליחה
-  //   console.log("✅ State נשמר בהצלחה:", state);
+  try {
+    const stateAsText = JSON.stringify(state);
+    localStorage.setItem(STORAGE_KEY, stateAsText);
+    console.log("✅ State נשמר בהצלחה:", state);
+  } catch (error) {
+    console.error("שגיאה בשמירת state ל-localStorage:", error);
+  }
 }
 
 
@@ -451,15 +473,16 @@ function syncStateToStorage(state) {
  *   צוות A קורא לה כשהדף נטען (בתוך main.js)
  */
 function loadStateFromStorage() {
+  try {
+    const savedText = localStorage.getItem(STORAGE_KEY);
 
-  // TODO שלב 1: קראו את המידע מ-localStorage
-  //   const savedText = localStorage.getItem(STORAGE_KEY);
+    if (!savedText) return null;
 
-  // TODO שלב 2: אם אין כלום — החזירו null
-  //   if (!savedText) return null;
-
-  // TODO שלב 3: המירו את המחרוזת חזרה לאובייקט והחזירו
-  //   return JSON.parse(savedText);
+    return JSON.parse(savedText);
+  } catch (error) {
+    console.error("שגיאה בטעינת state מ-localStorage:", error);
+    return null;
+  }
 }
 
 
@@ -476,6 +499,9 @@ const logicManager = {
   analyzeActionability,
   handleTaskValidation,
   calculateBackwardTimeline,
+  createEditableTimelinePlan,
+  updateTimelineMilestone,
+  normalizeTimelineDate,
   requestAIAngles,
   syncStateToStorage,
   loadStateFromStorage,

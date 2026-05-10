@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>דמו analyzeActionability</title>
+  <style>
+    :root {
+      --bg1: #f5f2ec;
+      --bg2: #e6f0ea;
+      --card: rgba(255, 255, 255, 0.9);
+      --text: #18231c;
+      --muted: #63736a;
+      --accent: #2c6e55;
+      --accent-2: #1d3c2f;
+      --border: #d5e0d8;
+      --shadow: 0 18px 42px rgba(18, 34, 27, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, rgba(44, 110, 85, 0.12), transparent 30%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .wrap {
+      width: min(1100px, calc(100% - 32px));
+      margin: 24px auto;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid rgba(213, 224, 216, 0.95);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      backdrop-filter: blur(10px);
+    }
+
+    h1, h2 {
+      margin: 0 0 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+      color: var(--accent-2);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      resize: vertical;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      font-size: 15px;
+      font-family: inherit;
+      line-height: 1.6;
+      background: white;
+      color: var(--text);
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: rgba(44, 110, 85, 0.6);
+      box-shadow: 0 0 0 4px rgba(44, 110, 85, 0.12);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 10px 24px rgba(44, 110, 85, 0.18);
+    }
+
+    .ghost {
+      background: #edf3ef;
+      color: var(--accent-2);
+    }
+
+    .result {
+      display: grid;
+      gap: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .badge.green {
+      background: rgba(44, 110, 85, 0.12);
+      color: var(--accent-2);
+    }
+
+    .badge.red {
+      background: rgba(177, 63, 63, 0.12);
+      color: #8b2222;
+    }
+
+    .meta {
+      display: grid;
+      gap: 8px;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .samples {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .sample {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .sample strong {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .sample button {
+      white-space: nowrap;
+    }
+
+    .out {
+      padding: 14px;
+      border-radius: 16px;
+      background: #0f1f19;
+      color: #d9f0e4;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 180px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 920px) {
+      .wrap { grid-template-columns: 1fr; }
+      .sample { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="panel">
+      <h1>דמו analyzeActionability</h1>
+      <p class="subtitle">מדביקים משימה, לוחצים בדיקה, ורואים אם הטקסט נחשב ממוקד או רחב מדי לפי <b>logicManager.js</b>.</p>
+
+      <label for="taskText">טקסט המשימה</label>
+      <textarea id="taskText" placeholder="לדוגמה: לכתוב פסקה אחת על הסיבות למהפכה הצרפתית"></textarea>
+
+      <div class="actions">
+        <button class="primary" type="button" onclick="runCheck()">בדוק משימה</button>
+        <button class="ghost" type="button" onclick="clearInput()">נקה</button>
+      </div>
+
+      <div class="samples">
+        <div class="sample">
+          <strong>דוגמה טובה: "לארגן רשימה של שלוש פסקאות עם מקורות ודוגמה אחת על המהפכה הצרפתית"</strong>
+          <button class="ghost" type="button" onclick="useSample('לארגן רשימה של שלוש פסקאות עם מקורות ודוגמה אחת על המהפכה הצרפתית')">טען</button>
+        </div>
+        <div class="sample">
+          <strong>דוגמה רחבה: "לסיים את כל העבודה"</strong>
+          <button class="ghost" type="button" onclick="useSample('לסיים את כל העבודה')">טען</button>
+        </div>
+        <div class="sample">
+          <strong>דוגמה לא טובה: "abcxyz"</strong>
+          <button class="ghost" type="button" onclick="useSample('abcxyz')">טען</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>תוצאה</h2>
+      <div id="resultBadge" class="badge green">מוכן לבדיקה</div>
+      <div class="meta" id="resultMeta">
+        <div>כאן יוצגו התוצאה, הניקוד והסיבה אם יש.</div>
+      </div>
+      <div id="rawOutput" class="out">אין עדיין פלט.</div>
+    </section>
+  </div>
+
+  <script src="logicManager.js"></script>
+  <script>
+    function useSample(text) {
+      document.getElementById('taskText').value = text;
+      runCheck();
+    }
+
+    function clearInput() {
+      document.getElementById('taskText').value = '';
+      document.getElementById('resultBadge').className = 'badge green';
+      document.getElementById('resultBadge').textContent = 'מוכן לבדיקה';
+      document.getElementById('resultMeta').innerHTML = '<div>כאן יוצגו התוצאה, הניקוד והסיבה אם יש.</div>';
+      document.getElementById('rawOutput').textContent = 'אין עדיין פלט.';
+    }
+
+    function runCheck() {
+      const text = document.getElementById('taskText').value;
+      const result = analyzeActionability(text);
+      const badge = document.getElementById('resultBadge');
+      const meta = document.getElementById('resultMeta');
+      const raw = document.getElementById('rawOutput');
+
+      const summary = result
+        ? 'הטקסט נראה ממוקד ובר ביצוע.'
+        : 'הטקסט נראה רחב מדי או לא ממוקד.';
+
+      badge.className = result ? 'badge green' : 'badge red';
+      badge.textContent = result ? 'PASS' : 'FAIL';
+
+      meta.innerHTML = `
+        <div><b>סיכום:</b> ${summary}</div>
+        <div><b>הקלט:</b> ${text || '(ריק)'}</div>
+      `;
+
+      raw.textContent = JSON.stringify({
+        input: text,
+        output: result
+      }, null, 2);
+    }
+  </script>
+</body>
+</html>

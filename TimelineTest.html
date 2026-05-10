@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>בדיקת לוח זמנים</title>
+  <style>
+    :root {
+      --bg1: #f6f4ee;
+      --bg2: #e7efe9;
+      --card: #ffffff;
+      --text: #1f2a24;
+      --muted: #607067;
+      --accent: #2f6f57;
+      --accent-2: #214235;
+      --border: #d6e1d9;
+      --shadow: 0 16px 40px rgba(22, 38, 31, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: radial-gradient(circle at top, rgba(47, 111, 87, 0.12), transparent 32%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: var(--text);
+    }
+
+    .shell {
+      width: min(1100px, calc(100% - 32px));
+      margin: 24px auto;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 360px 1fr;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(214, 225, 217, 0.9);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 0 0 20px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+      color: var(--accent-2);
+    }
+
+    .field {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .field:focus {
+      outline: none;
+      border-color: rgba(47, 111, 87, 0.6);
+      box-shadow: 0 0 0 4px rgba(47, 111, 87, 0.12);
+    }
+
+    .row {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 10px 24px rgba(47, 111, 87, 0.2);
+    }
+
+    .ghost {
+      background: #edf3ef;
+      color: var(--accent-2);
+    }
+
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .timeline-header h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .pill {
+      background: rgba(47, 111, 87, 0.12);
+      color: var(--accent-2);
+      border: 1px solid rgba(47, 111, 87, 0.14);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .timeline-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr auto;
+      gap: 10px;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .item strong {
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .item input[type="date"] {
+      width: 100%;
+    }
+
+    .mini {
+      padding: 10px 12px;
+      background: #12261f;
+      color: #fff;
+    }
+
+    .empty {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.66);
+    }
+
+    @media (max-width: 900px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .item {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="panel">
+      <h1>בדיקת לוח זמנים</h1>
+
+      <div class="row">
+        <div>
+          <label for="dueDate">תאריך הגשה</label>
+          <input class="field" id="dueDate" type="date">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="button" onclick="buildPlan()">בנה תוכנית</button>
+        <button class="ghost" type="button" onclick="resetPlan()">אפס</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="timeline-header">
+        <h2>תוכנית עבודה</h2>
+        <span id="planMeta" class="pill">0 שלבים</span>
+      </div>
+      <div id="timelineList" class="timeline-list">
+        <div class="empty">אין תוכנית להצגה עדיין.</div>
+      </div>
+    </section>
+  </div>
+
+  <script src="logicManager.js"></script>
+  <script>
+    let currentPlan = [];
+
+    function getDueDateValue() {
+      return document.getElementById("dueDate").value;
+    }
+
+    function renderPlan(plan) {
+      const list = document.getElementById("timelineList");
+      const planMeta = document.getElementById("planMeta");
+
+      planMeta.textContent = `${plan.length} שלבים`;
+
+      if (!plan.length) {
+        list.innerHTML = '<div class="empty">לא נבנתה תוכנית תקינה.</div>';
+        return;
+      }
+
+      list.innerHTML = plan.map((item, index) => `
+        <div class="item">
+          <input class="field" type="text" value="${item.milestone}" aria-label="${item.milestone} שם">
+          <input class="field" type="date" value="${item.date}" aria-label="${item.milestone}">
+          <button class="mini" type="button" onclick="saveMilestone(${index}, this.previousElementSibling.previousElementSibling.value, this.previousElementSibling.value)">שמור</button>
+        </div>
+      `).join("");
+    }
+
+    function buildPlan() {
+      const dueDate = getDueDateValue();
+
+      if (!dueDate) {
+        currentPlan = [];
+        renderPlan(currentPlan);
+        return;
+      }
+
+      currentPlan = createEditableTimelinePlan(dueDate);
+
+      renderPlan(currentPlan);
+    }
+
+    function saveMilestone(index, newMilestone, newDate) {
+      currentPlan = currentPlan.map((item, itemIndex) => {
+        if (itemIndex !== index) {
+          return item;
+        }
+
+        return {
+          ...item,
+          milestone: newMilestone,
+          date: normalizeTimelineDate(newDate) || item.date
+        };
+      });
+
+      renderPlan(currentPlan);
+    }
+
+    function resetPlan() {
+      currentPlan = [];
+      document.getElementById("dueDate").value = "";
+      renderPlan(currentPlan);
+    }
+  </script>
+</body>
+</html>
