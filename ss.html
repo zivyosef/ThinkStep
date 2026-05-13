@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #070b16;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 24px;
+            direction: rtl;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 22px;
+            margin-bottom: 28px;
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 14px;
+            background-image: url("logo_progect.jpeg");
+            background-size: cover;
+            background-position: center;
+        }
+
+        nav {
+            display: flex;
+            gap: 18px;
+        }
+
+        nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+        }
+
+        .cta-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 14px;
+            cursor: pointer;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 28px;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .hero-text {
+            padding: 28px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 28px;
+        }
+
+        .hero-text h1 {
+            font-size: 3rem;
+            margin-bottom: 18px;
+        }
+
+        .cards {
+            display: flex;
+            gap: 18px;
+            margin-top: 24px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.04);
+            border-radius: 22px;
+            padding: 24px;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .hero-graphic {
+            min-height: 360px;
+            padding: 24px;
+            border-radius: 28px;
+            background: linear-gradient(180deg, rgba(30,41,59,0.95), rgba(15,23,42,0.85));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-illustration {
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .screen {
+            width: 100%;
+            height: 260px;
+            background: rgba(243,244,246,0.08);
+            border-radius: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .urgent-task-box {
+            width: 100%;
+            height: 100%;
+            border-radius: 22px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(148,163,184,0.18);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .urgent-title {
+            color: #ef4444;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .urgent-name {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .urgent-date {
+            color: #cbd5e1;
+            font-size: 1rem;
+        }
+
+        .urgent-time {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        .new-task-section {
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .new-task-btn {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 18px;
+            font-size: 1.05rem;
+            cursor: pointer;
+        }
+
+        .recent {
+            background: rgba(255,255,255,0.03);
+            border-radius: 28px;
+            padding: 24px;
+        }
+
+        .recent-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .recent-table th,
+        .recent-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(148,163,184,0.12);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.65);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: rgba(23,37,84,0.95);
+            border-radius: 28px;
+            padding: 20px;
+            width: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-submit,
+        .modal-cancel {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .modal-submit {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <header>
+
+        <div class="logo"></div>
+
+        <nav>
+            <a href="HomePage.html">דף עבודה</a>
+            <a href="RecuresiveDecomposition.html">התקדמות</a>
+            <a href="search.html">חיפוש</a>
+            <a href="profile.html">פרופיל</a>
+            <a href="about.html">אודות</a>
+        </nav>
+
+        <button class="cta-button">
+            התחברות
+        </button>
+
+    </header>
+
+    <section class="hero">
+
+        <div class="hero-text">
+
+            <h1>ברוך הבא!</h1>
+
+            <p>
+                מה תרצה לעשות היום?
+            </p>
+
+            <div class="cards">
+
+                <div class="card">
+                    🔍 חיפוש
+                </div>
+
+                <div class="card">
+                    🏁 התקדמות
+                </div>
+
+                <div class="card">
+                    📋 דף עבודה
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="hero-graphic">
+
+            <div class="hero-illustration">
+
+                <div class="screen">
+
+                    <div class="urgent-task-box">
+
+                        <div class="urgent-title">
+                            המשימה הקרובה ביותר
+                        </div>
+
+                        <div class="urgent-name" id="urgentName">
+                            אין משימות
+                        </div>
+
+                        <div class="urgent-date" id="urgentDate"></div>
+
+                        <div class="urgent-time" id="urgentTime"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <div class="new-task-section">
+
+        <button class="new-task-btn" onclick="openNewTaskModal()">
+            + משימה חדשה
+        </button>
+
+    </div>
+
+    <div id="taskModal" class="modal">
+
+        <div class="modal-content">
+
+            <form onsubmit="handleNewTask(event)">
+
+                <div class="form-group">
+                    <input type="text" id="taskTitle" placeholder="נושא העבודה">
+                </div>
+
+                <div class="form-group">
+                    <input type="date" id="taskDate">
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="submit" class="modal-submit">
+                        הוסף
+                    </button>
+
+                    <button type="button" class="modal-cancel" onclick="closeNewTaskModal()">
+                        ביטול
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <section class="recent">
+
+        <table class="recent-table">
+
+            <thead>
+
+                <tr>
+                    <th>משימה</th>
+                    <th>סטטוס</th>
+                    <th>תאריך</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            </tbody>
+
+        </table>
+
+    </section>
+
+</div>
+
+<script>
+
+    function openNewTaskModal() {
+
+        document.getElementById('taskModal').classList.add('show');
+
+    }
+
+    function closeNewTaskModal() {
+
+        document.getElementById('taskModal').classList.remove('show');
+
+    }
+
+    function handleNewTask(event) {
+
+        event.preventDefault();
+
+        const title =
+            document.getElementById('taskTitle').value;
+
+        const date =
+            document.getElementById('taskDate').value;
+
+        const tbody =
+            document.querySelector('.recent-table tbody');
+
+        const row =
+            document.createElement('tr');
+
+        row.innerHTML = `
+            <td>${title}</td>
+            <td>בתהליך</td>
+            <td>${date}</td>
+        `;
+
+        tbody.appendChild(row);
+
+        updateUrgentTask();
+
+        closeNewTaskModal();
+
+    }
+
+    function updateUrgentTask() {
+
+        const rows =
+            document.querySelectorAll('.recent-table tbody tr');
+
+        let closestTask = null;
+
+        let closestDate = null;
+
+        rows.forEach(row => {
+
+            const dateText =
+                row.cells[2].textContent.trim();
+
+            const date =
+                new Date(dateText);
+
+            if (!isNaN(date) &&
+                (!closestDate || date < closestDate)) {
+
+                closestDate = date;
+
+                closestTask = {
+
+                    title:
+                        row.cells[0].textContent,
+
+                    date:
+                        dateText
+                };
+            }
+
+        });
+
+        if (closestTask) {
+
+            const today = new Date();
+
+            today.setHours(0,0,0,0);
+
+            const diffTime =
+                closestDate - today;
+
+            const diffDays =
+                Math.ceil(diffTime / (1000*60*60*24));
+
+            document.getElementById('urgentName').textContent =
+                closestTask.title;
+
+            document.getElementById('urgentDate').textContent =
+                'מועד הגשה: ' + closestTask.date;
+
+            if (diffDays > 0) {
+
+                document.getElementById('urgentTime').textContent =
+                    'נשארו ' + diffDays + ' ימים';
+
+            }
+
+            else if (diffDays === 0) {
+
+                document.getElementById('urgentTime').textContent =
+                    'ההגשה היום';
+
+            }
+
+            else {
+
+                document.getElementById('urgentTime').textContent =
+                    'זמן ההגשה עבר';
+
+            }
+
+        }
+
+    }
+
+</script>
+
+</body>
+</html>

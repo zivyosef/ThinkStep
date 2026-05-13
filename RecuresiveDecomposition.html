@@ -3,178 +3,611 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>התקדמות</title>
     
 <style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #070b16;
+    color: #e2e8f0;
     min-height: 100vh;
-    margin: 0;
-    background: linear-gradient(135deg, #0e3c72 0%, #2a9d8f 100%);
-    color: #0f2a44;
-    font-family: Arial, sans-serif;
+    padding: 24px;
+    direction: rtl;
 }
 
-#part1 {
-    width: 520px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 24px;
-    padding: 30px 32px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-    text-align: center;
-
+.page {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-input[type="text"],
-input[type="number"] {
-    width: 100%;
-    max-width: 100%;
-    padding: 12px 14px;
-    margin: 10px 0;
-    border: 1px solid #a8d0e6;
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 22px;
+    margin-bottom: 28px;
+    box-shadow: 0 24px 60px rgba(7, 11, 22, 0.32);
+}
+
+.logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+nav {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 10px 14px;
     border-radius: 12px;
-    background: #f4fbff;
-    font-size: 16px;
-    box-sizing: border-box;
+    transition: background 0.25s ease;
 }
 
-button {
-    padding: 12px 22px;
-    background-color: #2a9d8f;
+nav a:hover, nav a.active {
+    background: rgba(148, 163, 184, 0.14);
+    color: #fff;
+}
+
+.cta-button {
+    background: #2563eb;
     color: white;
     border: none;
-    border-radius: 999px;
+    padding: 12px 20px;
+    border-radius: 14px;
     cursor: pointer;
-    font-size: 15px;
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-button:hover {
-    transform: translateY(-2px);
-    background-color: #227c6f;
-}
-
-#quality_meter {
-    margin: 24px 0 10px;
-    padding: 18px 16px;
-    background: #e9f7f6;
-    border: 1px solid #bbe1df;
-    border-radius: 18px;
-}
-
-#quality_meter p,
-#quality_meter label {
-    margin: 12px 0 6px;
-    display: block;
     font-weight: 600;
+    transition: transform 0.2s ease, background 0.2s ease;
 }
 
-#score_bar_wrapper {
-    width: 100%;
-    height: 12px;
-    background: #d8edf0;
-    border-radius: 999px;
+.cta-button:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+/* ============ סקשן התקדמות ============ */
+.progress-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 28px;
+    padding: 28px;
+    margin-bottom: 28px;
+    box-shadow: 0 24px 60px rgba(7, 11, 22, 0.18);
+}
+
+.progress-section h2 {
+    font-size: 1.6rem;
+    color: #f8fafc;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.progress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.progress-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 22px;
+    padding: 24px;
+    transition: all 0.3s ease;
+}
+
+.progress-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(59, 130, 246, 0.35);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.progress-card-title {
+    color: #cbd5e1;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* ===== מטרות שבועיות ===== */
+.goals-input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.goals-input-group input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+    font-size: 0.9rem;
+}
+
+.goals-input-group button {
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.goals-input-group button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.goals-list {
+    max-height: 280px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.goal-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.goal-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.goal-text {
+    flex: 1;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+}
+
+.goal-item.completed .goal-text {
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+.goal-delete {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.goal-delete:hover {
+    color: #fca5a5;
+}
+
+.progress-bar-container {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
     overflow: hidden;
-    margin-top: 14px;
+    height: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
 }
 
-#score_bar {
+.progress-bar {
     height: 100%;
-    width: 50%;
-    border-radius: 999px;
-    transition: width 0.3s ease, background 0.3s ease;
-    background: linear-gradient(90deg, #2a9d8f, #1d6f63);
-}
-
-#score_label {
-    margin-top: 12px;
-    font-size: 16px;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.7rem;
     font-weight: 700;
-    color: #0f2a44;
 }
 
-#prompt_output {
-    margin-top: 50px;
-    background: #f1fcfb;
-    border: 1px solid #b5e5db;
+.progress-percentage {
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* ===== גרף פעילות ===== */
+.chart-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 160px;
+    margin-bottom: 16px;
+}
+
+.chart-bar {
+    flex: 1;
+    background: linear-gradient(180deg, #2563eb, #3b82f6);
+    border-radius: 8px 8px 0 0;
+    min-height: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: growUp 0.5s ease-out;
+}
+
+@keyframes growUp {
+    from {
+        height: 0;
+    }
+    to {
+        height: var(--height);
+    }
+}
+
+.chart-bar:hover {
+    background: linear-gradient(180deg, #1d4ed8, #2563eb);
+    filter: brightness(1.2);
+}
+
+.chart-bar-label {
+    position: absolute;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #94a3b8;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.chart-bar-value {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #cbd5e1;
+    font-size: 0.8rem;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.chart-bar:hover .chart-bar-value {
+    opacity: 1;
+}
+
+/* ===== טיפ יומי ===== */
+.tip-content {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(124, 58, 237, 0.15));
+    border: 1px solid rgba(37, 99, 235, 0.25);
     border-radius: 16px;
-    padding: 14px 16px;
-    text-align: right;
-    white-space: pre-wrap;
-    color: #0f2a44;
+    padding: 20px;
+    margin-bottom: 16px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    animation: fadeInTip 0.5s ease;
 }
 
+@keyframes fadeInTip {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.tip-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+.tip-text {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.tip-button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.tip-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+@media (max-width: 700px) {
+    body {
+        padding: 16px;
+    }
+
+    .progress-section {
+        padding: 18px;
+    }
+
+    .progress-grid {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 
 </head>
 <body>
-   
-   <div id="part1">
-<h1>חלק ראשון</h1>
-<input id="topic" type="text" placeholder="נושא העבודה">
+    <div class="page">
+        <header>
+            <div class="logo">📊</div>
+            <nav>
+                <a href="HomePage.html">דף עבודה</a>
+                <a href="RecuresiveDecomposition.html" class="active">התקדמות</a>
+                <a href="search.html">חיפוש</a>
+                <a href="profile.html">פרופיל</a>
+                <a href="test.html">בית</a>
+            </nav>
+            <button class="cta-button">התחברות</button>
+        </header>
 
-<br>
+        <!-- === סקשן התקדמות === -->
+        <section class="progress-section">
+            <h2>📊 התקדמות שלך</h2>
+            
+            <div class="progress-grid">
+                <!-- מטרות שבועיות -->
+                <div class="progress-card">
+                    <div class="progress-card-title">🎯 מטרות שבועיות</div>
+                    <div class="goals-input-group">
+                        <input type="text" id="goalInput" placeholder="הוסף מטרה חדשה..." />
+                        <button onclick="addWeeklyGoal()">הוסף</button>
+                    </div>
+                    <div class="goals-list" id="goalsList"></div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="goalsProgressBar" style="width: 0%">0%</div>
+                    </div>
+                    <div class="progress-percentage" id="goalsPercentage">0/0 משימות הושלמו</div>
+                </div>
 
-<input id="background" type="text" placeholder="רקע על העבודה">
+                <!-- גרף פעילות -->
+                <div class="progress-card">
+                    <div class="progress-card-title">📈 גרף פעילות</div>
+                    <div class="chart-container" id="activityChart"></div>
+                    <div class="progress-percentage" id="activityStats">לא יש נתונים עדיין</div>
+                </div>
 
-<div id="quality_meter">
+                <!-- טיפ יומי -->
+                <div class="progress-card">
+                    <div class="progress-card-title">💡 טיפ יומי</div>
+                    <div class="tip-content">
+                        <div class="tip-icon" id="tipIcon">💡</div>
+                        <div class="tip-text" id="tipText">טפל בתיקייה שלך...</div>
+                    </div>
+                    <button class="tip-button" onclick="getNewTip()">טיפ חדש</button>
+                </div>
+            </div>
+        </section>
+    </div>
 
-<p>כמה הרקע טוב</p>
-
-<div id="score_bar_wrapper">
-  <div id="score_bar"></div>
-</div>
-
-<p id="score_label">50%</p>
-
-<button type="button" onclick="updateQualityMeter()">הפעל מד איכות</button>
-
-<p>כמעט שם</p>
-
-</div>
-<button type="button" onclick="submitPrompt()">להפוך לפרומפט</button>
-
-<p>פרומט מתוקן:</p>
-<div id="prompt_output"></div>
-   </div>
 <script>
+// טיפים יומיים
+const dailyTips = [
+    { icon: '💡', text: 'ספח את המטרות שלך לחלקים קטנים יותר - זה יעזור לך להישאר מוטיבציה!' },
+    { icon: '🚀', text: 'התחל את היום שלך עם משימה קלה כדי לבנות תנופה!' },
+    { icon: '⏱️', text: 'השתמש בטכניקת Pomodoro: 25 דקות עבודה, 5 דקות הפסקה!' },
+    { icon: '🎯', text: 'דרג את המשימות שלך לפי חשיבות כדי להתמקד בחשובות ביותר!' },
+    { icon: '📝', text: 'תעד את ההתקדמות שלך - זה מעורר השראה וביטחון!' },
+    { icon: '🌟', text: 'אל תשכח לשמור על איזון בין עבודה להנאה!' },
+    { icon: '💪', text: 'כל יום קטן של התקדמות עדיף מאשר יום ללא פעולה!' },
+    { icon: '🔄', text: 'בדוק את ההתקדמות שלך בסוף כל יום וכוונן את המטרות שלך!' }
+];
 
-
-
-
-function updateQualityMeter() {
-  let topic = document.getElementById('topic').value.trim();
-  let background = document.getElementById('background').value.trim();
-  let score = 50;
-
-  if (!topic && !background) { score = 10;
-  } else {
-    if (topic) score += 15;
-    if (background) score += 15;
-    score += Math.min(20, Math.floor((topic.length + background.length) / 20));
-  }
-
-  score = Math.max(0, Math.min(100, score));
-  let scoreBar = document.getElementById('score_bar');
-  scoreBar.style.width = score + '%';
-  scoreBar.style.background = score < 33 ? '#e74c3c' : (score <= 66 ? '#f1c40f' : '#2ecc71');
-  document.getElementById('score_label').textContent = score + '%';
+// אתחול
+function initProgress() {
+    loadWeeklyGoals();
+    initActivityChart();
+    getNewTip();
 }
 
-function submitPrompt() {
-  let topic = document.getElementById('topic').value.trim();
-  let background = document.getElementById('background').value.trim();
-  if (!topic && !background) {
-    document.getElementById('prompt_output').textContent = 'יש להזין נושא ורקע כדי ליצור פרומפט.';
-    return;
-  }
-  let promptText = 'נושא העבודה: ' + (topic || 'לא הוזן') + '\n' +
-                   'רקע על העבודה: ' + (background || 'לא הוזן');
-  document.getElementById('prompt_output').textContent = promptText;
+// ===== מטרות שבועיות =====
+function addWeeklyGoal() {
+    const input = document.getElementById('goalInput');
+    const goalText = input.value.trim();
+
+    if (!goalText) {
+        alert('אנא כתוב מטרה');
+        return;
+    }
+
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const newGoal = {
+        id: Date.now(),
+        text: goalText,
+        completed: false,
+        createdAt: new Date().toISOString()
+    };
+
+    goals.push(newGoal);
+    localStorage.setItem('weeklyGoals', JSON.stringify(goals));
+    input.value = '';
+    renderGoals();
+    updateGoalsProgress();
 }
+
+function renderGoals() {
+    const goalsList = document.getElementById('goalsList');
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+
+    goalsList.innerHTML = '';
+    goals.forEach(goal => {
+        const goalItem = document.createElement('div');
+        goalItem.className = 'goal-item' + (goal.completed ? ' completed' : '');
+        goalItem.innerHTML = `
+            <input type="checkbox" ${goal.completed ? 'checked' : ''} onchange="toggleGoal(${goal.id})">
+            <div class="goal-text">${goal.text}</div>
+            <button class="goal-delete" onclick="deleteGoal(${goal.id})">✕</button>
+        `;
+        goalsList.appendChild(goalItem);
+    });
+}
+
+function toggleGoal(goalId) {
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const goal = goals.find(g => g.id === goalId);
+    if (goal) {
+        goal.completed = !goal.completed;
+        localStorage.setItem('weeklyGoals', JSON.stringify(goals));
+        renderGoals();
+        updateGoalsProgress();
+    }
+}
+
+function deleteGoal(goalId) {
+    let goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    goals = goals.filter(g => g.id !== goalId);
+    localStorage.setItem('weeklyGoals', JSON.stringify(goals));
+    renderGoals();
+    updateGoalsProgress();
+}
+
+function loadWeeklyGoals() {
+    renderGoals();
+    updateGoalsProgress();
+}
+
+function updateGoalsProgress() {
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const completed = goals.filter(g => g.completed).length;
+    const total = goals.length;
+    const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+    document.getElementById('goalsProgressBar').style.width = percentage + '%';
+    document.getElementById('goalsProgressBar').textContent = percentage + '%';
+    document.getElementById('goalsPercentage').textContent = `${completed}/${total} משימות הושלמו`;
+}
+
+// ===== גרף פעילות =====
+function initActivityChart() {
+    const chart = document.getElementById('activityChart');
+    const activityData = JSON.parse(localStorage.getItem('activityData') || '[]');
+
+    // אם אין נתונים, יוצר נתונים דמויים לכל 7 הימים
+    if (activityData.length === 0) {
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            activityData.push({
+                date: date.toISOString().split('T')[0],
+                count: Math.floor(Math.random() * 10)
+            });
+        }
+        localStorage.setItem('activityData', JSON.stringify(activityData));
+    }
+
+    chart.innerHTML = '';
+    const maxCount = Math.max(...activityData.map(d => d.count), 1);
+
+    activityData.slice(-7).forEach((data, index) => {
+        const bar = document.createElement('div');
+        const height = (data.count / maxCount) * 100;
+        const days = ['ראש', 'ש"ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
+
+        bar.className = 'chart-bar';
+        bar.style.setProperty('--height', height + '%');
+        bar.innerHTML = `
+            <div class="chart-bar-value">${data.count}</div>
+            <div class="chart-bar-label">${days[index]}</div>
+        `;
+        chart.appendChild(bar);
+    });
+
+    const totalActivity = activityData.reduce((sum, d) => sum + d.count, 0);
+    document.getElementById('activityStats').textContent = `סה"כ פעילות: ${totalActivity} משימות זה שבוע`;
+}
+
+function recordActivity() {
+    const activityData = JSON.parse(localStorage.getItem('activityData') || '[]');
+    const today = new Date().toISOString().split('T')[0];
+    let todayData = activityData.find(d => d.date === today);
+
+    if (!todayData) {
+        todayData = { date: today, count: 0 };
+        activityData.push(todayData);
+    }
+
+    todayData.count++;
+    localStorage.setItem('activityData', JSON.stringify(activityData));
+    initActivityChart();
+}
+
+// ===== טיפ יומי =====
+function getNewTip() {
+    const randomIndex = Math.floor(Math.random() * dailyTips.length);
+    const tip = dailyTips[randomIndex];
+
+    document.getElementById('tipIcon').textContent = tip.icon;
+    document.getElementById('tipText').textContent = tip.text;
+
+    localStorage.setItem('lastTipTime', new Date().toISOString());
+}
+
+// טעינת העמוד
+document.addEventListener('DOMContentLoaded', function() {
+    initProgress();
+    
+    // תיעוד פעילות בכל פעם שמשתמש מבצע פעולה
+    document.addEventListener('click', function() {
+        recordActivity();
+    }, { once: false });
+});
 </script>
 </body>
 </html>

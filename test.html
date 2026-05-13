@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #070b16;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 24px;
+            direction: rtl;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 22px;
+            margin-bottom: 28px;
+            box-shadow: 0 24px 60px rgba(7, 11, 22, 0.32);
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 90px;
+            height: 90px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            background-image: url("logo_progect.jpeg");
+            background-size: cover;
+            background-position: center;
+        }
+
+        nav {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 12px;
+            transition: background 0.25s ease;
+        }
+
+        nav a:hover {
+            background: rgba(148, 163, 184, 0.14);
+            color: #fff;
+        }
+
+        .cta-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 28px;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .hero-text {
+            padding: 28px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px rgba(7, 11, 22, 0.2);
+        }
+
+        .hero-text h1 {
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            line-height: 1.05;
+            margin-bottom: 18px;
+            color: #f8fafc;
+        }
+
+        .hero-text p {
+            color: #cbd5e1;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .hero-text small {
+            display: inline-block;
+            color: #94a3b8;
+            margin-bottom: 24px;
+        }
+
+        .hero-graphic {
+            min-height: 360px;
+            padding: 24px;
+            border-radius: 28px;
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.85));
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            display: grid;
+            place-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-graphic::before {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.16);
+            top: -40px;
+            left: -40px;
+        }
+
+        .hero-graphic::after {
+            content: '';
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.18);
+            bottom: -20px;
+            right: -20px;
+        }
+
+        .hero-illustration {
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+            height: 100%;
+            display: grid;
+            place-items: center;
+        }
+
+        .hero-illustration .screen {
+            width: 92%;
+            height: 64%;
+            background: rgba(243, 244, 246, 0.08);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            border-radius: 26px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .urgent-task-box {
+            width: 100%;
+            height: 100%;
+            border-radius: 22px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(148,163,184,0.18);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .urgent-title {
+            color: #ef4444;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .urgent-name {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .urgent-date {
+            color: #cbd5e1;
+            font-size: 1rem;
+        }
+
+        .urgent-time {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        .cards {
+            display: flex;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 22px;
+            padding: 24px;
+            flex: 1;
+            min-height: 175px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 16px;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(59, 130, 246, 0.35);
+        }
+
+        .card-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .card-title {
+            color: #f8fafc;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .card-description {
+            color: #94a3b8;
+            font-size: 0.98rem;
+            line-height: 1.6;
+        }
+
+        .recent {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(7, 11, 22, 0.18);
+        }
+
+        .recent-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .recent-header h2 {
+            font-size: 1.2rem;
+            color: #f8fafc;
+        }
+
+        .recent-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .recent-table th,
+        .recent-table td {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+        }
+
+        .recent-table th {
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.78rem;
+        }
+
+        .recent-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .recent-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .recent-cta {
+            background: rgba(37, 99, 235, 0.16);
+            color: #e2e8f0;
+            border: 1px solid rgba(37, 99, 235, 0.22);
+            border-radius: 14px;
+            padding: 12px 18px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .recent-cta:hover {
+            background: rgba(37, 99, 235, 0.28);
+        }
+
+        .new-task-section {
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .new-task-btn {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 18px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
+        }
+
+        .new-task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(37, 99, 235, 0.45);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            overflow: hidden;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: rgba(23, 37, 84, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 28px;
+            padding: 20px;
+            max-width: 520px;
+            width: 100%;
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 999px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.35);
+            border-radius: 999px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 10px 14px;
+        }
+
+        .form-row {
+            flex-direction: column;
+        }
+
+        .form-row .form-group {
+            width: 100%;
+        }
+
+        .summary-section {
+            padding: 14px;
+        }
+
+        .task-summary {
+            min-height: 50px;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: #f8fafc;
+            margin: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-modal:hover {
+            color: #cbd5e1;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            max-height: 120px;
+        }
+
+        .distribute-btn {
+            width: 100%;
+            background: rgba(16, 185, 129, 0.22);
+            color: #cbd5e1;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .distribute-btn:hover {
+            background: rgba(16, 185, 129, 0.35);
+            color: #f8fafc;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .summary-section {
+            background: rgba(37, 99, 235, 0.12);
+            border: 1px solid rgba(37, 99, 235, 0.24);
+            border-radius: 18px;
+            padding: 16px;
+            margin: 18px 0;
+        }
+
+        .summary-section label {
+            display: block;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+
+        .task-summary {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 14px;
+            padding: 12px 14px;
+            min-height: 60px;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.5;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .summary-btn {
+            width: 100%;
+            background: rgba(37, 99, 235, 0.22);
+            color: #cbd5e1;
+            border: 1px solid rgba(37, 99, 235, 0.35);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .generate-summary-btn {
+            width: 100%;
+            background: rgba(37, 99, 235, 0.22);
+            color: #cbd5e1;
+            border: 1px solid rgba(37, 99, 235, 0.35);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
+        }
+
+        .generate-summary-btn:hover {
+            background: rgba(37, 99, 235, 0.35);
+            color: #f8fafc;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-footer button {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .modal-submit {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+        }
+
+        .modal-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .modal-cancel {
+            background: rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+        }
+
+        .modal-cancel:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .urgent-task {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.1));
+            border: 2px solid #ef4444;
+            border-radius: 28px;
+            padding: 32px 28px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .urgent-task::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 120px;
+            height: 120px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 50%;
+        }
+
+        .urgent-task::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 100px;
+            height: 100px;
+            background: rgba(239, 68, 68, 0.08);
+            border-radius: 50%;
+        }
+
+        .urgent-task-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .urgent-task-badge {
+            display: inline-block;
+            background: #ef4444;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .urgent-task h3 {
+            font-size: 1.6rem;
+            color: #fecaca;
+            margin: 0 0 12px 0;
+            line-height: 1.3;
+        }
+
+        .urgent-task p {
+            color: #fca5a5;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0 0 16px 0;
+        }
+
+        .urgent-task-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ef4444;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 980px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .cards {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 16px;
+            }
+
+            header,
+            .hero-text,
+            .hero-graphic,
+            .recent {
+                padding: 18px;
+            }
+
+            .hero-text h1 {
+                font-size: 2.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page"> /* כל העמוד */
+        <header>
+            <div class="logo"> </div>
+            <nav>
+                <a href="HomePage.html">דף עבודה</a>
+                <a href="RecuresiveDecomposition.html">התקדמות</a>
+                <a href="search.html">חיפוש</a>
+                <a href="profile.html">פרופיל</a>
+                <a href="about.html">אודות</a>
+            </nav>
+            <button class="cta-button" onclick="openLoginModal()">התחברות</button>
+        </header>
+
+        <section class="hero">
+            <div class="hero-text">/* החלק העליון בדף*/
+                <h1>ברוך הבא!</h1>
+                <p>מה תרצה לעשות היום? בחר משימה, חפש מידע או בדוק התקדמות.</p>
+                <small>בחר אפשרות מהכרטיסים הבאים כדי לצאת לדרך.</small>
+                <div class="cards">
+                    <div class="card" onclick="window.location.href='search.html'">
+                        <div class="card-icon">🔍</div>
+                        <div>
+                            <div class="card-title">חיפוש</div>
+                            <div class="card-description">חפש מידע, משימות ואנשים במהירות.</div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="window.location.href='RecuresiveDecomposition.html'">
+                        <div class="card-icon">🏁</div>
+                        <div>
+                            <div class="card-title">התקדמות</div>
+                            <div class="card-description">צפה איפה אתה נמצא בתהליך ותמשיך קדימה.</div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="window.location.href='HomePage.html'">
+                        <div class="card-icon">📋</div>
+                        <div>
+                            <div class="card-title">דף עבודה</div>
+                            <div class="card-description">המשך את המשימות שלך ועקוב אחר כל הפרטים.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-graphic">
+                <div class="hero-illustration">
+                   <div class="screen">
+                        <div class="urgent-task-box">
+                            <div class="urgent-title">
+                                המשימה הקרובה ביותר
+                            </div>
+                            <div class="urgent-name" id="urgentName">
+                                אין משימות
+                            </div>
+                            <div class="urgent-date" id="urgentDate"></div>
+                            <div class="urgent-time" id="urgentTime"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="new-task-section">
+            <button class="new-task-btn" onclick="openNewTaskModal()">+ משימה חדשה</button>
+        </div>
+
+        <div id="taskModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>משימה חדשה</h2>
+                    <button class="close-modal" onclick="closeNewTaskModal()">&times;</button>
+                </div>
+                <form onsubmit="handleNewTask(event)">
+                    <div class="form-group">
+                        <label for="taskDescription">טקסט חופשי</label>
+                        <textarea id="taskDescription" placeholder="מה אתה רוצה לכתוב?" style="resize: vertical; min-height: 80px; max-height: 120px;"></textarea>
+                        <button type="button" class="distribute-btn" onclick="distributeData()">פזר נתונים</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskSubject">מקצוע</label>
+                        <input type="text" id="taskSubject" placeholder="הזן מקצוע">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskTitle">נושא העבודה</label>
+                        <input type="text" id="taskTitle" placeholder="הזן נושא העבודה" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskPages">מספר עמודים</label>
+                            <input type="number" id="taskPages" placeholder="מספר עמודים">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDate">תאריך</label>
+                            <input type="date" id="taskDate">
+                        </div>
+                    </div>
+                        <button type="button" class="generate-summary-btn" onclick="generateSummary()">חבר סיכום</button>
+                    <div class="summary-section">
+                        <label>סיכום:</label>
+                        <div id="taskSummary" class="task-summary"></div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="modal-cancel" onclick="closeNewTaskModal()">ביטול</button>
+                        <button type="submit" class="modal-submit">הוספת משימה</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="loginModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">התחברות</h2>
+                    <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+                </div>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="username">שם משתמש</label>
+                        <input type="text" id="username" placeholder="הזן שם משתמש" required>
+                    </div>
+                    <div class="form-group" id="emailGroup" style="display: none;">
+                        <label for="email">אימייל</label>
+                        <input type="email" id="email" placeholder="הזן אימייל">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">סיסמה</label>
+                        <input type="password" id="password" placeholder="הזן סיסמה" required>
+                    </div>
+                    <div class="form-group" id="confirmPasswordGroup" style="display: none;">
+                        <label for="confirmPassword">אשר סיסמה</label>
+                        <input type="password" id="confirmPassword" placeholder="אשר סיסמה">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="modal-cancel" onclick="closeLoginModal()">ביטול</button>
+                        <button type="submit" id="submitBtn" class="modal-submit">התחבר</button>
+                    </div>
+                </form>
+                <p id="switchLink">אין לך חשבון? <a href="#" onclick="switchToRegister()">הירשם</a></p>
+            </div>
+        </div>
+
+        <section class="recent" id="recent">
+            <div class="recent-header">
+                <h2>המשימות האחרונות שלך</h2>
+            </div>
+            <table class="recent-table">
+                <thead>
+                    <tr>
+                        <th>משימה</th>
+                        <th>סטטוס</th>
+                        <th>תאריך עדכון</th>
+                    </tr>
+                </thead>
+                <tbody>
+  
+                </tbody>
+            </table>
+
+        </section>
+    </div>
+
+    <script>
+        function openNewTaskModal() {
+            const modal = document.getElementById('taskModal');
+            modal.classList.add('show');
+        }
+
+        function closeNewTaskModal() {
+            const modal = document.getElementById('taskModal');
+            modal.classList.remove('show');
+            document.getElementById('taskDescription').value = '';
+            document.getElementById('taskSubject').value = '';
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskPages').value = '';
+            document.getElementById('taskDate').value = '';
+            document.getElementById('taskSummary').textContent = '';
+        }
+
+        function distributeData() {
+            const text = document.getElementById('taskDescription').value.trim();
+            if (!text) {
+                alert('אין טקסט לפיזור');
+                return;
+            }
+
+            // פשוט חלוקה בסיסית - ניתן לשפר עם AI או לוגיקה מתקדמת
+            const lines = text.split('\n');
+            lines.forEach(line => {
+                const lowerLine = line.toLowerCase();
+                if (lowerLine.includes('מקצוע') || lowerLine.includes('subject')) {
+                    document.getElementById('taskSubject').value = line.replace(/מקצוע[:\s]*/i, '').trim();
+                } else if (lowerLine.includes('נושא') || lowerLine.includes('topic')) {
+                    document.getElementById('taskTitle').value = line.replace(/נושא[:\s]*/i, '').trim();
+                } else if (lowerLine.includes('עמוד') || lowerLine.includes('pages')) {
+                    const pages = line.match(/\d+/);
+                    if (pages) document.getElementById('taskPages').value = pages[0];
+                }
+            });
+        }
+
+        function generateSummary() {
+            const subject = document.getElementById('taskSubject').value.trim();
+            const title = document.getElementById('taskTitle').value.trim();
+            const pages = document.getElementById('taskPages').value.trim();
+            const date = document.getElementById('taskDate').value;
+
+            let summary = '';
+            if (subject) summary += 'מקצוע: ' + subject + ' &#128308 ';
+            if (title) summary += 'נושא: ' + title + '  &#128308  ';
+            if (pages) summary += 'עמודים: ' + pages + ' ';
+            if (date) summary += '<br>תאריך: ' + date;
+
+            document.getElementById('taskSummary').innerHTML = summary || 'אין מידע להצגה';
+        }
+
+        function handleNewTask(event) {
+            event.preventDefault();
+            const subject = document.getElementById('taskSubject').value.trim();
+            const title = document.getElementById('taskTitle').value.trim();
+            const pages = document.getElementById('taskPages').value.trim();
+            const date = document.getElementById('taskDate').value;
+            const summary = document.getElementById('taskSummary').textContent.trim();
+
+            if (!title) {
+                alert('יש להזין לפחות נושא העבודה');
+                return;
+            }
+
+            const taskText = subject ? `${subject} - ${title}` : title;
+            const newRow = document.createElement('tr');
+            const taskCell = document.createElement('td');
+            const statusCell = document.createElement('td');
+            const dateCell = document.createElement('td');
+
+            taskCell.innerHTML = taskText + (summary ? `<br><small style="color:#94a3b8; font-size:0.82rem;">${summary}</small>` : '');
+            statusCell.textContent = 'בתהליך';
+            dateCell.textContent = date || new Date().toLocaleDateString('he-IL');
+
+            newRow.appendChild(taskCell);
+            newRow.appendChild(statusCell);
+            newRow.appendChild(dateCell);
+            document.querySelector('.recent-table tbody').appendChild(newRow);
+
+            alert(`משימה "${title}" נוספה בהצלחה!`);
+            closeNewTaskModal();
+            updateUrgentTask();
+        }
+
+        function updateUrgentTask() {
+            const rows = document.querySelectorAll('.recent-table tbody tr');
+            let closestTask = null;
+            let closestDate = null;
+
+            rows.forEach(row => {
+                const dateText = row.cells[2].textContent.trim();
+                if (dateText) {
+                    const date = new Date(dateText);
+                    if (!isNaN(date) && (!closestDate || date < closestDate)) {
+                        closestDate = date;
+                        closestTask = {
+                            title: row.cells[0].textContent.trim(),
+                            date: dateText
+                        };
+                    }
+                }
+            });
+
+            if (closestTask) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const diffTime = closestDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                document.getElementById('urgentName').textContent = closestTask.title;
+                document.getElementById('urgentDate').textContent = 'מועד הגשה: ' + closestTask.date;
+
+                if (diffDays > 0) {
+                    document.getElementById('urgentTime').textContent = 'נשארו ' + diffDays + ' ימים';
+                } else if (diffDays === 0) {
+                    document.getElementById('urgentTime').textContent = 'היום!';
+                } else {
+                    document.getElementById('urgentTime').textContent = 'עבר! ' + Math.abs(diffDays) + ' ימים';
+                }
+            } else {
+                document.getElementById('urgentName').textContent = 'אין משימות';
+                document.getElementById('urgentDate').textContent = '';
+                document.getElementById('urgentTime').textContent = '';
+            }
+        }
+
+        function parseDate(dateStr) {
+            // פורסום תאריכים בפורמטים שונים
+            const dateRegex = /(\d{1,2})[\/.\\-](\d{1,2})[\/.\\-](\d{4})/;
+            const match = dateStr.match(dateRegex);
+            if (match) {
+                return new Date(match[3], match[2] - 1, match[1]);
+            }
+            return null;
+        }
+
+        let loginMode = true;
+
+        function openLoginModal() {
+            loginMode = true;
+            updateModal();
+            document.getElementById('loginModal').classList.add('show');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+        }
+
+        function switchToRegister() {
+            loginMode = false;
+            updateModal();
+        }
+
+        function switchToLogin() {
+            loginMode = true;
+            updateModal();
+        }
+
+        function updateModal() {
+            const title = document.getElementById('modalTitle');
+            const emailGroup = document.getElementById('emailGroup');
+            const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+            const submitBtn = document.getElementById('submitBtn');
+            const switchLink = document.getElementById('switchLink');
+
+            if (loginMode) {
+                title.textContent = 'התחברות';
+                emailGroup.style.display = 'none';
+                confirmPasswordGroup.style.display = 'none';
+                submitBtn.textContent = 'התחבר';
+                switchLink.innerHTML = 'אין לך חשבון? <a href="#" onclick="switchToRegister()">הירשם</a>';
+            } else {
+                title.textContent = 'הרשמה';
+                emailGroup.style.display = 'block';
+                confirmPasswordGroup.style.display = 'block';
+                submitBtn.textContent = 'הירשם';
+                switchLink.innerHTML = 'כבר יש לך חשבון? <a href="#" onclick="switchToLogin()">התחבר</a>';
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const emailInput = document.getElementById('email').value;
+            const storedEmail = localStorage.getItem('userEmail') || '';
+            const email = loginMode ? storedEmail : emailInput;
+            const profileData = {
+                username,
+                email,
+                accountType: 'תלמיד',
+                status: 'פעיל',
+                lastAction: loginMode ? 'התחברות' : 'הרשמה',
+                lastActionDate: new Date().toLocaleDateString('he-IL')
+            };
+
+            if (!loginMode && password !== document.getElementById('confirmPassword').value) {
+                alert('הסיסמאות לא תואמות');
+                return;
+            }
+
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            localStorage.setItem('userEmail', email);
+
+            const activityHistory = JSON.parse(localStorage.getItem('activityHistory') || '[]');
+            activityHistory.unshift({
+                date: profileData.lastActionDate,
+                action: profileData.lastAction,
+                details: loginMode ? `התחברת כ: ${username}` : `נרשמת כ: ${username} עם אימייל: ${email}`
+            });
+            localStorage.setItem('activityHistory', JSON.stringify(activityHistory.slice(0, 10)));
+
+            if (loginMode) {
+                alert(`התחברת כ: ${username}`);
+            } else {
+                alert(`נרשמת כ: ${username} עם אימייל: ${email}`);
+            }
+            closeLoginModal();
+        }
+
+        // עדכן urgent task כשהעמוד טוען
+        window.onclick = function(event) {
+            const taskModal = document.getElementById('taskModal');
+            const loginModal = document.getElementById('loginModal');
+            if (event.target === taskModal) {
+                closeNewTaskModal();
+            }
+            if (event.target === loginModal) {
+                closeLoginModal();
+            }
+        }
+    </script>
+</body>
+</html>
