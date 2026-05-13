@@ -140,12 +140,18 @@ textarea:focus,input:focus{outline:none;box-shadow:0 2px 8px rgba(0,0,0,0.15);ba
 </div>
 
 
-  חיבור לקבצים שלכם:
-<script src="aiService.js" type="module"></script>
-<script src="logicManager.js" type="module"></script>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai"
+  }
+}
+</script>
+<script type="module">
+import './aiService.js';
+import logicManager from './logicManager.js';
 
 
-<script>
 const MILESTONES = [
   { name: "הבנת המשימה ובחירת מבנה", p: 0.10 },
   { name: "בחירת מקורות",             p: 0.30 },
@@ -158,14 +164,12 @@ const MILESTONES = [
 let currentTimeline = [];
 let taskCounter = 0;
 
-// ── עזר: loading state ────────────────────────────────────
 function setLoading(labelId, spinnerId, on) {
   const labels = { 'start-label': ['בוא נתחיל', 'מעבד...'], 'validate-label': ['בדוק משימה', 'בודק...'] };
   document.getElementById(labelId).textContent = on ? labels[labelId][1] : labels[labelId][0];
   document.getElementById(spinnerId).classList.toggle('hidden', !on);
 }
 
-// ── כפתור "טען מהטקסט" ───────────────────────────────────
 async function handleLoadFromText() {
   const rawText = document.getElementById('free-text').value.trim();
   if (!rawText) { alert('כתוב תיאור משימה בקופסה למעלה לפני הטעינה'); return; }
@@ -175,13 +179,9 @@ async function handleLoadFromText() {
   document.getElementById('load-btn').disabled = true;
 
   try {
-    if (typeof logicManager !== 'undefined') {
-      const aiResult = await logicManager.initProject(rawText);
-      if (aiResult?.subject) document.getElementById('subject').value = aiResult.subject;
-      if (aiResult?.topic)   document.getElementById('topic').value   = aiResult.topic;
-    } else {
-      console.warn('logicManager לא זמין');
-    }
+    const aiResult = await logicManager.initProject(rawText);
+    if (aiResult?.subject) document.getElementById('subject').value = aiResult.subject;
+    if (aiResult?.topic)   document.getElementById('topic').value   = aiResult.topic;
   } catch (e) {
     console.warn('שגיאה בטעינת נתונים:', e);
   } finally {
@@ -191,7 +191,6 @@ async function handleLoadFromText() {
   }
 }
 
-// ── כפתור "בוא נתחיל" ────────────────────────────────────
 async function handleStart() {
   const rawText = document.getElementById('free-text').value.trim();
   const subject = document.getElementById('subject').value.trim();
@@ -205,11 +204,9 @@ async function handleStart() {
   let aiResult = null;
 
   try {
-    if (typeof logicManager !== 'undefined') {
-      aiResult = await logicManager.initProject(rawText);
-    }
+    aiResult = await logicManager.initProject(rawText);
   } catch (e) {
-    console.warn('logicManager לא זמין:', e);
+    console.warn('שגיאה בהפעלה:', e);
   } finally {
     setLoading('start-label', 'start-spinner', false);
   }
@@ -232,7 +229,6 @@ async function handleStart() {
   if (date) rebuildTimeline();
 }
 
-// ── כפתור "בדוק משימה" ───────────────────────────────────
 async function handleValidate() {
   const taskText = document.getElementById('task-input').value.trim();
   if (!taskText) { alert('כתוב משימה לבדיקה'); return; }
@@ -246,23 +242,19 @@ async function handleValidate() {
   let result = null;
 
   try {
-    if (typeof logicManager !== 'undefined') {
-      result = await logicManager.handleTaskValidation(taskId, taskText);
-    }
+    result = await logicManager.handleTaskValidation(taskId, taskText);
   } catch (e) {
-    console.warn('logicManager לא זמין, מריץ fallback מקומי:', e);
+    console.warn('שגיאה בבדיקה, fallback מקומי:', e);
   } finally {
     setLoading('validate-label', 'validate-spinner', false);
   }
 
-  // fallback מקומי אם logicManager לא מחובר
   if (!result) result = localFallbackValidation(taskId, taskText);
 
   renderValidationResult(result);
   resultDiv.classList.remove('hidden');
 }
 
-// ── Fallback מקומי (ללא logicManager) ────────────────────
 function localFallbackValidation(taskId, taskText) {
   const greenWords = ["פסקה","שורה","משפט","מקור","ספר","מאמר","טבלה","גרף","תרשים","דוגמה","השוואה","סיכום","רשימה","מבוא","מסקנה"];
   const hasGreen   = greenWords.some(w => taskText.includes(w));
@@ -277,7 +269,6 @@ function localFallbackValidation(taskId, taskText) {
   return { taskId, score, label: labels[score], explanation: explains[score], source: 'local', aiSuggestion: null };
 }
 
-// ── הצגת תוצאת הבדיקה ────────────────────────────────────
 function renderValidationResult(result) {
   const scoreClass = { red: 'score-red', yellow: 'score-yellow', green: 'score-green' }[result.score] || 'score-yellow';
   const scoreIcon  = { red: '🔴', yellow: '🟡', green: '🟢' }[result.score] || '🟡';
@@ -310,7 +301,6 @@ function applyAISuggestion(text) {
   document.getElementById('task-input').value = text;
 }
 
-// ── לוח זמנים ────────────────────────────────────────────
 function rebuildTimeline() {
   const dateVal = document.getElementById('date').value;
   const list    = document.getElementById('timeline-list');
@@ -355,6 +345,15 @@ function saveMilestone(i) {
 }
 
 function resetTimeline() { rebuildTimeline(); }
+
+// חשיפת הפונקציות לכפתורי ה-HTML (נדרש כי זה מודול)
+window.handleStart        = handleStart;
+window.handleValidate     = handleValidate;
+window.handleLoadFromText = handleLoadFromText;
+window.applyAISuggestion  = applyAISuggestion;
+window.rebuildTimeline    = rebuildTimeline;
+window.resetTimeline      = resetTimeline;
+window.saveMilestone      = saveMilestone;
 </script>
 
 </body>

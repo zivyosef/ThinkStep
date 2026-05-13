@@ -8,7 +8,7 @@ import { GoogleGenAI } from "@google/genai";
 
 const AI_HISTORY_KEY = "my_ai_app_history";
 const MAX_HISTORY = 10;
-const ai = new GoogleGenAI({});
+const ai = new GoogleGenAI({ apiKey: "AIzaSyDMg2ByJaXvb0RzJDzood8b4KxiNdlqkx0" });
 const GEMINI_MODEL = "gemini-2.0-flash"; // ✅ תוקן: gemini-3-flash-preview לא קיים
 
 // ============================================================
@@ -55,7 +55,9 @@ async function sendQuery(intent, rawData, userDescription) {
     return result;
 
   } catch (error) {
-    console.error(`❌ שגיאה בביצוע ${intent}:`, error);
+    const msg = error?.message || String(error);
+    console.error(`❌ שגיאה בביצוע ${intent}:`, msg);
+    alert(`שגיאת AI (${intent}):\n${msg}`);
     return null;
   }
 }
