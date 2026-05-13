@@ -83,6 +83,13 @@ textarea:focus,input:focus{outline:none;box-shadow:0 2px 8px rgba(0,0,0,0.15);ba
 
   <!-- טופס פרטים -->
   <div class="card-green">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:13px;color:rgba(255,255,255,0.85)">מקצוע ונושא</span>
+      <button class="btn btn-outline btn-sm" id="load-btn" onclick="handleLoadFromText()" style="color:white;border-color:rgba(255,255,255,0.5);margin-top:0;padding:5px 12px;font-size:12px">
+        <span id="load-spinner" class="spinner hidden"></span>
+        <span id="load-label">⬆ טען מהטקסט</span>
+      </button>
+    </div>
     <div class="row">
       <div><label>מקצוע</label><input type="text" id="subject" placeholder="היסטוריה, מדע..."></div>
       <div><label>נושא</label><input type="text" id="topic" placeholder="נושא העבודה"></div>
@@ -132,11 +139,11 @@ textarea:focus,input:focus{outline:none;box-shadow:0 2px 8px rgba(0,0,0,0.15);ba
 
 </div>
 
-<!-- 
+
   חיבור לקבצים שלכם:
-  <script src="aiService.js" type="module"></script>
-  <script src="logicManager.js" type="module"></script>
--->
+<script src="aiService.js" type="module"></script>
+<script src="logicManager.js" type="module"></script>
+
 
 <script>
 const MILESTONES = [
@@ -156,6 +163,32 @@ function setLoading(labelId, spinnerId, on) {
   const labels = { 'start-label': ['בוא נתחיל', 'מעבד...'], 'validate-label': ['בדוק משימה', 'בודק...'] };
   document.getElementById(labelId).textContent = on ? labels[labelId][1] : labels[labelId][0];
   document.getElementById(spinnerId).classList.toggle('hidden', !on);
+}
+
+// ── כפתור "טען מהטקסט" ───────────────────────────────────
+async function handleLoadFromText() {
+  const rawText = document.getElementById('free-text').value.trim();
+  if (!rawText) { alert('כתוב תיאור משימה בקופסה למעלה לפני הטעינה'); return; }
+
+  document.getElementById('load-spinner').classList.remove('hidden');
+  document.getElementById('load-label').textContent = 'טוען...';
+  document.getElementById('load-btn').disabled = true;
+
+  try {
+    if (typeof logicManager !== 'undefined') {
+      const aiResult = await logicManager.initProject(rawText);
+      if (aiResult?.subject) document.getElementById('subject').value = aiResult.subject;
+      if (aiResult?.topic)   document.getElementById('topic').value   = aiResult.topic;
+    } else {
+      console.warn('logicManager לא זמין');
+    }
+  } catch (e) {
+    console.warn('שגיאה בטעינת נתונים:', e);
+  } finally {
+    document.getElementById('load-spinner').classList.add('hidden');
+    document.getElementById('load-label').textContent = '⬆ טען מהטקסט';
+    document.getElementById('load-btn').disabled = false;
+  }
 }
 
 // ── כפתור "בוא נתחיל" ────────────────────────────────────

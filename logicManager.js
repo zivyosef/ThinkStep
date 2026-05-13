@@ -467,4 +467,5 @@ const logicManager = {
   loadStateFromStorage,
 };
 
+window.logicManager = logicManager;
 export default logicManager;

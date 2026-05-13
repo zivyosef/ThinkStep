@@ -397,4 +397,5 @@ const aiService = {
   updateContext,
 };
 
+window.aiService = aiService;
 export default aiService;

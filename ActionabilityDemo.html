@@ -138,6 +138,11 @@
       color: #8b2222;
     }
 
+    .badge.yellow {
+      background: rgba(196, 143, 32, 0.16);
+      color: #7a5a14;
+    }
+
     .meta {
       display: grid;
       gap: 8px;
@@ -246,29 +251,102 @@
       document.getElementById('rawOutput').textContent = 'אין עדיין פלט.';
     }
 
-    function runCheck() {
+    async function runCheck() {
       const text = document.getElementById('taskText').value;
-      const result = analyzeActionability(text);
       const badge = document.getElementById('resultBadge');
       const meta = document.getElementById('resultMeta');
       const raw = document.getElementById('rawOutput');
 
-      const summary = result
-        ? 'הטקסט נראה ממוקד ובר ביצוע.'
-        : 'הטקסט נראה רחב מדי או לא ממוקד.';
+      // Use the full flow only when AI service exists in this page context.
+      const canUseFullFlow =
+        typeof logicManager !== 'undefined' &&
+        typeof logicManager.handleTaskValidation === 'function' &&
+        typeof aiService !== 'undefined' &&
+        typeof aiService.sendQuery === 'function';
 
-      badge.className = result ? 'badge green' : 'badge red';
-      badge.textContent = result ? 'PASS' : 'FAIL';
+      if (canUseFullFlow) {
+        try {
+          const res = await logicManager.handleTaskValidation('demo-task', text);
+          const state = res && res.score ? res.score : 'red';
 
-      meta.innerHTML = `
-        <div><b>סיכום:</b> ${summary}</div>
-        <div><b>הקלט:</b> ${text || '(ריק)'}</div>
-      `;
+          if (state === 'green') {
+            badge.className = 'badge green';
+            badge.textContent = 'PASS';
+          } else if (state === 'yellow') {
+            badge.className = 'badge yellow';
+            badge.textContent = 'WARN';
+          } else {
+            badge.className = 'badge red';
+            badge.textContent = 'FAIL';
+          }
 
-      raw.textContent = JSON.stringify({
-        input: text,
-        output: result
-      }, null, 2);
+          const summary = state === 'green'
+            ? 'הטקסט נראה ממוקד ובר ביצוע.'
+            : state === 'yellow'
+              ? 'הטקסט סביר אך כדאי למקד אותו קצת.'
+              : 'הטקסט נראה רחב מדי או לא ממוקד.';
+
+          meta.innerHTML = `
+            <div><b>סיכום:</b> ${summary}</div>
+            <div><b>תווית:</b> ${res.label || '-'}</div>
+            <div><b>הקלט:</b> ${text || '(ריק)'}</div>
+          `;
+
+          raw.textContent = JSON.stringify(res, null, 2);
+          return;
+        } catch (e) {
+          console.error('handleTaskValidation error:', e);
+          // fallback to simple analyzer below
+        }
+      }
+
+      // Fallback: call analyzer directly
+      try {
+        const result = typeof analyzeActionability === 'function'
+          ? analyzeActionability(text)
+          : (logicManager && logicManager.analyzeActionability ? logicManager.analyzeActionability(text) : false);
+
+        const numericScore = typeof result === 'number' ? result : (result ? 10 : 0);
+        const state = numericScore < 5 ? 'red' : (numericScore < 10 ? 'yellow' : 'green');
+
+        const summary = state === 'green'
+          ? 'הטקסט נראה ממוקד ובר ביצוע.'
+          : state === 'yellow'
+            ? 'הטקסט סביר אך כדאי למקד אותו קצת.'
+            : 'הטקסט נראה רחב מדי או לא ממוקד.';
+
+        if (state === 'green') {
+          badge.className = 'badge green';
+          badge.textContent = 'PASS';
+        } else if (state === 'yellow') {
+          badge.className = 'badge yellow';
+          badge.textContent = 'WARN';
+        } else {
+          badge.className = 'badge red';
+          badge.textContent = 'FAIL';
+        }
+
+        meta.innerHTML = `
+          <div><b>סיכום:</b> ${summary}</div>
+          <div><b>מצב בדמו:</b> ${canUseFullFlow ? 'בדיקה מלאה עם AI' : 'דירוג מקומי (ללא AI)'}</div>
+          <div><b>ציון:</b> ${numericScore}</div>
+          <div><b>הקלט:</b> ${text || '(ריק)'}</div>
+        `;
+
+        raw.textContent = JSON.stringify({
+          input: text,
+          output: result,
+          score: numericScore,
+          state,
+          mode: canUseFullFlow ? 'full' : 'local'
+        }, null, 2);
+      } catch (e) {
+        console.error('analyze fallback error:', e);
+        badge.className = 'badge red';
+        badge.textContent = 'ERROR';
+        meta.innerHTML = `<div>אירעה שגיאה בניתוח.</div>`;
+        raw.textContent = String(e);
+      }
     }
   </script>
 </body>
