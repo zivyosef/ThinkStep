@@ -3,143 +3,324 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Decompose App</title>
+<title>דף עבודה | למידה חכמה</title>
+<link rel="stylesheet" href="styles.css">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;direction:rtl;background:linear-gradient(135deg,#f5f5f5 0%,#e8f1ed 100%);min-height:100vh;padding:1rem}
-.page{max-width:540px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding:1rem 0}
-.card{background:white;border:1px solid rgba(0,0,0,0.08);border-radius:15px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-.card-green{background:#5ea07e;border:none;border-radius:15px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-label{font-size:13px;color:rgba(255,255,255,0.85);display:block;margin-bottom:6px}
-textarea,input[type="text"],input[type="date"],input[type="number"]{
-  width:100%;border:none;border-radius:8px;padding:9px 12px;
-  font-size:14px;font-family:'Segoe UI',Arial,sans-serif;
-  background:white;color:#1a1a1a;transition:all 0.2s
+/* ===== PAGE LAYOUT ===== */
+.work-page {
+  max-width: 580px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 40px;
 }
-textarea{resize:vertical}
-textarea:focus,input:focus{outline:none;box-shadow:0 2px 8px rgba(0,0,0,0.15);background:#f9f9f9}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-.btn{
-  width:100%;padding:11px;background:#2c2c2c;color:white;
-  border:none;border-radius:8px;cursor:pointer;font-size:14px;
-  font-weight:600;margin-top:8px;transition:all 0.3s
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.35rem;
+  box-shadow: 0 4px 16px rgba(7,11,22,0.18);
+  transition: border-color 0.2s ease;
 }
-.btn:hover{background:#4a7c5e;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
-.btn-outline{
-  background:transparent;color:#2c2c2c;
-  border:1px solid rgba(0,0,0,0.2);
+
+.card:hover { border-color: rgba(148,163,184,0.24); }
+
+.card-accent {
+  background: rgba(20, 30, 55, 0.85);
+  border: 1px solid rgba(37, 99, 235, 0.35);
+  border-radius: 16px;
+  padding: 1.35rem;
+  box-shadow: 0 4px 20px rgba(37,99,235,0.12);
 }
-.btn-outline:hover{background:rgba(0,0,0,0.05);transform:translateY(-1px)}
-.btn-sm{width:auto;padding:8px 14px;margin-top:0;font-size:13px}
-.section-title{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:12px}
-.card .label-dark{font-size:13px;color:#555;display:block;margin-bottom:6px}
-.card textarea,.card input[type="text"],.card input[type="date"],.card input[type="number"]{
-  border:1px solid rgba(0,0,0,0.12);
+
+/* ===== LABELS & INPUTS ===== */
+label, .label-alt {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
 }
-.score-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:500}
-.score-red{background:#fcebeb;color:#a32d2d}
-.score-yellow{background:#faeeda;color:#854f0b}
-.score-green{background:#eaf3de;color:#3b6d11}
-.result-box{border-radius:8px;padding:1rem;margin-top:10px;border:1px solid rgba(0,0,0,0.08);background:#fafafa}
-.suggestion-box{background:#f4f4f4;border-radius:8px;padding:1rem;margin-top:10px;border:1px solid rgba(0,0,0,0.08)}
-.suggestion-box .sug-label{font-size:12px;color:#777;margin-bottom:6px}
-.suggestion-box .sug-text{font-size:14px;color:#1a1a1a;font-weight:500}
-.suggestion-box .sug-explain{font-size:13px;color:#555;margin-top:6px;line-height:1.5}
-.timeline-item{
-  display:grid;grid-template-columns:1.4fr 1fr auto;gap:8px;
-  align-items:center;background:#f8fbf8;border-radius:10px;
-  padding:10px;margin-bottom:8px;border:1px solid #d8e3dc
+
+textarea,
+input[type="text"],
+input[type="date"],
+input[type="number"] {
+  width: 100%;
+  border: 1px solid rgba(148,163,184,0.2);
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  transition: all 0.2s;
 }
-.timeline-item strong{font-size:13px;font-weight:500;color:#214235}
-.timeline-item input{border:1px solid rgba(0,0,0,0.12)}
-.timeline-empty{font-size:14px;color:#888;text-align:center;padding:1rem 0}
-.summary-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-size:14px}
-.summary-row:last-child{border-bottom:none}
-.summary-key{color:#666}
-.summary-val{font-weight:500;color:#1a1a1a}
-.spinner{
-  display:inline-block;width:14px;height:14px;
-  border:2px solid rgba(255,255,255,0.3);border-top-color:white;
-  border-radius:50%;animation:spin 0.7s linear infinite;
-  vertical-align:middle;margin-right:6px
+
+textarea { resize: vertical; }
+
+textarea:focus,
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(37,99,235,0.08);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
 }
-@keyframes spin{to{transform:rotate(360deg)}}
-.hidden{display:none}
-.ai-tag{font-size:11px;background:#e6f1fb;color:#185fa5;padding:2px 8px;border-radius:10px;margin-left:6px}
-.local-tag{font-size:11px;background:#f0f0f0;color:#666;padding:2px 8px;border-radius:10px;margin-left:6px}
-.timeline-actions{display:flex;gap:10px;margin-top:12px}
-.timeline-actions .btn{flex:1}
+
+/* ===== BUTTONS ===== */
+.btn {
+  width: 100%;
+  padding: 11px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: white;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  margin-top: 8px;
+  transition: all 0.25s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(37,99,235,0.35);
+}
+
+.btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid rgba(148,163,184,0.28);
+}
+
+.btn-outline:hover {
+  background: rgba(148,163,184,0.1);
+  color: var(--text-bright);
+  box-shadow: none;
+}
+
+.btn-sm { width: auto; padding: 7px 13px; margin-top: 0; font-size: 13px; }
+
+/* ===== SECTION TITLE ===== */
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 14px;
+}
+
+/* ===== ROW LAYOUT ===== */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* ===== DIVIDER ===== */
+.demands-divider {
+  border: none;
+  border-top: 1px solid rgba(148,163,184,0.18);
+  margin: 14px 0;
+}
+
+/* ===== SUMMARY ===== */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(148,163,184,0.1);
+  font-size: 14px;
+}
+
+.summary-row:last-child { border-bottom: none; }
+.summary-key { color: var(--text-muted); }
+.summary-val { font-weight: 600; color: var(--text-bright); }
+
+/* ===== SPINNER ===== */
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.hidden { display: none; }
+
+/* ===== TIMELINE ===== */
+.timeline-item {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(148,163,184,0.14);
+}
+
+.timeline-item strong {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.timeline-item input { border: 1px solid rgba(148,163,184,0.2); }
+
+.timeline-empty {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 1.2rem 0;
+}
+
+/* ===== TIMELINE ACTIONS ===== */
+.timeline-actions { display: flex; gap: 10px; margin-top: 12px; }
+.timeline-actions .btn { flex: 1; }
+
+/* ===== SUB-TASKS ===== */
+.subtask-item {
+  background: rgba(255,255,255,0.04);
+  border-radius: 11px;
+  padding: 13px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(148,163,184,0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  transition: border-color 0.2s ease;
+}
+
+.subtask-item:hover { border-color: rgba(37,99,235,0.3); }
+
+.subtask-item input[type="text"] {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.subtask-item textarea {
+  font-size: 13px;
+  color: var(--text-secondary);
+  resize: vertical;
+  min-height: 50px;
+}
+
+.subtask-delete {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: none; border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.subtask-delete:hover { color: #ef4444; }
+
+.subtask-add-row { margin-top: 4px; }
+
+/* ===== CARD HEADER ===== */
+.card-header-row {
+  font-size: 13px;
+  color: rgba(148,163,184,0.9);
+  margin-bottom: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 </style>
 </head>
 <body>
-
 <div class="page">
 
-  <!-- תיאור המשימה -->
-  <div class="card-green">
-    <label>תאר את המשימה שלך</label>
-    <textarea id="free-text" rows="3" placeholder="מה אתה רוצה לכתוב? למשל: לכתוב עבודה על המהפכה הצרפתית..."></textarea>
-  </div>
+  <!-- Navigation Header -->
+  <header class="site-header">
+    <div class="logo"></div>
+    <nav>
+      <a href="index.html">דף הבית</a>
+      <a href="HomePage.html" class="active">דף עבודה</a>
+      <a href="RecuresiveDecomposition.html">התקדמות</a>
+      <a href="search.html">חיפוש</a>
+      <a href="profile.html">פרופיל</a>
+      <a href="about.html">אודות</a>
+    </nav>
+    <button class="cta-button" onclick="window.location.href='index.html'">דף הבית</button>
+  </header>
 
-  <!-- טופס פרטים -->
-  <div class="card-green">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <span style="font-size:13px;color:rgba(255,255,255,0.85)">מקצוע ונושא</span>
-      <button class="btn btn-outline btn-sm" id="load-btn" onclick="handleLoadFromText()" style="color:white;border-color:rgba(255,255,255,0.5);margin-top:0;padding:5px 12px;font-size:12px">
-        <span id="load-spinner" class="spinner hidden"></span>
-        <span id="load-label">⬆ טען מהטקסט</span>
+  <div class="work-page">
+
+    <!-- כרטיס פרטי משימה -->
+    <div class="card-accent">
+      <div class="card-header-row">פרטי המשימה</div>
+      <div class="row">
+        <div><label>מקצוע</label><input type="text" id="subject" placeholder="היסטוריה, מדע..."></div>
+        <div><label>נושא</label><input type="text" id="topic" placeholder="נושא העבודה"></div>
+      </div>
+      <div class="row">
+        <div><label>מספר עמודים</label><input type="number" id="pages" placeholder="5" min="1" max="1000"></div>
+        <div><label>תאריך הגשה</label><input type="date" id="date"></div>
+      </div>
+
+      <hr class="demands-divider">
+
+      <label>דרישות העבודה</label>
+      <textarea id="demands-input" rows="3" placeholder="הדבק כאן את הנחיות המורה / דרישות המטלה..."></textarea>
+      <button class="btn" id="analyze-btn" onclick="handleAnalyzeDemands()">
+        <span id="analyze-spinner" class="spinner hidden"></span>
+        <span id="analyze-label">נתח וצור משימות</span>
       </button>
     </div>
-    <div class="row">
-      <div><label>מקצוע</label><input type="text" id="subject" placeholder="היסטוריה, מדע..."></div>
-      <div><label>נושא</label><input type="text" id="topic" placeholder="נושא העבודה"></div>
+
+    <!-- סיכום -->
+    <div id="summary-card" class="card hidden">
+      <div class="section-title">סיכום המשימה</div>
+      <div id="summary-content"></div>
     </div>
-    <div class="row">
-      <div><label>מספר עמודים</label><input type="number" id="pages" placeholder="5" min="1" max="1000"></div>
-      <div><label>תאריך הגשה</label><input type="date" id="date"></div>
+
+    <!-- משימות לביצוע -->
+    <div id="subtasks-card" class="card hidden">
+      <div class="section-title">משימות לביצוע</div>
+      <div id="subtasks-list"></div>
+      <div class="subtask-add-row">
+        <button class="btn btn-outline" onclick="addSubtask()">+ הוסף משימה</button>
+      </div>
     </div>
-    <button class="btn" onclick="handleStart()">
-      <span id="start-spinner" class="spinner hidden"></span>
-      <span id="start-label">בוא נתחיל</span>
-    </button>
-  </div>
 
-  <!-- סיכום -->
-  <div id="summary-card" class="card hidden">
-    <div class="section-title">סיכום המשימה</div>
-    <div id="summary-content"></div>
-  </div>
-
-  <!-- בדיקת מיקוד -->
-  <div class="card">
-    <div class="section-title">בדיקת מיקוד המשימה</div>
-    <label class="label-dark">כתוב את המשימה הספציפית לבדיקה</label>
-    <textarea id="task-input" rows="2" placeholder="למשל: לכתוב פסקת פתיחה על הסיבות הכלכליות למהפכה הצרפתית"></textarea>
-    <button class="btn" onclick="handleValidate()">
-      <span id="validate-spinner" class="spinner hidden"></span>
-      <span id="validate-label">בדוק משימה</span>
-    </button>
-    <div id="validation-result" class="hidden"></div>
-  </div>
-
-  <!-- לוח זמנים -->
-  <div class="card">
-    <div class="section-title">לוח זמנים מותאם אישית</div>
-    <p style="font-size:14px;color:#666;margin-bottom:14px;line-height:1.5">
-      המערכת בונה תוכנית לפי תאריך ההגשה — אפשר לשנות כל שלב ידנית.
-    </p>
-    <div id="timeline-list">
-      <div class="timeline-empty">עדיין לא נבנה לוח זמנים.</div>
+    <!-- לוח זמנים -->
+    <div class="card">
+      <div class="section-title">לוח זמנים מותאם אישית</div>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+        המערכת בונה תוכנית לפי תאריך ההגשה — אפשר לשנות כל שלב ידנית.
+      </p>
+      <div id="timeline-list">
+        <div class="timeline-empty">עדיין לא נבנה לוח זמנים.</div>
+      </div>
+      <div class="timeline-actions">
+        <button class="btn btn-outline" onclick="rebuildTimeline()">בנה לוח זמנים</button>
+        <button class="btn btn-outline" onclick="resetTimeline()">אפס שינויים</button>
+      </div>
     </div>
-    <div class="timeline-actions">
-      <button class="btn btn-outline" onclick="rebuildTimeline()">בנה לוח זמנים</button>
-      <button class="btn btn-outline" onclick="resetTimeline()">אפס שינויים</button>
-    </div>
-  </div>
 
-</div>
+  </div><!-- /work-page -->
+</div><!-- /page -->
 
-
+<script>
+  window.GEMINI_API_KEY = 'AIzaSyClpw7Ln7W1VazfnOh-H9xVsRuxM4DRzEs';
+</script>
 <script type="importmap">
 {
   "imports": {
@@ -151,7 +332,6 @@ textarea:focus,input:focus{outline:none;box-shadow:0 2px 8px rgba(0,0,0,0.15);ba
 import './aiService.js';
 import logicManager from './logicManager.js';
 
-
 const MILESTONES = [
   { name: "הבנת המשימה ובחירת מבנה", p: 0.10 },
   { name: "בחירת מקורות",             p: 0.30 },
@@ -162,143 +342,94 @@ const MILESTONES = [
 ];
 
 let currentTimeline = [];
-let taskCounter = 0;
+let subtasks = [];
 
-function setLoading(labelId, spinnerId, on) {
-  const labels = { 'start-label': ['בוא נתחיל', 'מעבד...'], 'validate-label': ['בדוק משימה', 'בודק...'] };
+function setLoading(labelId, spinnerId, btnId, on) {
+  const labels = { 'analyze-label': ['נתח וצור משימות', 'מנתח...'] };
   document.getElementById(labelId).textContent = on ? labels[labelId][1] : labels[labelId][0];
   document.getElementById(spinnerId).classList.toggle('hidden', !on);
+  if (btnId) document.getElementById(btnId).disabled = on;
 }
 
-async function handleLoadFromText() {
-  const rawText = document.getElementById('free-text').value.trim();
-  if (!rawText) { alert('כתוב תיאור משימה בקופסה למעלה לפני הטעינה'); return; }
-
-  document.getElementById('load-spinner').classList.remove('hidden');
-  document.getElementById('load-label').textContent = 'טוען...';
-  document.getElementById('load-btn').disabled = true;
-
-  try {
-    const aiResult = await logicManager.initProject(rawText);
-    if (aiResult?.subject) document.getElementById('subject').value = aiResult.subject;
-    if (aiResult?.topic)   document.getElementById('topic').value   = aiResult.topic;
-  } catch (e) {
-    console.warn('שגיאה בטעינת נתונים:', e);
-  } finally {
-    document.getElementById('load-spinner').classList.add('hidden');
-    document.getElementById('load-label').textContent = '⬆ טען מהטקסט';
-    document.getElementById('load-btn').disabled = false;
-  }
-}
-
-async function handleStart() {
-  const rawText = document.getElementById('free-text').value.trim();
+function showSummary() {
   const subject = document.getElementById('subject').value.trim();
   const topic   = document.getElementById('topic').value.trim();
-  const pages   = document.getElementById('pages').value;
+  const pages   = document.getElementById('pages').value.trim();
   const date    = document.getElementById('date').value;
-
-  if (!rawText) { alert('אנא כתוב תיאור משימה לפני שממשיכים'); return; }
-
-  setLoading('start-label', 'start-spinner', true);
-  let aiResult = null;
-
-  try {
-    aiResult = await logicManager.initProject(rawText);
-  } catch (e) {
-    console.warn('שגיאה בהפעלה:', e);
-  } finally {
-    setLoading('start-label', 'start-spinner', false);
-  }
-
-  const finalSubject = aiResult?.subject || subject || '—';
-  const finalTopic   = aiResult?.topic   || topic   || '—';
-  const finalType    = aiResult?.assignmentType     || '—';
 
   const summaryCard = document.getElementById('summary-card');
   summaryCard.classList.remove('hidden');
   document.getElementById('summary-content').innerHTML = `
-    <div class="summary-row"><span class="summary-key">מקצוע</span><span class="summary-val">${finalSubject}</span></div>
-    <div class="summary-row"><span class="summary-key">נושא</span><span class="summary-val">${finalTopic}</span></div>
-    <div class="summary-row"><span class="summary-key">סוג מטלה</span><span class="summary-val">${finalType}</span></div>
-    ${pages ? `<div class="summary-row"><span class="summary-key">עמודים</span><span class="summary-val">${pages}</span></div>` : ''}
-    ${date  ? `<div class="summary-row"><span class="summary-key">תאריך הגשה</span><span class="summary-val">${date}</span></div>` : ''}
-    ${aiResult?.chunks?.length ? `<div class="summary-row"><span class="summary-key">חלקים שזוהו</span><span class="summary-val">${aiResult.chunks.length} חלקים</span></div>` : ''}
+    ${subject ? `<div class="summary-row"><span class="summary-key">מקצוע</span><span class="summary-val">${subject}</span></div>` : ''}
+    ${topic   ? `<div class="summary-row"><span class="summary-key">נושא</span><span class="summary-val">${topic}</span></div>` : ''}
+    ${pages   ? `<div class="summary-row"><span class="summary-key">עמודים</span><span class="summary-val">${pages}</span></div>` : ''}
+    ${date    ? `<div class="summary-row"><span class="summary-key">תאריך הגשה</span><span class="summary-val">${date}</span></div>` : ''}
   `;
-
   if (date) rebuildTimeline();
 }
 
-async function handleValidate() {
-  const taskText = document.getElementById('task-input').value.trim();
-  if (!taskText) { alert('כתוב משימה לבדיקה'); return; }
+async function handleAnalyzeDemands() {
+  const demandsText = document.getElementById('demands-input').value.trim();
+  if (!demandsText) { alert('אנא הדבק את דרישות העבודה לפני הניתוח'); return; }
 
-  const resultDiv = document.getElementById('validation-result');
-  resultDiv.classList.add('hidden');
-  setLoading('validate-label', 'validate-spinner', true);
+  showSummary();
+  setLoading('analyze-label', 'analyze-spinner', 'analyze-btn', true);
 
-  taskCounter++;
-  const taskId = `task-${taskCounter}`;
-  let result = null;
+  const context = {
+    subject: document.getElementById('subject').value.trim(),
+    topic:   document.getElementById('topic').value.trim(),
+    pages:   document.getElementById('pages').value.trim(),
+    dueDate: document.getElementById('date').value,
+  };
 
   try {
-    result = await logicManager.handleTaskValidation(taskId, taskText);
+    const result = await logicManager.analyzeDemandsAndCreateSubtasks(demandsText, context);
+    subtasks = result.length > 0 ? result : [];
+    if (subtasks.length === 0) {
+      alert('לא הצלחנו לנתח את הדרישות. נסה לנסח אותן בצורה ברורה יותר.');
+    } else {
+      renderSubtasks();
+      document.getElementById('subtasks-card').classList.remove('hidden');
+    }
   } catch (e) {
-    console.warn('שגיאה בבדיקה, fallback מקומי:', e);
+    console.error('שגיאה בניתוח דרישות:', e);
+    alert('אירעה שגיאה. בדוק את החיבור לאינטרנט ונסה שוב.');
   } finally {
-    setLoading('validate-label', 'validate-spinner', false);
+    setLoading('analyze-label', 'analyze-spinner', 'analyze-btn', false);
   }
-
-  if (!result) result = localFallbackValidation(taskId, taskText);
-
-  renderValidationResult(result);
-  resultDiv.classList.remove('hidden');
 }
 
-function localFallbackValidation(taskId, taskText) {
-  const greenWords = ["פסקה","שורה","משפט","מקור","ספר","מאמר","טבלה","גרף","תרשים","דוגמה","השוואה","סיכום","רשימה","מבוא","מסקנה"];
-  const hasGreen   = greenWords.some(w => taskText.includes(w));
-  const isShort    = taskText.length < 30;
-  const score      = hasGreen ? 'green' : isShort ? 'red' : 'yellow';
-  const labels     = { red: 'המשימה נראית רחבה מדי', yellow: 'המשימה רחבה מעט', green: 'המשימה נראית ממוקדת' };
-  const explains   = {
-    red:    'נסה להתמקד בפסקה, משפט, או רעיון ספציפי אחד.',
-    yellow: 'הוסף פירוט — כמה פסקאות? איזה היבט ספציפי?',
-    green:  'מצוין! המשימה קטנה וניתנת לביצוע.'
-  };
-  return { taskId, score, label: labels[score], explanation: explains[score], source: 'local', aiSuggestion: null };
+function renderSubtasks() {
+  document.getElementById('subtasks-list').innerHTML = subtasks.map((st, i) => `
+    <div class="subtask-item">
+      <button class="subtask-delete" onclick="deleteSubtask(${i})" title="מחק משימה">×</button>
+      <input type="text" value="${escapeAttr(st.title)}" placeholder="שם המשימה"
+        oninput="subtasks[${i}].title = this.value">
+      <textarea placeholder="תיאור המשימה"
+        oninput="subtasks[${i}].description = this.value">${escapeHtml(st.description)}</textarea>
+    </div>
+  `).join('');
 }
 
-function renderValidationResult(result) {
-  const scoreClass = { red: 'score-red', yellow: 'score-yellow', green: 'score-green' }[result.score] || 'score-yellow';
-  const scoreIcon  = { red: '🔴', yellow: '🟡', green: '🟢' }[result.score] || '🟡';
-  const sourceTag  = result.source === 'ai'
-    ? '<span class="ai-tag">AI</span>'
-    : '<span class="local-tag">מקומי</span>';
-
-  let html = `<div class="result-box">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-      ${sourceTag}
-      <span class="${scoreClass} score-badge">${scoreIcon} ${result.label}</span>
-    </div>`;
-  if (result.explanation) html += `<p style="font-size:14px;color:#555;line-height:1.6">${result.explanation}</p>`;
-  html += `</div>`;
-
-  if (result.aiSuggestion) {
-    const safeText = (result.aiSuggestion.refinedText || '').replace(/'/g, "\\'");
-    html += `<div class="suggestion-box">
-      <div class="sug-label">💡 הצעת שיפור מה-AI</div>
-      <div class="sug-text">${result.aiSuggestion.refinedText || ''}</div>
-      ${result.aiSuggestion.explanation ? `<div class="sug-explain">${result.aiSuggestion.explanation}</div>` : ''}
-      <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="applyAISuggestion('${safeText}')">השתמש בהצעה זו</button>
-    </div>`;
-  }
-
-  document.getElementById('validation-result').innerHTML = html;
+function escapeAttr(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function applyAISuggestion(text) {
-  document.getElementById('task-input').value = text;
+function escapeHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function deleteSubtask(i) {
+  subtasks.splice(i, 1);
+  renderSubtasks();
+}
+
+function addSubtask() {
+  subtasks.push({ id: `task-${Date.now()}`, title: '', description: '' });
+  renderSubtasks();
+  document.getElementById('subtasks-card').classList.remove('hidden');
+  const items = document.querySelectorAll('.subtask-item input[type="text"]');
+  if (items.length) items[items.length - 1].focus();
 }
 
 function rebuildTimeline() {
@@ -346,14 +477,12 @@ function saveMilestone(i) {
 
 function resetTimeline() { rebuildTimeline(); }
 
-// חשיפת הפונקציות לכפתורי ה-HTML (נדרש כי זה מודול)
-window.handleStart        = handleStart;
-window.handleValidate     = handleValidate;
-window.handleLoadFromText = handleLoadFromText;
-window.applyAISuggestion  = applyAISuggestion;
-window.rebuildTimeline    = rebuildTimeline;
-window.resetTimeline      = resetTimeline;
-window.saveMilestone      = saveMilestone;
+window.handleAnalyzeDemands = handleAnalyzeDemands;
+window.rebuildTimeline      = rebuildTimeline;
+window.resetTimeline        = resetTimeline;
+window.saveMilestone        = saveMilestone;
+window.deleteSubtask        = deleteSubtask;
+window.addSubtask           = addSubtask;
 </script>
 
 </body>

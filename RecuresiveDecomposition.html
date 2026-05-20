@@ -3,610 +3,891 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>התקדמות</title>
-    
+    <title>התקדמות | למידה חכמה</title>
+    <link rel="stylesheet" href="styles.css">
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #070b16;
-    color: #e2e8f0;
-    min-height: 100vh;
-    padding: 24px;
-    direction: rtl;
-}
-
-.page {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+/* ===== STAT CARDS ===== */
+.stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    padding: 20px 24px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(148, 163, 184, 0.16);
-    border-radius: 22px;
     margin-bottom: 28px;
-    box-shadow: 0 24px 60px rgba(7, 11, 22, 0.32);
+    animation: slideInUp 0.7s ease-out;
 }
 
-.logo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.8rem;
-}
-
-nav {
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 20px;
     display: flex;
-    gap: 18px;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.25s ease, border-color 0.2s ease;
 }
 
-nav a {
-    color: #cbd5e1;
-    text-decoration: none;
-    padding: 10px 14px;
+.stat-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(37,99,235,0.3);
+}
+
+.stat-icon {
+    width: 48px; height: 48px;
     border-radius: 12px;
-    transition: background 0.25s ease;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
 }
 
-nav a:hover, nav a.active {
-    background: rgba(148, 163, 184, 0.14);
-    color: #fff;
-}
+.stat-icon.blue   { background: rgba(37,99,235,0.16); }
+.stat-icon.green  { background: rgba(16,185,129,0.16); }
+.stat-icon.purple { background: rgba(124,58,237,0.16); }
 
-.cta-button {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 14px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: transform 0.2s ease, background 0.2s ease;
-}
+.stat-info { min-width: 0; }
+.stat-value { font-size: 1.8rem; font-weight: 800; color: var(--text-bright); line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
 
-.cta-button:hover {
-    background: #1d4ed8;
-    transform: translateY(-1px);
-}
-
-/* ============ סקשן התקדמות ============ */
+/* ===== PROGRESS SECTION ===== */
 .progress-section {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(148, 163, 184, 0.1);
-    border-radius: 28px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
     padding: 28px;
     margin-bottom: 28px;
-    box-shadow: 0 24px 60px rgba(7, 11, 22, 0.18);
+    box-shadow: var(--shadow-card);
+    animation: slideInUp 0.8s ease-out;
 }
 
 .progress-section h2 {
-    font-size: 1.6rem;
-    color: #f8fafc;
+    font-size: 1.5rem;
+    color: var(--text-bright);
     margin-bottom: 24px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .progress-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-    margin-bottom: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+    margin-bottom: 22px;
 }
 
 .progress-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(148, 163, 184, 0.12);
-    border-radius: 22px;
-    padding: 24px;
-    transition: all 0.3s ease;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(148,163,184,0.12);
+    border-radius: 18px;
+    padding: 22px;
+    transition: all 0.25s ease;
 }
 
 .progress-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(59, 130, 246, 0.35);
-    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(37,99,235,0.28);
+    background: rgba(255,255,255,0.05);
 }
 
 .progress-card-title {
-    color: #cbd5e1;
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 16px;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.82rem;
+    margin-bottom: 14px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
 
-/* ===== מטרות שבועיות ===== */
+/* ===== GOALS ===== */
 .goals-input-group {
     display: flex;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .goals-input-group input {
     flex: 1;
-    padding: 10px 14px;
-    border: 1px solid rgba(148, 163, 184, 0.24);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    color: #e2e8f0;
+    padding: 9px 13px;
+    border: 1px solid rgba(148,163,184,0.22);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
     font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.goals-input-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(37,99,235,0.06);
 }
 
 .goals-input-group button {
-    padding: 10px 16px;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    padding: 9px 14px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.88rem;
+    font-family: inherit;
     transition: all 0.2s ease;
 }
 
 .goals-input-group button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37,99,235,0.4);
 }
 
+.goals-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.goals-reset-btn {
+    flex: 1;
+    padding: 8px;
+    background: rgba(239,68,68,0.1);
+    color: #fca5a5;
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-family: inherit;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.goals-reset-btn:hover { background: rgba(239,68,68,0.18); color: #fecaca; }
+
 .goals-list {
-    max-height: 280px;
+    max-height: 240px;
     overflow-y: auto;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .goal-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 10px;
-    margin-bottom: 8px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 9px;
+    margin-bottom: 6px;
     animation: slideIn 0.3s ease;
+    transition: background 0.2s ease;
 }
 
+.goal-item:hover { background: rgba(255,255,255,0.05); }
+
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
 .goal-item input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: 18px; height: 18px;
     cursor: pointer;
+    accent-color: var(--accent);
 }
 
-.goal-text {
-    flex: 1;
-    color: #cbd5e1;
-    font-size: 0.9rem;
-}
-
-.goal-item.completed .goal-text {
-    color: #94a3b8;
-    text-decoration: line-through;
-}
+.goal-text { flex: 1; color: var(--text-secondary); font-size: 0.9rem; transition: color 0.2s; }
+.goal-item.completed .goal-text { color: var(--text-muted); text-decoration: line-through; }
 
 .goal-delete {
-    background: none;
-    border: none;
-    color: #ef4444;
+    background: none; border: none;
+    color: var(--text-muted);
     cursor: pointer;
-    font-size: 1.2rem;
-    transition: all 0.2s ease;
+    font-size: 1.1rem;
+    transition: color 0.2s ease;
+    padding: 2px 4px;
+    border-radius: 4px;
 }
 
-.goal-delete:hover {
-    color: #fca5a5;
-}
+.goal-delete:hover { color: #ef4444; }
 
 .progress-bar-container {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 999px;
     overflow: hidden;
-    height: 20px;
-    border: 1px solid rgba(148, 163, 184, 0.12);
+    height: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
 }
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #2563eb, #7c3aed);
-    border-radius: 10px;
-    transition: width 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+    border-radius: 999px;
+    transition: width 0.4s ease;
 }
 
 .progress-percentage {
-    color: #cbd5e1;
-    font-size: 0.9rem;
-    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
     text-align: center;
 }
 
-/* ===== גרף פעילות ===== */
+/* ===== CHART ===== */
 .chart-container {
     display: flex;
     align-items: flex-end;
-    gap: 8px;
-    height: 160px;
-    margin-bottom: 16px;
+    gap: 6px;
+    height: 140px;
+    margin-bottom: 14px;
+    padding-bottom: 28px;
 }
 
 .chart-bar {
     flex: 1;
-    background: linear-gradient(180deg, #2563eb, #3b82f6);
-    border-radius: 8px 8px 0 0;
-    min-height: 20px;
+    background: linear-gradient(180deg, var(--accent), #3b82f6);
+    border-radius: 6px 6px 0 0;
+    min-height: 4px;
     position: relative;
     cursor: pointer;
-    transition: all 0.3s ease;
-    animation: growUp 0.5s ease-out;
+    transition: filter 0.2s ease;
 }
 
-@keyframes growUp {
-    from {
-        height: 0;
-    }
-    to {
-        height: var(--height);
-    }
-}
-
-.chart-bar:hover {
-    background: linear-gradient(180deg, #1d4ed8, #2563eb);
-    filter: brightness(1.2);
-}
+.chart-bar:hover { filter: brightness(1.25); }
 
 .chart-bar-label {
     position: absolute;
-    bottom: -24px;
-    left: 50%;
+    bottom: -22px; left: 50%;
     transform: translateX(-50%);
-    color: #94a3b8;
-    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.72rem;
     white-space: nowrap;
 }
 
 .chart-bar-value {
     position: absolute;
-    top: -22px;
-    left: 50%;
+    top: -20px; left: 50%;
     transform: translateX(-50%);
-    color: #cbd5e1;
-    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
     font-weight: 700;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
 }
 
-.chart-bar:hover .chart-bar-value {
-    opacity: 1;
-}
+.chart-bar:hover .chart-bar-value { opacity: 1; }
 
-/* ===== טיפ יומי ===== */
+/* ===== TIP ===== */
 .tip-content {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(124, 58, 237, 0.15));
-    border: 1px solid rgba(37, 99, 235, 0.25);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
-    min-height: 100px;
+    background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(124,58,237,0.12));
+    border: 1px solid rgba(37,99,235,0.2);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    min-height: 90px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    animation: fadeInTip 0.5s ease;
+    animation: fadeIn 0.5s ease;
 }
 
-@keyframes fadeInTip {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-.tip-icon {
-    font-size: 2.5rem;
-    margin-bottom: 12px;
-}
-
-.tip-text {
-    color: #cbd5e1;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    text-align: center;
-}
+.tip-icon  { font-size: 2.2rem; margin-bottom: 10px; }
+.tip-text  { color: var(--text-secondary); font-size: 0.93rem; line-height: 1.6; text-align: center; }
 
 .tip-button {
     width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    padding: 11px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.9rem;
+    font-family: inherit;
     transition: all 0.2s ease;
 }
 
-.tip-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+.tip-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
+/* ===== UPCOMING TASKS ===== */
+.upcoming-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 26px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-card);
+    animation: slideInUp 0.9s ease-out;
 }
 
+.upcoming-section h2 {
+    font-size: 1.2rem;
+    color: var(--text-bright);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.upcoming-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.upcoming-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(37,99,235,0.25); }
+.upcoming-item:last-child { margin-bottom: 0; }
+
+.upcoming-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.upcoming-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.upcoming-title { color: var(--text-bright); font-weight: 600; font-size: 0.93rem; margin-bottom: 2px; }
+.upcoming-date  { color: var(--text-muted);  font-size: 0.82rem; }
+
+.upcoming-days {
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.days-urgent  { background: rgba(239,68,68,0.15);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.28); }
+.days-soon    { background: rgba(251,146,60,0.15);  color: #fdba74; border: 1px solid rgba(251,146,60,0.28); }
+.days-ok      { background: rgba(16,185,129,0.15);  color: #6ee7b7; border: 1px solid rgba(16,185,129,0.28); }
+
+.upcoming-empty {
+    text-align: center;
+    padding: 28px 16px;
+    color: var(--text-muted);
+    font-size: 0.93rem;
+}
+
+.upcoming-empty a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.upcoming-empty a:hover { text-decoration: underline; }
+
+/* ===== PROJECT TIMELINE ===== */
+.timeline-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 26px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-card);
+    animation: slideInUp 1s ease-out;
+}
+
+.timeline-section h2 {
+    font-size: 1.2rem;
+    color: var(--text-bright);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.milestone-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.milestone-item:last-child { border-bottom: none; }
+
+.milestone-dot-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.milestone-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    transition: background 0.2s ease;
+}
+
+.milestone-dot.done { background: var(--accent); border-color: var(--accent); }
+.milestone-dot.current { background: var(--purple); border-color: var(--purple); box-shadow: 0 0 0 4px rgba(124,58,237,0.2); }
+
+.milestone-connector {
+    width: 2px;
+    height: 20px;
+    background: var(--border);
+    margin: 2px 0;
+}
+
+.milestone-info { flex: 1; min-width: 0; }
+.milestone-name { color: var(--text-secondary); font-size: 0.93rem; font-weight: 600; margin-bottom: 2px; }
+.milestone-date { color: var(--text-muted); font-size: 0.82rem; }
+
+.milestone-pct {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    min-width: 38px;
+    text-align: left;
+}
+
+.no-project-cta {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-muted);
+}
+
+.no-project-cta .cta-link {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 11px 24px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    color: white;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.93rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.no-project-cta .cta-link:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--accent-glow); }
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 700px) {
-    body {
-        padding: 16px;
-    }
+    .stat-row     { grid-template-columns: 1fr; }
+    .progress-section { padding: 18px; }
+    .progress-grid { grid-template-columns: 1fr; }
+}
 
-    .progress-section {
-        padding: 18px;
-    }
-
-    .progress-grid {
-        grid-template-columns: 1fr;
-    }
+@media (max-width: 480px) {
+    .stat-row { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .stat-value { font-size: 1.4rem; }
 }
 </style>
-
 </head>
 <body>
-    <div class="page">
-        <header>
-            <div class="logo">📊</div>
-            <nav>
-                <a href="HomePage.html">דף עבודה</a>
-                <a href="RecuresiveDecomposition.html" class="active">התקדמות</a>
-                <a href="search.html">חיפוש</a>
-                <a href="profile.html">פרופיל</a>
-                <a href="test.html">בית</a>
-            </nav>
-            <button class="cta-button">התחברות</button>
-        </header>
+<div class="page">
 
-        <!-- === סקשן התקדמות === -->
-        <section class="progress-section">
-            <h2>📊 התקדמות שלך</h2>
-            
-            <div class="progress-grid">
-                <!-- מטרות שבועיות -->
-                <div class="progress-card">
-                    <div class="progress-card-title">🎯 מטרות שבועיות</div>
-                    <div class="goals-input-group">
-                        <input type="text" id="goalInput" placeholder="הוסף מטרה חדשה..." />
-                        <button onclick="addWeeklyGoal()">הוסף</button>
-                    </div>
-                    <div class="goals-list" id="goalsList"></div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" id="goalsProgressBar" style="width: 0%">0%</div>
-                    </div>
-                    <div class="progress-percentage" id="goalsPercentage">0/0 משימות הושלמו</div>
-                </div>
+    <!-- Navigation Header -->
+    <header class="site-header">
+        <div class="logo"></div>
+        <nav>
+            <a href="index.html">דף הבית</a>
+            <a href="HomePage.html">דף עבודה</a>
+            <a href="RecuresiveDecomposition.html" class="active">התקדמות</a>
+            <a href="search.html">חיפוש</a>
+            <a href="profile.html">פרופיל</a>
+            <a href="about.html">אודות</a>
+        </nav>
+        <button class="cta-button" onclick="window.location.href='index.html'">דף הבית</button>
+    </header>
 
-                <!-- גרף פעילות -->
-                <div class="progress-card">
-                    <div class="progress-card-title">📈 גרף פעילות</div>
-                    <div class="chart-container" id="activityChart"></div>
-                    <div class="progress-percentage" id="activityStats">לא יש נתונים עדיין</div>
-                </div>
-
-                <!-- טיפ יומי -->
-                <div class="progress-card">
-                    <div class="progress-card-title">💡 טיפ יומי</div>
-                    <div class="tip-content">
-                        <div class="tip-icon" id="tipIcon">💡</div>
-                        <div class="tip-text" id="tipText">טפל בתיקייה שלך...</div>
-                    </div>
-                    <button class="tip-button" onclick="getNewTip()">טיפ חדש</button>
-                </div>
+    <!-- Stat Cards -->
+    <div class="stat-row" id="statRow">
+        <div class="stat-card">
+            <div class="stat-icon blue">✅</div>
+            <div class="stat-info">
+                <div class="stat-value" id="statCompleted">0</div>
+                <div class="stat-label">משימות הושלמו</div>
             </div>
-        </section>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">🔥</div>
+            <div class="stat-info">
+                <div class="stat-value" id="statStreak">0</div>
+                <div class="stat-label">ימי רצף</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple">📈</div>
+            <div class="stat-info">
+                <div class="stat-value" id="statWeekly">0</div>
+                <div class="stat-label">פעילויות השבוע</div>
+            </div>
+        </div>
     </div>
 
+    <!-- Progress Section -->
+    <section class="progress-section">
+        <h2>📊 התקדמות שלך</h2>
+
+        <div class="progress-grid">
+            <!-- מטרות שבועיות -->
+            <div class="progress-card">
+                <div class="progress-card-title">🎯 מטרות שבועיות</div>
+                <div class="goals-input-group">
+                    <input type="text" id="goalInput" placeholder="הוסף מטרה חדשה..."
+                           onkeydown="if(event.key==='Enter') addWeeklyGoal()">
+                    <button onclick="addWeeklyGoal()">הוסף</button>
+                </div>
+                <div class="goals-list" id="goalsList"></div>
+                <div class="goals-actions">
+                    <button class="goals-reset-btn" onclick="resetWeeklyGoals()">🗑 אפס מטרות שבועיות</button>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="goalsProgressBar" style="width:0%"></div>
+                </div>
+                <div class="progress-percentage" id="goalsPercentage">0/0 משימות הושלמו</div>
+            </div>
+
+            <!-- גרף פעילות -->
+            <div class="progress-card">
+                <div class="progress-card-title">📈 גרף פעילות שבועי</div>
+                <div class="chart-container" id="activityChart"></div>
+                <div class="progress-percentage" id="activityStats">אין נתונים עדיין</div>
+            </div>
+
+            <!-- טיפ יומי -->
+            <div class="progress-card">
+                <div class="progress-card-title">💡 טיפ יומי</div>
+                <div class="tip-content">
+                    <div class="tip-icon" id="tipIcon">💡</div>
+                    <div class="tip-text" id="tipText">טוען טיפ...</div>
+                </div>
+                <button class="tip-button" onclick="getNewTip()">טיפ חדש</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Tasks -->
+    <section class="upcoming-section">
+        <h2>📅 משימות קרובות</h2>
+        <div id="upcomingList"></div>
+    </section>
+
+    <!-- Project Timeline -->
+    <section class="timeline-section">
+        <h2>🗺️ ציר זמן פרויקט נוכחי</h2>
+        <div id="projectTimeline"></div>
+    </section>
+
+</div>
+
 <script>
-// טיפים יומיים
 const dailyTips = [
-    { icon: '💡', text: 'ספח את המטרות שלך לחלקים קטנים יותר - זה יעזור לך להישאר מוטיבציה!' },
-    { icon: '🚀', text: 'התחל את היום שלך עם משימה קלה כדי לבנות תנופה!' },
-    { icon: '⏱️', text: 'השתמש בטכניקת Pomodoro: 25 דקות עבודה, 5 דקות הפסקה!' },
-    { icon: '🎯', text: 'דרג את המשימות שלך לפי חשיבות כדי להתמקד בחשובות ביותר!' },
-    { icon: '📝', text: 'תעד את ההתקדמות שלך - זה מעורר השראה וביטחון!' },
-    { icon: '🌟', text: 'אל תשכח לשמור על איזון בין עבודה להנאה!' },
-    { icon: '💪', text: 'כל יום קטן של התקדמות עדיף מאשר יום ללא פעולה!' },
-    { icon: '🔄', text: 'בדוק את ההתקדמות שלך בסוף כל יום וכוונן את המטרות שלך!' }
+    { icon: '💡', text: 'פרק את המטרות שלך לחלקים קטנים יותר — כך תישאר ממוקד ומוטיבציה.' },
+    { icon: '🚀', text: 'התחל את היום עם משימה קלה כדי לבנות תנופה!' },
+    { icon: '⏱️', text: 'טכניקת Pomodoro: 25 דקות עבודה, 5 דקות הפסקה. מוכח מדעית.' },
+    { icon: '🎯', text: 'דרג משימות לפי חשיבות ודחיפות — התמקד בחשובות ביותר קודם.' },
+    { icon: '📝', text: 'תעד את ההתקדמות שלך — זה מעורר השראה ומגביר ביטחון.' },
+    { icon: '🌟', text: 'שמור על איזון בין עבודה ומנוחה — המוח זקוק לשניהם.' },
+    { icon: '💪', text: 'כל יום קטן של התקדמות עדיף על יום ללא פעולה.' },
+    { icon: '🔄', text: 'סקור את ההתקדמות שלך בסוף כל יום וכוונן מטרות בהתאם.' }
 ];
 
-// אתחול
+const MILESTONES_LABELS = [
+    { name: 'הבנת המשימה ובחירת מבנה', p: 0.10 },
+    { name: 'בחירת מקורות',             p: 0.30 },
+    { name: 'איסוף מקורות',              p: 0.50 },
+    { name: 'כתיבת פסקה ראשונה',        p: 0.70 },
+    { name: 'עריכה וסיכום',              p: 0.90 },
+    { name: 'הגשה סופית',               p: 1.00 }
+];
+
 function initProgress() {
+    loadStatCards();
     loadWeeklyGoals();
     initActivityChart();
     getNewTip();
+    loadUpcomingTasks();
+    loadProjectTimeline();
 }
 
-// ===== מטרות שבועיות =====
+/* ===== STAT CARDS ===== */
+function loadStatCards() {
+    const goals      = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const completed  = goals.filter(g => g.completed).length;
+    const actData    = JSON.parse(localStorage.getItem('activityData') || '[]');
+    const weeklySum  = actData.slice(-7).reduce((s, d) => s + d.count, 0);
+    const streak     = calcStreak(actData);
+
+    document.getElementById('statCompleted').textContent = completed;
+    document.getElementById('statStreak').textContent    = streak;
+    document.getElementById('statWeekly').textContent    = weeklySum;
+}
+
+function calcStreak(actData) {
+    if (!actData.length) return 0;
+    const sorted = [...actData].sort((a, b) => b.date.localeCompare(a.date));
+    let streak = 0;
+    let prev   = null;
+    for (const d of sorted) {
+        if (!d.count) break;
+        if (prev === null) { streak = 1; prev = d.date; continue; }
+        const diff = (new Date(prev) - new Date(d.date)) / 86400000;
+        if (diff === 1) { streak++; prev = d.date; }
+        else break;
+    }
+    return streak;
+}
+
+/* ===== WEEKLY GOALS ===== */
 function addWeeklyGoal() {
     const input = document.getElementById('goalInput');
-    const goalText = input.value.trim();
-
-    if (!goalText) {
-        alert('אנא כתוב מטרה');
-        return;
-    }
+    const text  = input.value.trim();
+    if (!text) return;
 
     const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
-    const newGoal = {
-        id: Date.now(),
-        text: goalText,
-        completed: false,
-        createdAt: new Date().toISOString()
-    };
-
-    goals.push(newGoal);
+    goals.push({ id: Date.now(), text, completed: false, createdAt: new Date().toISOString() });
     localStorage.setItem('weeklyGoals', JSON.stringify(goals));
     input.value = '';
     renderGoals();
     updateGoalsProgress();
+    loadStatCards();
 }
 
 function renderGoals() {
-    const goalsList = document.getElementById('goalsList');
     const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
-
-    goalsList.innerHTML = '';
-    goals.forEach(goal => {
-        const goalItem = document.createElement('div');
-        goalItem.className = 'goal-item' + (goal.completed ? ' completed' : '');
-        goalItem.innerHTML = `
-            <input type="checkbox" ${goal.completed ? 'checked' : ''} onchange="toggleGoal(${goal.id})">
-            <div class="goal-text">${goal.text}</div>
-            <button class="goal-delete" onclick="deleteGoal(${goal.id})">✕</button>
-        `;
-        goalsList.appendChild(goalItem);
-    });
+    const list  = document.getElementById('goalsList');
+    list.innerHTML = goals.length ? goals.map(g => `
+        <div class="goal-item${g.completed ? ' completed' : ''}">
+            <input type="checkbox" ${g.completed ? 'checked' : ''} onchange="toggleGoal(${g.id})">
+            <div class="goal-text">${escapeHtml(g.text)}</div>
+            <button class="goal-delete" onclick="deleteGoal(${g.id})">✕</button>
+        </div>`).join('') : '<div style="text-align:center;color:var(--text-muted);font-size:0.88rem;padding:12px 0;">אין מטרות עדיין — הוסף אחת!</div>';
 }
 
-function toggleGoal(goalId) {
+function toggleGoal(id) {
     const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
-    const goal = goals.find(g => g.id === goalId);
-    if (goal) {
-        goal.completed = !goal.completed;
-        localStorage.setItem('weeklyGoals', JSON.stringify(goals));
-        renderGoals();
-        updateGoalsProgress();
-    }
+    const g     = goals.find(g => g.id === id);
+    if (g) { g.completed = !g.completed; localStorage.setItem('weeklyGoals', JSON.stringify(goals)); }
+    renderGoals();
+    updateGoalsProgress();
+    loadStatCards();
 }
 
-function deleteGoal(goalId) {
-    let goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
-    goals = goals.filter(g => g.id !== goalId);
+function deleteGoal(id) {
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]').filter(g => g.id !== id);
     localStorage.setItem('weeklyGoals', JSON.stringify(goals));
     renderGoals();
     updateGoalsProgress();
+    loadStatCards();
 }
 
-function loadWeeklyGoals() {
+function resetWeeklyGoals() {
+    if (!confirm('למחוק את כל המטרות השבועיות?')) return;
+    localStorage.removeItem('weeklyGoals');
     renderGoals();
     updateGoalsProgress();
+    loadStatCards();
 }
+
+function loadWeeklyGoals() { renderGoals(); updateGoalsProgress(); }
 
 function updateGoalsProgress() {
-    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
-    const completed = goals.filter(g => g.completed).length;
-    const total = goals.length;
-    const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+    const goals      = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const completed  = goals.filter(g => g.completed).length;
+    const total      = goals.length;
+    const pct        = total === 0 ? 0 : Math.round((completed / total) * 100);
 
-    document.getElementById('goalsProgressBar').style.width = percentage + '%';
-    document.getElementById('goalsProgressBar').textContent = percentage + '%';
-    document.getElementById('goalsPercentage').textContent = `${completed}/${total} משימות הושלמו`;
+    document.getElementById('goalsProgressBar').style.width = pct + '%';
+    document.getElementById('goalsPercentage').textContent  = `${completed}/${total} משימות הושלמו`;
 }
 
-// ===== גרף פעילות =====
+/* ===== ACTIVITY CHART ===== */
 function initActivityChart() {
-    const chart = document.getElementById('activityChart');
-    const activityData = JSON.parse(localStorage.getItem('activityData') || '[]');
+    let actData = JSON.parse(localStorage.getItem('activityData') || '[]');
 
-    // אם אין נתונים, יוצר נתונים דמויים לכל 7 הימים
-    if (activityData.length === 0) {
+    if (actData.length === 0) {
         for (let i = 6; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            activityData.push({
-                date: date.toISOString().split('T')[0],
-                count: Math.floor(Math.random() * 10)
-            });
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            actData.push({ date: d.toISOString().split('T')[0], count: Math.floor(Math.random() * 8) });
         }
-        localStorage.setItem('activityData', JSON.stringify(activityData));
+        localStorage.setItem('activityData', JSON.stringify(actData));
     }
 
-    chart.innerHTML = '';
-    const maxCount = Math.max(...activityData.map(d => d.count), 1);
+    const chart    = document.getElementById('activityChart');
+    const last7    = actData.slice(-7);
+    const maxCount = Math.max(...last7.map(d => d.count), 1);
+    const days     = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
 
-    activityData.slice(-7).forEach((data, index) => {
-        const bar = document.createElement('div');
-        const height = (data.count / maxCount) * 100;
-        const days = ['ראש', 'ש"ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
+    chart.innerHTML = last7.map((d, i) => {
+        const heightPct = (d.count / maxCount) * 100;
+        return `<div class="chart-bar" style="height:${heightPct}%">
+            <div class="chart-bar-value">${d.count}</div>
+            <div class="chart-bar-label">${days[i]}</div>
+        </div>`;
+    }).join('');
 
-        bar.className = 'chart-bar';
-        bar.style.setProperty('--height', height + '%');
-        bar.innerHTML = `
-            <div class="chart-bar-value">${data.count}</div>
-            <div class="chart-bar-label">${days[index]}</div>
-        `;
-        chart.appendChild(bar);
-    });
+    const total = last7.reduce((s, d) => s + d.count, 0);
+    document.getElementById('activityStats').textContent = total
+        ? `סה"כ פעילות השבוע: ${total} משימות`
+        : 'אין נתונים עדיין';
 
-    const totalActivity = activityData.reduce((sum, d) => sum + d.count, 0);
-    document.getElementById('activityStats').textContent = `סה"כ פעילות: ${totalActivity} משימות זה שבוע`;
+    loadStatCards();
 }
 
 function recordActivity() {
-    const activityData = JSON.parse(localStorage.getItem('activityData') || '[]');
-    const today = new Date().toISOString().split('T')[0];
-    let todayData = activityData.find(d => d.date === today);
-
-    if (!todayData) {
-        todayData = { date: today, count: 0 };
-        activityData.push(todayData);
-    }
-
-    todayData.count++;
-    localStorage.setItem('activityData', JSON.stringify(activityData));
+    const actData = JSON.parse(localStorage.getItem('activityData') || '[]');
+    const today   = new Date().toISOString().split('T')[0];
+    let entry     = actData.find(d => d.date === today);
+    if (!entry)  { entry = { date: today, count: 0 }; actData.push(entry); }
+    entry.count++;
+    localStorage.setItem('activityData', JSON.stringify(actData));
     initActivityChart();
 }
 
-// ===== טיפ יומי =====
+/* ===== DAILY TIP ===== */
 function getNewTip() {
-    const randomIndex = Math.floor(Math.random() * dailyTips.length);
-    const tip = dailyTips[randomIndex];
-
+    const tip = dailyTips[Math.floor(Math.random() * dailyTips.length)];
     document.getElementById('tipIcon').textContent = tip.icon;
     document.getElementById('tipText').textContent = tip.text;
-
-    localStorage.setItem('lastTipTime', new Date().toISOString());
 }
 
-// טעינת העמוד
+/* ===== UPCOMING TASKS ===== */
+function loadUpcomingTasks() {
+    const container = document.getElementById('upcomingList');
+
+    // Collect tasks: from weeklyGoals with dates + any saved project state
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    // Try to read saved project from decompose_app_state
+    let projectTasks = [];
+    try {
+        const state = JSON.parse(localStorage.getItem('decompose_app_state') || 'null');
+        if (state && state.dueDate && state.topic) {
+            projectTasks.push({
+                title: `עבודה: ${state.topic}`,
+                dueDate: state.dueDate,
+                color: '#a78bfa'
+            });
+        }
+    } catch(e) {}
+
+    const allTasks = [
+        ...projectTasks,
+        ...goals.filter(g => !g.completed && g.createdAt).map(g => ({
+            title: g.text,
+            dueDate: null,
+            color: '#60a5fa'
+        }))
+    ].filter(t => t.dueDate !== null || t.color).slice(0, 5);
+
+    if (projectTasks.length === 0 && goals.filter(g => !g.completed).length === 0) {
+        container.innerHTML = `<div class="upcoming-empty">
+            אין משימות קרובות. <a href="HomePage.html">צור פרויקט חדש</a> כדי להתחיל.
+        </div>`;
+        return;
+    }
+
+    // Show pending goals
+    const pendingGoals = goals.filter(g => !g.completed).slice(0, 4);
+    if (pendingGoals.length === 0 && projectTasks.length === 0) {
+        container.innerHTML = `<div class="upcoming-empty">כל המטרות הושלמו! 🎉<br><a href="HomePage.html">פתח פרויקט חדש</a></div>`;
+        return;
+    }
+
+    const items = [
+        ...projectTasks.map(t => {
+            const due   = new Date(t.dueDate);
+            const diff  = Math.ceil((due - today) / 86400000);
+            const cls   = diff <= 2 ? 'days-urgent' : diff <= 7 ? 'days-soon' : 'days-ok';
+            const label = diff < 0 ? 'עבר!' : diff === 0 ? 'היום!' : `עוד ${diff} ימים`;
+            return `<div class="upcoming-item">
+                <div class="upcoming-dot" style="background:${t.color}"></div>
+                <div class="upcoming-text">
+                    <div class="upcoming-title">${escapeHtml(t.title)}</div>
+                    <div class="upcoming-date">הגשה: ${t.dueDate}</div>
+                </div>
+                <span class="upcoming-days ${cls}">${label}</span>
+            </div>`;
+        }),
+        ...pendingGoals.map(g => `<div class="upcoming-item">
+            <div class="upcoming-dot" style="background:#60a5fa"></div>
+            <div class="upcoming-text">
+                <div class="upcoming-title">${escapeHtml(g.text)}</div>
+                <div class="upcoming-date">מטרה שבועית</div>
+            </div>
+            <span class="upcoming-days days-ok">בתהליך</span>
+        </div>`)
+    ];
+
+    container.innerHTML = items.join('') || `<div class="upcoming-empty">אין משימות להצגה. <a href="HomePage.html">פתח פרויקט חדש</a></div>`;
+}
+
+/* ===== PROJECT TIMELINE ===== */
+function loadProjectTimeline() {
+    const container = document.getElementById('projectTimeline');
+
+    let state = null;
+    try { state = JSON.parse(localStorage.getItem('decompose_app_state') || 'null'); } catch(e) {}
+
+    if (!state || !state.dueDate) {
+        container.innerHTML = `<div class="no-project-cta">
+            <div style="font-size:2rem;margin-bottom:10px;">📋</div>
+            <div>עדיין לא התחלת פרויקט.<br>
+                <small style="color:var(--text-muted);">הקישור שלמטה ייפתח את דף העבודה.</small>
+            </div>
+            <a href="HomePage.html" class="cta-link">התחל פרויקט חדש</a>
+        </div>`;
+        return;
+    }
+
+    const today    = new Date(); today.setHours(0,0,0,0);
+    const dueDate  = new Date(state.dueDate);
+    const total    = Math.max(1, Math.round((dueDate - new Date(state.startDate || today)) / 86400000));
+    const elapsed  = Math.round((today - new Date(state.startDate || today)) / 86400000);
+    const progress = Math.min(1, Math.max(0, elapsed / total));
+
+    const items = MILESTONES_LABELS.map((m, i) => {
+        const isDone    = progress >= m.p;
+        const isCurrent = !isDone && (i === 0 || progress >= MILESTONES_LABELS[i-1].p);
+        const milestoneDate = new Date(new Date(state.startDate || today).getTime() + m.p * total * 86400000);
+        const dotClass = isDone ? 'done' : isCurrent ? 'current' : '';
+
+        return `<div class="milestone-item">
+            <div class="milestone-dot-wrap">
+                <div class="milestone-dot ${dotClass}"></div>
+                ${i < MILESTONES_LABELS.length - 1 ? '<div class="milestone-connector"></div>' : ''}
+            </div>
+            <div class="milestone-info">
+                <div class="milestone-name">${m.name}</div>
+                <div class="milestone-date">${milestoneDate.toLocaleDateString('he-IL')}</div>
+            </div>
+            <div class="milestone-pct">${Math.round(m.p*100)}%</div>
+        </div>`;
+    });
+
+    container.innerHTML = `
+        <div style="margin-bottom:16px;color:var(--text-muted);font-size:0.88rem;">
+            פרויקט: <strong style="color:var(--text-bright);">${escapeHtml(state.topic || '')}</strong>
+            | הגשה: <strong style="color:var(--text-bright);">${state.dueDate}</strong>
+        </div>
+        ${items.join('')}
+    `;
+}
+
+function escapeHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initProgress();
-    
-    // תיעוד פעילות בכל פעם שמשתמש מבצע פעולה
-    document.addEventListener('click', function() {
-        recordActivity();
-    }, { once: false });
+    document.addEventListener('click', recordActivity, { once: false });
 });
 </script>
 </body>

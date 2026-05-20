@@ -25,12 +25,11 @@ function createNewState() {
     topic: null,
     pgNumberScope: null,
     dueDate: null,
-    chunkLabel: null,
-    chunkSummary: null,
   };
 }
 
 async function initProject(rawText) {
+  console.log('🔵 [logicManager] initProject התחיל, rawText:', rawText?.substring(0, 50));
   if (typeof rawText !== "string") {
     handleError(TASK_ERROR_MSG);
     return null;
@@ -58,12 +57,15 @@ async function initProject(rawText) {
   const newState = createNewState();
   newState.rawText = normalizedText;
 
+  console.log('🔵 [logicManager] שולח ל-aiService.sendQuery...');
+  console.log('🔵 [logicManager] aiService זמין?', typeof aiService, typeof aiService?.sendQuery);
   try {
     const currentState = await aiService.sendQuery(
       "DECOMPOSE_INITIAL",
       normalizedText,
       newState
     );
+    console.log('🔵 [logicManager] תשובה מ-aiService:', currentState);
 
     if (!currentState) {
       handleError("לא התקבלה תגובה מהשרת. נסה שוב.");
@@ -225,13 +227,8 @@ function analyzeActionability(taskText) {
 // ============================================================
 /**
  * שלב 1: בדיקה מקומית מהירה (analyzeActionability)
- * שלב 2: שליחה ל-AI לניתוח עמוק יותר (VALIDATE_TASK)
+ * שלב 2: שליחה ל-AI רק אם הציון אינו ברור (לא ירוק ברור)
  * שלב 3: אם "אדום" — מבקשים מה-AI הצעת שיפור (SUGGEST_IMPROVEMENT)
- *
- * הרשיונות:
- *   - הבדיקה המקומית מהירה ונותנת תשובה מיידית
- *   - ה-AI מדייק את הסיווג ומוסיף הסבר
- *   - אם האדום מאושר ע"י AI — מגיעה גם הצעה לשיפור
  *
  * קלט:  taskId (string), taskText (string)
  * פלט:  {
@@ -257,29 +254,32 @@ async function handleTaskValidation(taskId, taskText) {
     localAnalysis = { score: "green", label: "המשימה נראית ממוקדת" };
   }
 
-  // ── שלב 2: שליחה ל-AI לניתוח מעמיק ───────────────────────
-  let aiValidation = null;
+  // ── שלב 2: AI רק לציונים לא חד-משמעיים ─────────────────────
+  // ציון גבוה (>=15) = ירוק ברור — אין צורך ב-AI
+  const needsAI = localScore === false || localScore < 15;
+
   let finalScore = localAnalysis.score;
   let finalLabel = localAnalysis.label;
   let finalExplanation = "";
   let source = "local";
 
-  try {
-    console.log("🤖 שולח ל-AI לאימות...");
-    aiValidation = await aiService.sendQuery("VALIDATE_TASK", normalizedTaskText);
+  if (needsAI) {
+    try {
+      console.log("🤖 שולח ל-AI לאימות...");
+      const aiValidation = await aiService.sendQuery("VALIDATE_TASK", normalizedTaskText);
 
-    if (aiValidation && aiValidation.score) {
-      // ה-AI מנצח — הסיווג שלו מדויק יותר
-      finalScore = aiValidation.score;
-      finalLabel = aiValidation.label;
-      finalExplanation = aiValidation.explanation || "";
-      source = "ai";
-      console.log(`✅ AI החליט: ${finalScore} — ${finalLabel}`);
+      if (aiValidation && aiValidation.score) {
+        finalScore = aiValidation.score;
+        finalLabel = aiValidation.label;
+        finalExplanation = aiValidation.explanation || "";
+        source = "ai";
+        console.log(`✅ AI החליט: ${finalScore} — ${finalLabel}`);
+      }
+    } catch (error) {
+      console.error("⚠️ AI validation נכשל, משתמשים בניתוח מקומי:", error);
     }
-  } catch (error) {
-    // ה-AI נכשל — ממשיכים עם התוצאה המקומית
-    console.error("⚠️ AI validation נכשל, משתמשים בניתוח מקומי:", error);
-    source = "local";
+  } else {
+    console.log("✅ ציון מקומי גבוה — מדלגים על AI validation");
   }
 
   // ── שלב 3: אם אדום — מבקשים הצעת שיפור ────────────────────
@@ -294,7 +294,6 @@ async function handleTaskValidation(taskId, taskText) {
       });
     } catch (error) {
       console.error("⚠️ שגיאה בקבלת הצעת שיפור:", error);
-      aiSuggestion = null;
     }
   }
 
@@ -303,8 +302,8 @@ async function handleTaskValidation(taskId, taskText) {
     score: finalScore,
     label: finalLabel,
     explanation: finalExplanation,
-    source: source,              // "local" | "ai" — שימושי לדיבאג
-    aiSuggestion: aiSuggestion,  // { refinedText, explanation } | null
+    source: source,
+    aiSuggestion: aiSuggestion,
   };
 }
 
@@ -421,7 +420,27 @@ async function requestAIAngles(topic) {
 
 
 // ============================================================
-//  פונקציה 6: syncStateToStorage
+//  פונקציה 6: analyzeDemandsAndCreateSubtasks
+// ============================================================
+async function analyzeDemandsAndCreateSubtasks(demandsText, context) {
+  if (typeof demandsText !== "string" || !demandsText.trim()) {
+    handleError("אנא הדבק את דרישות העבודה לפני הניתוח.");
+    return [];
+  }
+
+  try {
+    const result = await aiService.sendQuery("ANALYZE_DEMANDS", demandsText.trim(), context);
+    if (!result || !Array.isArray(result)) return [];
+    return result;
+  } catch (error) {
+    console.error("שגיאה בניתוח הדרישות:", error);
+    return [];
+  }
+}
+
+
+// ============================================================
+//  פונקציה 7: syncStateToStorage
 // ============================================================
 function syncStateToStorage(state) {
   try {
@@ -463,6 +482,7 @@ const logicManager = {
   updateTimelineMilestone,
   normalizeTimelineDate,
   requestAIAngles,
+  analyzeDemandsAndCreateSubtasks,
   syncStateToStorage,
   loadStateFromStorage,
 };

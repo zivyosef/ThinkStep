@@ -1,0 +1,228 @@
+/* =====================================================
+   MentorAI — Shared Design System
+   ===================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:              #070b16;
+  --bg-card:         rgba(255, 255, 255, 0.04);
+  --bg-card-hover:   rgba(255, 255, 255, 0.07);
+  --border:          rgba(148, 163, 184, 0.14);
+  --border-focus:    rgba(37, 99, 235, 0.5);
+  --text:            #e2e8f0;
+  --text-bright:     #f8fafc;
+  --text-secondary:  #cbd5e1;
+  --text-muted:      #94a3b8;
+  --accent:          #2563eb;
+  --accent-hover:    #1d4ed8;
+  --accent-glow:     rgba(37, 99, 235, 0.35);
+  --purple:          #7c3aed;
+  --radius-sm:       10px;
+  --radius-md:       14px;
+  --radius-lg:       22px;
+  --radius-xl:       28px;
+  --shadow-card:     0 20px 50px rgba(7, 11, 22, 0.28);
+  --shadow-btn:      0 8px 20px rgba(37, 99, 235, 0.35);
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.75; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: translateY(-28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== BASE ===== */
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 24px;
+  direction: rtl;
+  animation: fadeIn 0.55s ease-out;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ===== HEADER ===== */
+
+header.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 22px;
+  background: rgba(7, 11, 22, 0.88);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: slideInUp 0.65s ease-out;
+  position: sticky;
+  top: 16px;
+  z-index: 100;
+}
+
+/* ===== LOGO ===== */
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  background-image: url("logo_progect.jpeg");
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+/* ===== NAV ===== */
+
+nav {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+nav a:hover {
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--text-bright);
+}
+
+nav a.active {
+  background: rgba(37, 99, 235, 0.18);
+  color: var(--text-bright);
+  font-weight: 600;
+}
+
+/* ===== CTA BUTTON ===== */
+
+.cta-button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cta-button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-btn);
+}
+
+/* ===== MODALS ===== */
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-content {
+  background: rgba(10, 17, 38, 0.97);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  max-width: 520px;
+  width: 100%;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.75);
+  animation: modalSlideIn 0.3s ease;
+}
+
+.modal-content::-webkit-scrollbar { width: 6px; }
+.modal-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 999px; }
+.modal-content::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 999px; }
+
+/* ===== SCROLLBAR ===== */
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 999px; }
+::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.28); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.42); }
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+  body { padding: 14px; }
+
+  header.site-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 16px;
+    top: 8px;
+  }
+
+  nav {
+    order: 3;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  nav a { padding: 7px 10px; font-size: 0.85rem; }
+}

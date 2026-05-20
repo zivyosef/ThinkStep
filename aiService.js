@@ -8,41 +8,38 @@ import { GoogleGenAI } from "@google/genai";
 
 const AI_HISTORY_KEY = "my_ai_app_history";
 const MAX_HISTORY = 10;
-const ai = new GoogleGenAI({ apiKey: "AIzaSyDMg2ByJaXvb0RzJDzood8b4KxiNdlqkx0" });
-const GEMINI_MODEL = "gemini-2.0-flash"; // ✅ תוקן: gemini-3-flash-preview לא קיים
+const _apiKey = window.GEMINI_API_KEY || import.meta.env?.VITE_GEMINI_API_KEY;
+console.log('🟠 [aiService] מפתח API נטען?', _apiKey ? `כן (${_apiKey.slice(0,8)}...)` : '❌ לא נמצא מפתח API!');
+const ai = new GoogleGenAI({ apiKey: _apiKey });
+const GEMINI_MODEL = "gemini-2.5-flash-lite";
 
 // ============================================================
 //  sendQuery — נקודת הכניסה המרכזית לכל הבקשות
 // ============================================================
-async function sendQuery(intent, rawData, userDescription) {
-  console.log(`🤖 aiService קיבל בקשה מסוג: ${intent}`);
+// הווסף פרמטר retryCount עם ערך ברירת מחדל 0
+async function sendQuery(intent, rawData, userDescription, retryCount = 0) {
+  const MAX_RETRIES = 2; // מקסימום 2 ניסיונות חוזרים (סך הכל 3 ריצות)
+  
+  console.log(`🤖 aiService קיבל בקשה מסוג: ${intent} (ניסיון ${retryCount + 1})`);
 
   const history = loadAIHistory();
   let result = null;
 
   try {
     if (intent === "DECOMPOSE_INITIAL") {
-      // rawData = הטקסט הגולמי, userDescription = newState שצריך למלא
       result = await generateSmartDecomposition(rawData, userDescription);
-
     } else if (intent === "SUGGEST_IMPROVEMENT") {
-      // rawData = { taskText, reason }
       result = await generateRefinedPrompt(rawData.taskText, rawData.reason);
-
     } else if (intent === "VALIDATE_TASK") {
-      // rawData = טקסט המשימה
-      // מחזיר { score: "red"|"yellow"|"green", label, explanation }
       result = await validateTaskWithAI(rawData);
-
     } else if (intent === "SOCRATIC_CHAT") {
       result = await getSocraticResponse(rawData, userDescription, history);
-
     } else if (intent === "STUCK_ADVISOR") {
       result = await getThinkingModels(rawData);
-
     } else if (intent === "GET_ANGLES") {
       result = await requestAnglesFromAI(rawData);
-
+    } else if (intent === "ANALYZE_DEMANDS") {
+      result = await generateSubtasksFromDemands(rawData, userDescription);
     } else {
       console.error("❌ intent לא מוכר:", intent);
       return null;
@@ -55,9 +52,21 @@ async function sendQuery(intent, rawData, userDescription) {
     return result;
 
   } catch (error) {
-    const msg = error?.message || String(error);
-    console.error(`❌ שגיאה בביצוע ${intent}:`, msg);
-    alert(`שגיאת AI (${intent}):\n${msg}`);
+    // טיפול בשגיאת מכסה מלאה (429)
+    if (error?.status === 429) {
+      if (retryCount < MAX_RETRIES) {
+        console.warn(`⏳ קוטה מלא — ממתין 30 שניות ומנסה שוב... (ניסיון ${retryCount + 1}/${MAX_RETRIES + 1})`);
+        await delay(30000);
+        // מעבירים את ה-retryCount פלוס 1 לקריאה הבאה
+        return sendQuery(intent, rawData, userDescription, retryCount + 1);
+      } else {
+        console.error("❌ נעצרו הניסיונות החוזרים: עברת את מקסימום הניסיונות המותרים לשגיאת 429.");
+        // מחזירים אובייקט שגיאה מסודר כדי שה-UI של 'Decompose' יוכל להציג הודעה ידידותית למשתמש
+        return { error: true, message: "השרת עמוס כרגע, אנא נסה שוב בעוד דקה." };
+      }
+    }
+    
+    console.error(`❌ שגיאה בביצוע ${intent} — FULL ERROR:`, error);
     return null;
   }
 }
@@ -136,9 +145,12 @@ async function validateTaskWithAI(taskText) {
  * פלט:  object עם שדות: subject, topic, assignmentType, chunks
  */
 async function generateSmartDecomposition(rawText, currentState) {
+  console.log("📤 שולח ל-AI לפירוק המשימה:", rawText);
+  const today = new Date().toISOString().split("T")[0];
   const prompt = `
 אתה עוזר לימודי חכם לתלמידי תיכון.
 קרא את תיאור המשימה הבא והחזר מידע מובנה.
+תאריך היום: ${today}
 
 תיאור המשימה:
 "${rawText}"
@@ -149,6 +161,7 @@ async function generateSmartDecomposition(rawText, currentState) {
   "topic": "נושא הפרויקט במשפט אחד (אם לא ברור כתוב null)",
   "assignmentType": "סוג המטלה: עבודה | בחינה | מצגת | קריאה | אחר",
   "pgNumberScope": null,
+  "dueDate": "YYYY-MM-DD אם מוזכר תאריך או פרק זמן (שבוע, שבועיים, חודש וכו') — חשב לפי תאריך היום. אם לא מוזכר כתוב null",
   "chunks": [
     { "id": "chunk-1", "title": "שם החלק", "description": "מה צריך לעשות בחלק הזה" },
     { "id": "chunk-2", "title": "שם החלק", "description": "מה צריך לעשות בחלק הזה" },
@@ -162,11 +175,11 @@ async function generateSmartDecomposition(rawText, currentState) {
 - ספרות / עברית → אלמנטים ספרותיים: עלילה, דמויות, מסר
 - כללי → מבוא, גוף, סיכום
 `;
-
   const response = await ai.models.generateContent({
     model: GEMINI_MODEL,
     contents: prompt,
   });
+  console.log("📥 תשובת AI לפירוק:", response.text);
 
   const text = response.text.trim().replace(/```json|```/g, "").trim();
 
@@ -180,10 +193,12 @@ async function generateSmartDecomposition(rawText, currentState) {
       topic: parsed.topic || null,
       assignmentType: parsed.assignmentType || null,
       pgNumberScope: parsed.pgNumberScope || currentState?.pgNumberScope || null,
+      dueDate: parsed.dueDate || currentState?.dueDate || null,
       chunks: Array.isArray(parsed.chunks) ? parsed.chunks : [],
     };
   } catch (e) {
     console.error("❌ שגיאה בפירוש תשובת AI לפירוק:", e, "\nתשובה גולמית:", text);
+    console.log("📤 שולח ל-AI לפירוק המשימה:", rawText);
     return currentState || null;
   }
 }
@@ -345,6 +360,56 @@ async function getThinkingModels(subject) {
 // ============================================================
 async function requestAnglesFromAI(topic) {
   return await getThinkingModels(topic);
+}
+
+
+// ============================================================
+//  פונקציה: generateSubtasksFromDemands
+//  נקראת ע"י intent: "ANALYZE_DEMANDS"
+// ============================================================
+async function generateSubtasksFromDemands(demandsText, context) {
+  const today = new Date().toISOString().split("T")[0];
+  const { subject, topic, pages, dueDate } = context || {};
+
+  const prompt = `
+אתה עוזר לימודי לתלמידי תיכון.
+קיבלת את דרישות המטלה הבאות:
+"${demandsText}"
+
+פרטי המשימה:
+- מקצוע: ${subject || "לא צוין"}
+- נושא: ${topic || "לא צוין"}
+- מספר עמודים: ${pages || "לא צוין"}
+- תאריך הגשה: ${dueDate || "לא צוין"}
+- תאריך היום: ${today}
+
+פרק את הדרישות לרשימת משימות ספציפיות וניתנות לביצוע.
+החזר JSON בלבד, ללא markdown:
+[
+  { "id": "task-1", "title": "שם המשימה", "description": "מה בדיוק צריך לעשות" },
+  { "id": "task-2", "title": "שם המשימה", "description": "מה בדיוק צריך לעשות" }
+]
+הנחיות:
+- 3 עד 6 משימות
+- כל משימה — ספציפית וניתנת לביצוע ב-1 עד 2 שעות
+- ממוינות לפי סדר הגיוני לביצוע
+`;
+
+  const response = await ai.models.generateContent({
+    model: GEMINI_MODEL,
+    contents: prompt,
+  });
+
+  const text = response.text.trim().replace(/```json|```/g, "").trim();
+
+  try {
+    const parsed = JSON.parse(text);
+    if (Array.isArray(parsed)) return parsed;
+    throw new Error("התשובה אינה מערך");
+  } catch (e) {
+    console.error("❌ שגיאה בפירוש תשובת ANALYZE_DEMANDS:", e, "\nתשובה גולמית:", text);
+    return [];
+  }
 }
 
 

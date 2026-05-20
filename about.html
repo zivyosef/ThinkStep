@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אודות | למידה חכמה</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --accent-bright: #60a5fa;
+            --highlight:     #a78bfa;
+            --bg-card-about: rgba(30, 41, 59, 0.5);
+            --border-about:  rgba(148, 163, 184, 0.15);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* ===== HERO ===== */
+        .about-hero {
+            position: relative;
+            padding: 56px 0 40px;
+            overflow: hidden;
+        }
+
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 220px; height: 220px;
+            background: var(--highlight);
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .about-hero h1 {
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            font-weight: 800;
+            line-height: 0.95;
+            color: var(--text-bright);
+            border-right: 5px solid var(--accent-bright);
+            padding-right: 22px;
+            margin-bottom: 14px;
+            letter-spacing: -0.02em;
+        }
+
+        .about-hero p {
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, var(--accent-bright), var(--highlight));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+        }
+
+        /* ===== SECTIONS ===== */
+        section {
+            margin-bottom: 56px;
+        }
+
+        .lead-text {
+            font-size: 1.05rem;
+            background: var(--bg-card-about);
+            border: 1px solid var(--border-about);
+            padding: 36px;
+            border-radius: 22px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+            backdrop-filter: blur(10px);
+        }
+
+        .lead-text p {
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            line-height: 1.75;
+        }
+
+        .lead-text p:last-child { margin-bottom: 0; }
+        .lead-text strong { color: var(--text-bright); font-weight: 700; }
+
+        h2 {
+            font-size: 1.75rem;
+            color: var(--text-bright);
+            margin-bottom: 28px;
+            position: relative;
+            display: inline-block;
+            font-weight: 700;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px; right: 0;
+            width: 56px; height: 3px;
+            background: linear-gradient(135deg, var(--accent-bright), var(--highlight));
+            border-radius: 2px;
+        }
+
+        /* ===== PROBLEM BOXES ===== */
+        .problem-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+            margin-top: 36px;
+        }
+
+        .problem-box {
+            background: rgba(30,41,59,0.6);
+            border: 1px solid var(--border-about);
+            padding: 28px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+            backdrop-filter: blur(8px);
+        }
+
+        .problem-box:hover {
+            transform: translateY(-5px);
+            border-color: rgba(96,165,250,0.4);
+            background: rgba(37,99,235,0.1);
+            box-shadow: 0 12px 28px rgba(59,130,246,0.18);
+        }
+
+        .problem-box i {
+            background: linear-gradient(135deg, var(--accent-bright), var(--highlight));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.4rem;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .problem-box h3 { color: var(--text-bright); font-size: 1.15rem; margin: 12px 0 8px; font-weight: 700; }
+        .problem-box p  { color: var(--text-secondary); font-size: 0.93rem; line-height: 1.6; }
+
+        /* ===== APPROACH STEPS ===== */
+        .approach-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 22px;
+            margin-bottom: 22px;
+            background: rgba(30,41,59,0.5);
+            padding: 24px;
+            border-radius: 18px;
+            border: 1px solid var(--border-about);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+            backdrop-filter: blur(8px);
+        }
+
+        .approach-step:hover {
+            border-color: rgba(96,165,250,0.38);
+            box-shadow: 0 8px 24px rgba(59,130,246,0.14);
+            background: rgba(37,99,235,0.08);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, var(--accent), var(--highlight));
+            color: white;
+            min-width: 48px; height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(59,130,246,0.3);
+        }
+
+        .approach-step div:last-child { color: var(--text-secondary); font-size: 0.93rem; line-height: 1.65; }
+        .approach-step strong { color: var(--text-bright); font-weight: 700; }
+
+        /* ===== GOALS GRID ===== */
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 18px;
+            margin-top: 36px;
+        }
+
+        .goal-card {
+            padding: 28px;
+            background: rgba(30,41,59,0.6);
+            border: 1px solid rgba(96,165,250,0.18);
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+            backdrop-filter: blur(8px);
+        }
+
+        .goal-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(96,165,250,0.45);
+            box-shadow: 0 12px 28px rgba(59,130,246,0.18);
+            background: rgba(37,99,235,0.1);
+        }
+
+        .goal-card i {
+            font-size: 2.4rem;
+            background: linear-gradient(135deg, var(--accent-bright), var(--highlight));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .goal-card h3 { color: var(--text-bright); font-size: 1.15rem; margin: 12px 0 8px; font-weight: 700; }
+        .goal-card p  { color: var(--text-secondary); font-size: 0.93rem; }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 56px 20px;
+            background: rgba(30,41,59,0.5);
+            border-top: 1px solid var(--border-about);
+            margin-top: 72px;
+            border-radius: 22px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+            backdrop-filter: blur(10px);
+        }
+
+        .final-quote {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-bright);
+        }
+
+        mark {
+            background: linear-gradient(135deg, var(--accent-bright), var(--highlight));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        footer p { margin-top: 18px; color: var(--text-muted); font-size: 0.88rem; }
+
+        @media (max-width: 768px) {
+            .about-hero h1 { font-size: 2.4rem; padding-right: 14px; }
+
+            .approach-step {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .lead-text { padding: 24px; }
+            .final-quote { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+
+        <!-- Navigation Header -->
+        <header class="site-header">
+            <div class="logo"></div>
+            <nav>
+                <a href="index.html">דף הבית</a>
+                <a href="HomePage.html">דף עבודה</a>
+                <a href="RecuresiveDecomposition.html">התקדמות</a>
+                <a href="search.html">חיפוש</a>
+                <a href="profile.html">פרופיל</a>
+                <a href="about.html" class="active">אודות</a>
+            </nav>
+            <button class="cta-button" onclick="window.location.href='index.html'">דף הבית</button>
+        </header>
+
+        <div class="container">
+            <div class="about-hero">
+                <h1>ללמוד,<br>לא רק להגיש.</h1>
+                <p>המהפכה בלמידה העצמאית</p>
+            </div>
+
+            <section>
+                <div class="lead-text">
+                    <p>אנחנו מאמינים שה-AI הוא לא תחליף למוח האנושי, אלא <strong>המנוע שיכול להזניק אותו קדימה</strong> – בתנאי שיודעים איך לעבוד איתו נכון.</p>
+                    <p style="color:#64748b;">למידה חכמה הוקמה כדי להוכיח שאפשר להשתמש בטכנולוגיה כדי להפוך לחכמים יותר, ולא רק כדי "לעקוף את המערכת".</p>
+                </div>
+            </section>
+
+            <section>
+                <h2>הבעיה שאנחנו פותרים</h2>
+                <div class="problem-container">
+                    <div class="problem-box">
+                        <i class="fas fa-ghost"></i>
+                        <h3>מחסום הדף הלבן</h3>
+                        <p>המשימות נראות גדולות ומאיימות מדי, מה שיוצר שיתוק ודחיינות של הרגע האחרון.</p>
+                    </div>
+                    <div class="problem-box">
+                        <i class="fas fa-brain"></i>
+                        <h3>למידה טכנית מדי</h3>
+                        <p>העתקה פשוטה מ-AI משאירה את התלמיד ללא הבנה של החומר וללא כלים לעתיד.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>הגישה שלנו: AI כמדריך</h2>
+
+                <div class="approach-step">
+                    <div class="step-number">01</div>
+                    <div><strong>פירוק לגורמים:</strong> הופכים נושא מחקר מורכב לצעדים קטנים וברי ביצוע.</div>
+                </div>
+                <div class="approach-step">
+                    <div class="step-number">02</div>
+                    <div><strong>דיאלוג לימודי:</strong> ה-AI שלנו שואל שאלות מנחות במקום לתת תשובות מוכנות.</div>
+                </div>
+                <div class="approach-step">
+                    <div class="step-number">03</div>
+                    <div><strong>חקר מבוסס מקורות:</strong> הנגשת מאמרים וידע אמיתי כדי למנוע "ניחושים סטטיסטיים".</div>
+                </div>
+            </section>
+
+            <section>
+                <h2>המטרות שלנו</h2>
+                <div class="goals-grid">
+                    <div class="goal-card">
+                        <i class="fas fa-user-shield"></i>
+                        <h3>ביטחון עצמי</h3>
+                        <p>להרגיש מסוגל מול כל משימה.</p>
+                    </div>
+                    <div class="goal-card">
+                        <i class="fas fa-lightbulb"></i>
+                        <h3>חשיבה ביקורתית</h3>
+                        <p>להפוך מצרכנים ליוצרים.</p>
+                    </div>
+                    <div class="goal-card">
+                        <i class="fas fa-stream"></i>
+                        <h3>סדר וארגון</h3>
+                        <p>הרגלי עבודה לחיים.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <div class="final-quote">
+                תפסיקו "לעשות עבודות". <mark>תתחילו ליצור ידע.</mark>
+            </div>
+            <p>&copy; 2024 למידה חכמה | פלטפורמה ללמידה חכמה</p>
+        </footer>
+    </div>
+</body>
+</html>
