@@ -274,6 +274,19 @@
     </div>
 
     <script>
+        window.SUPABASE_URL      = 'https://fflgijtemitvpjwiofue.supabase.co';
+        window.SUPABASE_ANON_KEY = 'sb_publishable_5NMPAK52g1LVFZU5fdmQCw_Nf7UXex5';
+    </script>
+    <script type="importmap">
+    {
+      "imports": {
+        "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+      }
+    }
+    </script>
+    <script type="module">
+        import { getCurrentUser, getProfile, getActivityHistory } from './supabase.js';
+
         const defaultProfile = {
             username: 'משתמש חדש',
             email: 'לא הוגדר',
@@ -286,25 +299,37 @@
             learningScore: '85%',
         };
 
-        const profileData    = JSON.parse(localStorage.getItem('userProfile') || 'null') || defaultProfile;
-        const activityHistory = JSON.parse(localStorage.getItem('activityHistory') || '[]');
+        async function initProfile() {
+            const user = await getCurrentUser();
 
-        document.getElementById('profileName').textContent    = profileData.username;
-        document.getElementById('userFullName').textContent   = profileData.fullName   || defaultProfile.fullName;
-        document.getElementById('userDescription').textContent = profileData.description || defaultProfile.description;
-        document.getElementById('projectCount').textContent   = profileData.projectCount || defaultProfile.projectCount;
-        document.getElementById('taskCount').textContent      = profileData.taskCount    || defaultProfile.taskCount;
-        document.getElementById('learningScore').textContent  = profileData.learningScore || defaultProfile.learningScore;
+            let profileData     = defaultProfile;
+            let activityHistory = [];
 
-        const tableBody = document.querySelector('tbody');
-        tableBody.innerHTML = activityHistory.length
-            ? activityHistory.map(entry => `
-                <tr>
-                    <td>${entry.date}</td>
-                    <td>${entry.action}</td>
-                    <td>${entry.details}</td>
-                </tr>`).join('')
-            : '<tr><td colspan="3" style="color:var(--text-muted);text-align:center;">אין פעולות להצגה עדיין.</td></tr>';
+            if (user) {
+                const dbProfile = await getProfile(user.id);
+                if (dbProfile) {
+                    profileData = { ...defaultProfile, ...dbProfile, fullName: dbProfile.full_name };
+                }
+                activityHistory = await getActivityHistory(user.id);
+            }
+
+            document.getElementById('profileName').textContent     = profileData.username;
+            document.getElementById('userFullName').textContent    = profileData.fullName   || defaultProfile.fullName;
+            document.getElementById('userDescription').textContent = profileData.description || defaultProfile.description;
+            document.getElementById('projectCount').textContent    = profileData.projectCount || defaultProfile.projectCount;
+            document.getElementById('taskCount').textContent       = profileData.taskCount    || defaultProfile.taskCount;
+            document.getElementById('learningScore').textContent   = profileData.learningScore || defaultProfile.learningScore;
+
+            const tableBody = document.querySelector('tbody');
+            tableBody.innerHTML = activityHistory.length
+                ? activityHistory.map(entry => `
+                    <tr>
+                        <td>${entry.date}</td>
+                        <td>${entry.action}</td>
+                        <td>${entry.details}</td>
+                    </tr>`).join('')
+                : '<tr><td colspan="3" style="color:var(--text-muted);text-align:center;">אין פעולות להצגה עדיין.</td></tr>';
+        }
 
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -312,6 +337,8 @@
                 this.classList.add('active');
             });
         });
+
+        initProfile();
     </script>
 </body>
 </html>

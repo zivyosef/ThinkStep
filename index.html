@@ -381,6 +381,43 @@
 
         .modal-cancel:hover { background: rgba(255,255,255,0.11); }
 
+        /* ===== AUTH AREA ===== */
+        #auth-area { display: flex; align-items: center; gap: 10px; }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #10b981;
+            white-space: nowrap;
+        }
+
+        .user-badge::before {
+            content: '●';
+            font-size: 0.6rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid rgba(148,163,184,0.28);
+            border-radius: 14px;
+            padding: 5px 11px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover { color: #ef4444; border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.07); }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 980px) {
             .hero   { grid-template-columns: 1fr; }
@@ -406,7 +443,9 @@
                 <a href="profile.html">פרופיל</a>
                 <a href="about.html">אודות</a>
             </nav>
-            <button class="cta-button" onclick="openLoginModal()">התחברות</button>
+            <div id="auth-area">
+                <button class="cta-button" id="loginBtn" onclick="openLoginModal()">התחברות</button>
+            </div>
         </header>
 
         <section class="hero">
@@ -554,6 +593,19 @@
     </div>
 
     <script>
+        window.SUPABASE_URL      = 'https://fflgijtemitvpjwiofue.supabase.co';
+        window.SUPABASE_ANON_KEY = 'sb_publishable_5NMPAK52g1LVFZU5fdmQCw_Nf7UXex5';
+    </script>
+    <script type="importmap">
+    {
+      "imports": {
+        "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+      }
+    }
+    </script>
+    <script type="module">
+        import { supabase, getCurrentUser, getProfile, insertActivityEntry } from './supabase.js';
+
         function openNewTaskModal() {
             document.getElementById('taskModal').classList.add('show');
         }
@@ -665,6 +717,26 @@
             }
         }
 
+        async function updateAuthArea() {
+            const user = await getCurrentUser();
+            const area = document.getElementById('auth-area');
+            if (user) {
+                const profile = await getProfile(user.id);
+                const displayName = profile?.username || user.email;
+                area.innerHTML = `
+                    <span class="user-badge">שלום, ${displayName}</span>
+                    <button class="logout-btn" onclick="handleLogout()">התנתק</button>
+                `;
+            } else {
+                area.innerHTML = '<button class="cta-button" id="loginBtn" onclick="openLoginModal()">התחברות</button>';
+            }
+        }
+
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            updateAuthArea();
+        }
+
         let loginMode = true;
 
         function openLoginModal() {
@@ -689,7 +761,8 @@
 
             if (loginMode) {
                 title.textContent = 'התחברות';
-                emailGroup.style.display = confirmPasswordGroup.style.display = 'none';
+                emailGroup.style.display = 'block';
+                confirmPasswordGroup.style.display = 'none';
                 submitBtn.textContent    = 'התחבר';
                 switchLink.innerHTML     = 'אין לך חשבון? <a href="#" onclick="switchToRegister()" style="color:var(--accent);text-decoration:none;">הירשם</a>';
             } else {
@@ -700,40 +773,55 @@
             }
         }
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
-            const username   = document.getElementById('username').value;
-            const password   = document.getElementById('password').value;
-            const emailInput = document.getElementById('email').value;
-            const storedEmail = localStorage.getItem('userEmail') || '';
-            const email = loginMode ? storedEmail : emailInput;
+            const username        = document.getElementById('username').value.trim();
+            const emailInput      = document.getElementById('email').value.trim();
+            const password        = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
 
-            const profileData = {
-                username, email,
-                accountType: 'תלמיד',
-                status: 'פעיל',
-                lastAction: loginMode ? 'התחברות' : 'הרשמה',
-                lastActionDate: new Date().toLocaleDateString('he-IL')
-            };
+            if (!loginMode && password !== confirmPassword) { alert('הסיסמאות לא תואמות'); return; }
 
-            if (!loginMode && password !== document.getElementById('confirmPassword').value) {
-                alert('הסיסמאות לא תואמות'); return;
+            let authResult;
+            if (loginMode) {
+                authResult = await supabase.auth.signInWithPassword({ email: emailInput, password });
+            } else {
+                authResult = await supabase.auth.signUp({
+                    email: emailInput, password,
+                    options: { data: { username } }
+                });
             }
 
-            localStorage.setItem('userProfile', JSON.stringify(profileData));
-            localStorage.setItem('userEmail', email);
+            const { data, error } = authResult;
+            if (error) { alert('שגיאה: ' + error.message); return; }
 
-            const activityHistory = JSON.parse(localStorage.getItem('activityHistory') || '[]');
-            activityHistory.unshift({
-                date: profileData.lastActionDate,
-                action: profileData.lastAction,
-                details: loginMode ? `התחברת כ: ${username}` : `נרשמת כ: ${username} עם אימייל: ${email}`
+            const user = data.user;
+            const today = new Date().toLocaleDateString('he-IL');
+            await insertActivityEntry(user.id, {
+                date: today,
+                action: loginMode ? 'התחברות' : 'הרשמה',
+                details: loginMode ? `התחברת` : `נרשמת כ: ${username} עם אימייל: ${emailInput}`
             });
-            localStorage.setItem('activityHistory', JSON.stringify(activityHistory.slice(0, 10)));
 
-            alert(loginMode ? `התחברת כ: ${username}` : `נרשמת כ: ${username} עם אימייל: ${email}`);
+            alert(loginMode ? 'התחברת בהצלחה!' : `נרשמת בהצלחה כ: ${username}`);
             closeLoginModal();
+            updateAuthArea();
         }
+
+        // Expose all functions used in onclick/onsubmit attributes to global scope
+        window.openNewTaskModal  = openNewTaskModal;
+        window.closeNewTaskModal = closeNewTaskModal;
+        window.distributeData    = distributeData;
+        window.generateSummary   = generateSummary;
+        window.handleNewTask     = handleNewTask;
+        window.handleLogout      = handleLogout;
+        window.openLoginModal    = openLoginModal;
+        window.closeLoginModal   = closeLoginModal;
+        window.switchToRegister  = switchToRegister;
+        window.switchToLogin     = switchToLogin;
+        window.handleLogin       = handleLogin;
+
+        (async () => { await updateAuthArea(); })();
 
         window.onclick = function(event) {
             const taskModal  = document.getElementById('taskModal');
