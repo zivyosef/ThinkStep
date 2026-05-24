@@ -72,6 +72,11 @@ async function initProject(rawText) {
       return null;
     }
 
+    if (currentState.chunks && currentState.chunks.length > 0 && window.googleUserAccessToken) {
+      const firstChunk = currentState.chunks[0];
+      await checkAndSendDailyReminder(window.googleUserAccessToken, firstChunk);
+    }
+
     const missingFields = [];
     if (!currentState.subject) missingFields.push("מקצוע");
     if (!currentState.topic) missingFields.push("נושא");
@@ -438,17 +443,92 @@ async function analyzeDemandsAndCreateSubtasks(demandsText, context) {
   }
 }
 
+// ============================================================
+//  פונקציות תוספת: ניהול התראות ויומן גוגל (צוות C)
+// ============================================================
+const CALENDAR_LAST_SENT_KEY = "decompose_calendar_last_sent";
 
+async function addNotificationToGoogleCalendar(accessToken, taskDetails) {
+  console.log('📅 [logicManager] מנסה ליצור תזכורת ביומן גוגל...');
+
+  const today = new Date();
+  const startTime = new Date(today.setHours(14, 0, 0, 0)).toISOString();
+  const endTime = new Date(today.setHours(15, 0, 0, 0)).toISOString();
+
+  const event = {
+    summary: `🚀 משימה מהאפליקציה: ${taskDetails.title}`,
+    description: `${taskDetails.description}\n\nאל תשכח להיכנס לאפליקציה ולסמן וי!`,
+    start: { dateTime: startTime, timeZone: 'Asia/Jerusalem' },
+    end: { dateTime: endTime, timeZone: 'Asia/Jerusalem' },
+    reminders: {
+      useDefault: false,
+      overrides: [{ method: 'popup', minutes: 15 }]
+    }
+  };
+
+  try {
+    const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(event)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Google API Error: ${errorData.error.message}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ האירוע נוצר בהצלחה ביומן!', data.htmlLink);
+    return data;
+  } catch (error) {
+    console.error('❌ שגיאה בסנכרון ליומן גוגל:', error);
+    return null;
+  }
+}
+
+async function checkAndSendDailyReminder(accessToken, currentChunk) {
+  const lastSent = localStorage.getItem(CALENDAR_LAST_SENT_KEY);
+  const now = new Date();
+
+  if (lastSent) {
+    const lastSentDate = new Date(lastSent);
+    const hoursPassed = (now - lastSentDate) / (1000 * 60 * 60);
+    
+    if (hoursPassed < 24) {
+      console.log(`⏳ התראה כבר נשלחה היום. עברו רק ${Math.round(hoursPassed)} שעות.`);
+      return; 
+    }
+  }
+
+  const success = await addNotificationToGoogleCalendar(accessToken, {
+    title: currentChunk.title,
+    description: currentChunk.description
+  });
+
+  if (success) {
+    localStorage.setItem(CALENDAR_LAST_SENT_KEY, now.toISOString());
+  }
+}ס
 // ============================================================
 //  פונקציה 7: syncStateToStorage
 // ============================================================
-function syncStateToStorage(state) {
+async function syncStateToStorage(state) {
   try {
-    const stateAsText = JSON.stringify(state);
-    localStorage.setItem(STORAGE_KEY, stateAsText);
-    console.log("✅ State נשמר בהצלחה:", state);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    console.log("✅ State נשמר ב-localStorage:", state);
+    if (window.supabaseHelpers) {
+      const user = await window.supabaseHelpers.getCurrentUser();
+      if (user) {
+        await window.supabaseHelpers.saveTaskState(user.id, state);
+        console.log("✅ State נשמר ב-Supabase");
+      }
+    }
   } catch (error) {
-    console.error("שגיאה בשמירת state ל-localStorage:", error);
+    console.error("שגיאה בשמירת state:", error);
   }
 }
 
@@ -456,7 +536,21 @@ function syncStateToStorage(state) {
 // ============================================================
 //  פונקציה נוספת: loadStateFromStorage
 // ============================================================
-function loadStateFromStorage() {
+async function loadStateFromStorage() {
+  if (window.supabaseHelpers) {
+    try {
+      const user = await window.supabaseHelpers.getCurrentUser();
+      if (user) {
+        const remoteState = await window.supabaseHelpers.loadTaskState(user.id);
+        if (remoteState) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteState));
+          return remoteState;
+        }
+      }
+    } catch (e) {
+      console.warn("Supabase unavailable, falling back to localStorage:", e);
+    }
+  }
   try {
     const savedText = localStorage.getItem(STORAGE_KEY);
     if (!savedText) return null;
@@ -485,6 +579,8 @@ const logicManager = {
   analyzeDemandsAndCreateSubtasks,
   syncStateToStorage,
   loadStateFromStorage,
+  addNotificationToGoogleCalendar,
+  checkAndSendDailyReminder,
 };
 
 window.logicManager = logicManager;

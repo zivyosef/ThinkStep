@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>פרופיל | למידה חכמה</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        body { padding-bottom: 60px; }
+        body {
+            padding-bottom: 60px;
+        }
 
         .profile-container {
             max-width: 940px;
@@ -40,7 +43,10 @@
             flex-shrink: 0;
         }
 
-        .profile-info { flex: 1; min-width: 0; }
+        .profile-info {
+            flex: 1;
+            min-width: 0;
+        }
 
         .profile-info h2 {
             font-size: 1.8rem;
@@ -66,7 +72,9 @@
             transition: background 0.2s ease;
         }
 
-        .edit-btn:hover { background: rgba(37, 99, 235, 0.22); }
+        .edit-btn:hover {
+            background: rgba(37, 99, 235, 0.22);
+        }
 
         .stats {
             display: flex;
@@ -76,8 +84,15 @@
             list-style: none;
         }
 
-        .stats li  { font-size: 0.94rem; color: var(--text-secondary); }
-        .stats li b { font-weight: 700; color: var(--text-bright); }
+        .stats li {
+            font-size: 0.94rem;
+            color: var(--text-secondary);
+        }
+
+        .stats li b {
+            font-weight: 700;
+            color: var(--text-bright);
+        }
 
         .bio {
             font-size: 0.97rem;
@@ -107,8 +122,17 @@
             background: none;
         }
 
-        .tab:hover  { background: var(--bg-card); color: var(--text-secondary); border-color: var(--border); }
-        .tab.active { color: var(--text-bright); background: rgba(37, 99, 235, 0.18); border-color: rgba(37, 99, 235, 0.25); }
+        .tab:hover {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border-color: var(--border);
+        }
+
+        .tab.active {
+            color: var(--text-bright);
+            background: rgba(37, 99, 235, 0.18);
+            border-color: rgba(37, 99, 235, 0.25);
+        }
 
         /* ===== PROJECTS GRID ===== */
         .projects-grid {
@@ -137,8 +161,14 @@
             border-top-width: 3px;
         }
 
-        .project-card:hover { transform: translateY(-3px); border-color: rgba(148,163,184,0.28); }
-        .project-card span { display: block; }
+        .project-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(148, 163, 184, 0.28);
+        }
+
+        .project-card span {
+            display: block;
+        }
 
         /* ===== ACTIVITY TABLE ===== */
         .activity-history {
@@ -162,17 +192,36 @@
             font-size: 0.93rem;
         }
 
-        th, td {
+        th,
+        td {
             text-align: right;
             padding: 12px 14px;
             border-bottom: 1px solid var(--border);
         }
 
-        th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; }
-        td { color: var(--text); }
-        tbody tr:last-child td { border-bottom: none; }
-        tbody tr { transition: background 0.2s ease; }
-        tbody tr:hover { background: rgba(37, 99, 235, 0.06); }
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        td {
+            color: var(--text);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(37, 99, 235, 0.06);
+        }
 
         /* ===== BACK LINK ===== */
         .back-link {
@@ -189,15 +238,178 @@
             font-size: 0.93rem;
         }
 
-        .back-link:hover { background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.28); }
+        .back-link:hover {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: rgba(37, 99, 235, 0.28);
+        }
+
+        /* ===== EDIT MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.4rem;
+            color: var(--text-bright);
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            padding: 0;
+        }
+
+        .close-btn:hover {
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease, background 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .modal-footer button {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.93rem;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.11);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         @media (max-width: 760px) {
-            .profile-header { flex-direction: column; text-align: center; }
-            .profile-info h2 { justify-content: center; }
-            .stats { justify-content: center; }
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-info h2 {
+                justify-content: center;
+            }
+
+            .stats {
+                justify-content: center;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="page">
         <!-- Navigation Header -->
@@ -222,7 +434,7 @@
                 <div class="profile-info">
                     <h2>
                         <span id="profileName"></span>
-                        <button class="edit-btn">עריכת פרופיל</button>
+                        <button class="edit-btn" onclick="openEditModal()">עריכת פרופיל</button>
                     </h2>
                     <ul class="stats">
                         <li><b id="projectCount">0</b> פרויקטים</li>
@@ -273,6 +485,34 @@
         </div>
     </div>
 
+    <!-- Edit Profile Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>עריכת פרופיל</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form onsubmit="saveProfileChanges(event)">
+                <div class="form-group">
+                    <label for="editFullName">שם מלא</label>
+                    <input type="text" id="editFullName" placeholder="הזן שם מלא" required>
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">תיאור</label>
+                    <textarea id="editDescription" placeholder="הזן תיאור קצר עלייך"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editLearningScore">ציון למידה (%)</label>
+                    <input type="number" id="editLearningScore" min="0" max="100" placeholder="הזן ציון בין 0 ל-100">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()">ביטול</button>
+                    <button type="submit" class="btn-save">שמור שינויים</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // עדכון כפתור הכניסה בטעינה דף
         function updateHeaderButton() {
@@ -315,16 +555,15 @@
             learningScore: '85%',
         };
 
-        const profileData    = JSON.parse(localStorage.getItem('userProfile') || 'null') || defaultProfile;
+        const profileData = JSON.parse(localStorage.getItem('userProfile') || 'null') || defaultProfile;
         const activityHistory = JSON.parse(localStorage.getItem('activityHistory') || '[]');
 
-        // הצג את נתוני המשתמש
-        document.getElementById('profileName').textContent    = profileData.username || defaultProfile.username;
-        document.getElementById('userFullName').textContent   = profileData.fullName   || defaultProfile.fullName;
+        document.getElementById('profileName').textContent = profileData.username;
+        document.getElementById('userFullName').textContent = profileData.fullName || defaultProfile.fullName;
         document.getElementById('userDescription').textContent = profileData.description || defaultProfile.description;
-        document.getElementById('projectCount').textContent   = profileData.projectCount || defaultProfile.projectCount;
-        document.getElementById('taskCount').textContent      = profileData.taskCount    || defaultProfile.taskCount;
-        document.getElementById('learningScore').textContent  = profileData.learningScore || defaultProfile.learningScore;
+        document.getElementById('projectCount').textContent = profileData.projectCount || defaultProfile.projectCount;
+        document.getElementById('taskCount').textContent = profileData.taskCount || defaultProfile.taskCount;
+        document.getElementById('learningScore').textContent = profileData.learningScore || defaultProfile.learningScore;
 
         const tableBody = document.querySelector('tbody');
         tableBody.innerHTML = activityHistory.length
@@ -337,7 +576,7 @@
             : '<tr><td colspan="3" style="color:var(--text-muted);text-align:center;">אין פעולות להצגה עדיין.</td></tr>';
 
         document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
+            tab.addEventListener('click', function () {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
             });
@@ -349,6 +588,59 @@
         } else {
             updateHeaderButton();
         }
-    </script>
+        // פונקציות עריכת פרופיל
+        function openEditModal() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            if (userProfile) {
+                document.getElementById('editFullName').value = userProfile.fullName || '';
+                document.getElementById('editDescription').value = userProfile.description || '';
+                document.getElementById('editLearningScore').value = userProfile.learningScore?.replace('%', '') || '';
+            }
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+        }
+
+        function saveProfileChanges(event) {
+            event.preventDefault();
+
+            const fullName = document.getElementById('editFullName').value.trim();
+            const description = document.getElementById('editDescription').value.trim();
+            const learningScore = document.getElementById('editLearningScore').value;
+
+            if (!fullName) {
+                alert('יש להזין שם מלא');
+                return;
+            }
+
+            // קבל את הפרופיל הקיים ועדכן אותו
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            if (userProfile) {
+                userProfile.fullName = fullName;
+                userProfile.description = description;
+                userProfile.learningScore = learningScore ? learningScore + '%' : '0%';
+                
+                localStorage.setItem('userProfile', JSON.stringify(userProfile));
+
+                // עדכן את התצוגה
+                document.getElementById('userFullName').textContent = fullName;
+                document.getElementById('userDescription').textContent = description;
+                document.getElementById('learningScore').textContent = userProfile.learningScore;
+
+                alert('הפרטים שלך עודכנו בהצלחה!');
+                closeEditModal();
+            }
+        }
+
+        // סגור מודל בלחיצה מחוץ לו
+        window.onclick = function(event) {
+            const editModal = document.getElementById('editModal');
+            if (event.target === editModal) {
+                closeEditModal();
+            }
+        };    </script>
 </body>
+
 </html>
