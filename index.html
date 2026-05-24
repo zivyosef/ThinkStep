@@ -392,6 +392,7 @@
             .hero-text, .hero-graphic,
             .recent                     { padding: 18px; }
         }
+        
     </style>
 </head>
 <body>
@@ -406,7 +407,7 @@
                 <a href="profile.html">פרופיל</a>
                 <a href="about.html">אודות</a>
             </nav>
-            <button class="cta-button" onclick="openLoginModal()">התחברות</button>
+            <button class="cta-button" id="loginBtn" onclick="handleHeaderButtonClick()">התחברות</button>
         </header>
 
         <section class="hero">
@@ -623,6 +624,13 @@
             newRow.appendChild(dateCell);
             document.querySelector('.recent-table tbody').appendChild(newRow);
 
+            // עדכן את מספר המשימות בפרופיל
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            if (userProfile) {
+                userProfile.taskCount = (userProfile.taskCount || 0) + 1;
+                localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            }
+
             alert(`משימה "${title}" נוספה בהצלחה!`);
             closeNewTaskModal();
             updateUrgentTask();
@@ -667,6 +675,35 @@
 
         let loginMode = true;
 
+        // עדכון כפתור הכניסה בטעינה דף
+        function updateHeaderButton() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (userProfile && userProfile.username) {
+                loginBtn.textContent = `ברוך הבא ${userProfile.username}`;
+                loginBtn.style.background = 'rgba(37, 99, 235, 0.18)';
+                loginBtn.style.border = '1px solid rgba(37, 99, 235, 0.3)';
+            } else {
+                loginBtn.textContent = 'התחברות';
+                loginBtn.style.background = '';
+                loginBtn.style.border = '';
+            }
+        }
+
+        // פונקציה שתטפל בלחיצה על כפתור הכניסה
+        function handleHeaderButtonClick() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            
+            if (userProfile && userProfile.username) {
+                // המשתמש מחובר - לך לפרופיל
+                window.location.href = 'profile.html';
+            } else {
+                // המשתמש לא מחובר - פתח מודל התחברות
+                openLoginModal();
+            }
+        }
+
         function openLoginModal() {
             loginMode = true;
             updateModal();
@@ -708,12 +745,21 @@
             const storedEmail = localStorage.getItem('userEmail') || '';
             const email = loginMode ? storedEmail : emailInput;
 
+            // קבל נתונים קיימים אם זו התחברות, או צור חדשים אם זו הרשמה
+            let existingProfile = JSON.parse(localStorage.getItem('userProfile') || 'null');
+            
             const profileData = {
                 username, email,
                 accountType: 'תלמיד',
                 status: 'פעיל',
                 lastAction: loginMode ? 'התחברות' : 'הרשמה',
-                lastActionDate: new Date().toLocaleDateString('he-IL')
+                lastActionDate: new Date().toLocaleDateString('he-IL'),
+                // נתונים שנשמרים בהרשמה או משמשים כברירת מחדל
+                fullName: existingProfile?.fullName || username,
+                description: existingProfile?.description || 'תלמיד חדש',
+                projectCount: existingProfile?.projectCount || 0,
+                taskCount: existingProfile?.taskCount || 0,
+                learningScore: existingProfile?.learningScore || '0%'
             };
 
             if (!loginMode && password !== document.getElementById('confirmPassword').value) {
@@ -733,6 +779,7 @@
 
             alert(loginMode ? `התחברת כ: ${username}` : `נרשמת כ: ${username} עם אימייל: ${email}`);
             closeLoginModal();
+            updateHeaderButton(); // עדכן את כפתור הכניסה
         }
 
         window.onclick = function(event) {
@@ -741,6 +788,17 @@
             if (event.target === taskModal)  closeNewTaskModal();
             if (event.target === loginModal) closeLoginModal();
         };
+
+        // עדכן את כפתור הכניסה בטעינה דף
+        document.addEventListener('DOMContentLoaded', function() {
+            updateHeaderButton();
+        });
+        // אם הדף כבר טעון, קרא לפונקציה מיד
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateHeaderButton);
+        } else {
+            updateHeaderButton();
+        }
     </script>
 </body>
 </html>

@@ -211,7 +211,7 @@
                 <a href="profile.html" class="active">פרופיל</a>
                 <a href="about.html">אודות</a>
             </nav>
-            <button class="cta-button" onclick="window.location.href='index.html'">דף הבית</button>
+            <button class="cta-button" id="loginBtn" onclick="handleHeaderButtonClick()">התחברות</button>
         </header>
 
         <div class="profile-container">
@@ -274,6 +274,35 @@
     </div>
 
     <script>
+        // עדכון כפתור הכניסה בטעינה דף
+        function updateHeaderButton() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (userProfile && userProfile.username) {
+                loginBtn.textContent = `ברוך הבא ${userProfile.username}`;
+                loginBtn.style.background = 'rgba(37, 99, 235, 0.18)';
+                loginBtn.style.border = '1px solid rgba(37, 99, 235, 0.3)';
+            } else {
+                loginBtn.textContent = 'התחברות';
+                loginBtn.style.background = '';
+                loginBtn.style.border = '';
+            }
+        }
+
+        // פונקציה שתטפל בלחיצה על כפתור הכניסה
+        function handleHeaderButtonClick() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            
+            if (userProfile && userProfile.username) {
+                // המשתמש מחובר - אפשר להוסיף פעולת התנתקות או לחזור לדף הבית
+                window.location.href = 'index.html';
+            } else {
+                // המשתמש לא מחובר - לך לדף הבית כדי להתחבר
+                window.location.href = 'index.html';
+            }
+        }
+
         const defaultProfile = {
             username: 'משתמש חדש',
             email: 'לא הוגדר',
@@ -289,7 +318,8 @@
         const profileData    = JSON.parse(localStorage.getItem('userProfile') || 'null') || defaultProfile;
         const activityHistory = JSON.parse(localStorage.getItem('activityHistory') || '[]');
 
-        document.getElementById('profileName').textContent    = profileData.username;
+        // הצג את נתוני המשתמש
+        document.getElementById('profileName').textContent    = profileData.username || defaultProfile.username;
         document.getElementById('userFullName').textContent   = profileData.fullName   || defaultProfile.fullName;
         document.getElementById('userDescription').textContent = profileData.description || defaultProfile.description;
         document.getElementById('projectCount').textContent   = profileData.projectCount || defaultProfile.projectCount;
@@ -312,6 +342,13 @@
                 this.classList.add('active');
             });
         });
+
+        // עדכן את כפתור הכניסה בטעינה דף
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateHeaderButton);
+        } else {
+            updateHeaderButton();
+        }
     </script>
 </body>
 </html>
