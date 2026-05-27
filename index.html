@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="he">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,7 +51,7 @@
             min-height: 340px;
             padding: 24px;
             border-radius: var(--radius-xl);
-            background: linear-gradient(180deg, rgba(25,35,55,0.95), rgba(12,20,40,0.9));
+            background: linear-gradient(180deg, rgba(25, 35, 55, 0.95), rgba(12, 20, 40, 0.9));
             border: 1px solid rgba(148, 252, 196, 0.7);
             display: grid;
             place-items: center;
@@ -61,19 +62,23 @@
         .hero-graphic::before {
             content: '';
             position: absolute;
-            width: 200px; height: 200px;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             background: rgba(59, 130, 246, 0.13);
-            top: -40px; left: -40px;
+            top: -40px;
+            left: -40px;
         }
 
         .hero-graphic::after {
             content: '';
             position: absolute;
-            width: 130px; height: 130px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
             background: rgba(16, 185, 129, 0.13);
-            bottom: -20px; right: -20px;
+            bottom: -20px;
+            right: -20px;
         }
 
         .hero-illustration {
@@ -86,7 +91,8 @@
         }
 
         .hero-illustration .screen {
-            width: 92%; height: 64%;
+            width: 92%;
+            height: 64%;
             background: rgba(243, 244, 246, 0.06);
             border: 1px solid rgba(148, 252, 196, 0.7);
             border-radius: 22px;
@@ -96,13 +102,52 @@
             padding: 20px;
         }
 
-       
+        .urgent-task-box {
+            width: 100%;
+            height: 100%;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(148, 252, 196, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            text-align: center;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.8s ease-out;
+        }
 
-        .urgent-title  { color: #ef4444; font-size: 0.88rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
-        .urgent-name   { color: var(--text-bright); font-size: 1.3rem; font-weight: 700; animation: pulse 2s ease-in-out infinite; }
-        .urgent-subject{ color: var(--text-muted); font-size: 0.93rem; }
-        .urgent-date   { color: var(--text-secondary); font-size: 0.93rem; }
-        .urgent-time   { color: var(--text-muted); font-size: 0.88rem; }
+        .urgent-title {
+            color: #ef4444;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .urgent-name {
+            color: var(--text-bright);
+            font-size: 1.3rem;
+            font-weight: 700;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .urgent-subject {
+            color: var(--text-muted);
+            font-size: 0.93rem;
+        }
+
+        .urgent-date {
+            color: var(--text-secondary);
+            font-size: 0.93rem;
+        }
+
+        .urgent-time {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
 
         /* ===== ACTION CARDS ===== */
         .cards {
@@ -121,7 +166,7 @@
             flex-direction: column;
             justify-content: space-between;
             gap: 12px;
-            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s, box-shadow 0.25s, background 0.25s;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s, box-shadow 0.25s, background 0.25s;
             cursor: pointer;
         }
 
@@ -133,7 +178,8 @@
         }
 
         .card-icon {
-            width: 46px; height: 46px;
+            width: 46px;
+            height: 46px;
             border-radius: 11px;
             background: rgba(255, 255, 255, 0.08);
             display: grid;
@@ -141,8 +187,17 @@
             font-size: 1.35rem;
         }
 
-        .card-title       { color: var(--text-bright); font-weight: 700; font-size: 1rem; }
-        .card-description { color: var(--text-muted); font-size: 0.92rem; line-height: 1.55; }
+        .card-title {
+            color: var(--text-bright);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .card-description {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
 
         /* ===== RECENT TABLE ===== */
         .recent {
@@ -163,7 +218,10 @@
             margin-bottom: 14px;
         }
 
-        .recent-header h2 { font-size: 1.15rem; color: var(--text-bright); }
+        .recent-header h2 {
+            font-size: 1.15rem;
+            color: var(--text-bright);
+        }
 
         .recent-table {
             width: 100%;
@@ -186,9 +244,17 @@
             font-size: 0.75rem;
         }
 
-        .recent-table tr:last-child td  { border-bottom: none; }
-        .recent-table tbody tr          { transition: background 0.2s ease; }
-        .recent-table tbody tr:hover    { background: rgba(37, 99, 235, 0.07); }
+        .recent-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .recent-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .recent-table tbody tr:hover {
+            background: rgba(37, 99, 235, 0.07);
+        }
 
         /* ===== NEW TASK BUTTON ===== */
         .new-task-section {
@@ -207,7 +273,7 @@
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
             box-shadow: 0 10px 28px rgba(37, 99, 235, 0.32);
         }
 
@@ -224,10 +290,14 @@
             margin-bottom: 22px;
         }
 
-        .modal-header h2 { font-size: 1.45rem; color: var(--text-bright); }
+        .modal-header h2 {
+            font-size: 1.45rem;
+            color: var(--text-bright);
+        }
 
         .close-modal {
-            background: none; border: none;
+            background: none;
+            border: none;
             color: var(--text-muted);
             font-size: 1.5rem;
             cursor: pointer;
@@ -235,9 +305,13 @@
             line-height: 1;
         }
 
-        .close-modal:hover { color: var(--text-secondary); }
+        .close-modal:hover {
+            color: var(--text-secondary);
+        }
 
-        .form-group { margin-bottom: 16px; }
+        .form-group {
+            margin-bottom: 16px;
+        }
 
         .form-group label {
             display: block;
@@ -267,10 +341,20 @@
             background: rgba(255, 255, 255, 0.08);
         }
 
-        .form-group textarea { resize: vertical; min-height: 80px; max-height: 130px; }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            max-height: 130px;
+        }
 
-        .form-row { display: flex; gap: 12px; }
-        .form-row .form-group { flex: 1; }
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
 
         .distribute-btn {
             width: 100%;
@@ -287,7 +371,10 @@
             margin-top: 8px;
         }
 
-        .distribute-btn:hover { background: rgba(16,185,129,0.28); color: var(--text-bright); }
+        .distribute-btn:hover {
+            background: rgba(16, 185, 129, 0.28);
+            color: var(--text-bright);
+        }
 
         .summary-section {
             background: rgba(148, 252, 196, 0.1);
@@ -336,9 +423,16 @@
             margin-bottom: 10px;
         }
 
-        .generate-summary-btn:hover { background: rgba(37,99,235,0.3); color: var(--text-bright); }
+        .generate-summary-btn:hover {
+            background: rgba(37, 99, 235, 0.3);
+            color: var(--text-bright);
+        }
 
-        .modal-footer { display: flex; gap: 10px; margin-top: 22px; }
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
+        }
 
         .modal-footer button {
             flex: 1;
@@ -357,7 +451,10 @@
             color: white;
         }
 
-        .modal-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 24px var(--accent-glow); }
+        .modal-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px var(--accent-glow);
+        }
 
         .modal-cancel {
             background: rgba(255, 255, 255, 0.07);
@@ -365,10 +462,16 @@
             border: 1px solid rgba(148, 252, 196, 0.7) !important;
         }
 
-        .modal-cancel:hover { background: rgba(255,255,255,0.11); }
+        .modal-cancel:hover {
+            background: rgba(255, 255, 255, 0.11);
+        }
 
         /* ===== AUTH AREA ===== */
-        #auth-area { display: flex; align-items: center; gap: 10px; }
+        #auth-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         .user-badge {
             display: flex;
@@ -402,21 +505,37 @@
             transition: all 0.2s;
         }
 
-        .logout-btn:hover { color: #ef4444; border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.07); }
+        .logout-btn:hover {
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.07);
+        }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 980px) {
-            .hero   { grid-template-columns: 1fr; }
-            .cards  { flex-direction: column; }
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .cards {
+                flex-direction: column;
+            }
         }
 
         @media (max-width: 700px) {
-            .hero-text h1               { font-size: 2.1rem; }
-            .hero-text, .hero-graphic,
-            .recent                     { padding: 18px; }
+            .hero-text h1 {
+                font-size: 2.1rem;
+            }
+
+            .hero-text,
+            .hero-graphic,
+            .recent {
+                padding: 18px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="page">
         <header class="site-header">
@@ -429,9 +548,7 @@
                 <a href="profile.html">פרופיל</a>
                 <a href="about.html">אודות</a>
             </nav>
-            <div id="auth-area">
-                <button class="cta-button" id="loginBtn" onclick="openLoginModal()">התחברות</button>
-            </div>
+            <button class="cta-button" id="loginBtn" onclick="handleHeaderButtonClick()">התחברות</button>
         </header>
 
         <section class="hero">
@@ -556,7 +673,8 @@
                     </div>
                 </form>
                 <p id="switchLink" style="margin-top:16px;color:var(--text-muted);font-size:0.9rem;text-align:center;">
-                    אין לך חשבון? <a href="#" onclick="switchToRegister()" style="color:var(--accent);text-decoration:none;">הירשם</a>
+                    אין לך חשבון? <a href="#" onclick="switchToRegister()"
+                        style="color:var(--accent);text-decoration:none;">הירשם</a>
                 </p>
             </div>
         </div>
@@ -579,19 +697,6 @@
     </div>
 
     <script>
-        window.SUPABASE_URL      = 'https://fflgijtemitvpjwiofue.supabase.co';
-        window.SUPABASE_ANON_KEY = 'sb_publishable_5NMPAK52g1LVFZU5fdmQCw_Nf7UXex5';
-    </script>
-    <script type="importmap">
-    {
-      "imports": {
-        "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
-      }
-    }
-    </script>
-    <script type="module">
-        import { supabase, getCurrentUser, getProfile, insertActivityEntry } from './supabase.js';
-
         function openNewTaskModal() {
             document.getElementById('taskModal').classList.add('show');
         }
@@ -625,41 +730,48 @@
 
         function generateSummary() {
             const subject = document.getElementById('taskSubject').value.trim();
-            const title   = document.getElementById('taskTitle').value.trim();
-            const pages   = document.getElementById('taskPages').value.trim();
-            const date    = document.getElementById('taskDate').value;
-            const parts   = [];
+            const title = document.getElementById('taskTitle').value.trim();
+            const pages = document.getElementById('taskPages').value.trim();
+            const date = document.getElementById('taskDate').value;
+            const parts = [];
             if (subject) parts.push('מקצוע: ' + subject);
-            if (title)   parts.push('נושא: '   + title);
-            if (pages)   parts.push('עמודים: ' + pages);
-            if (date)    parts.push('תאריך: '  + date);
+            if (title) parts.push('נושא: ' + title);
+            if (pages) parts.push('עמודים: ' + pages);
+            if (date) parts.push('תאריך: ' + date);
             document.getElementById('taskSummary').innerHTML = parts.join('<br>') || 'אין מידע להצגה';
         }
 
         function handleNewTask(event) {
             event.preventDefault();
             const subject = document.getElementById('taskSubject').value.trim();
-            const title   = document.getElementById('taskTitle').value.trim();
-            const pages   = document.getElementById('taskPages').value.trim();
-            const date    = document.getElementById('taskDate').value;
+            const title = document.getElementById('taskTitle').value.trim();
+            const pages = document.getElementById('taskPages').value.trim();
+            const date = document.getElementById('taskDate').value;
             const summary = document.getElementById('taskSummary').textContent.trim();
 
             if (!title) { alert('יש להזין לפחות נושא העבודה'); return; }
 
             const taskText = subject ? `${subject} - ${title}` : title;
             const newRow = document.createElement('tr');
-            const taskCell   = document.createElement('td');
+            const taskCell = document.createElement('td');
             const statusCell = document.createElement('td');
-            const dateCell   = document.createElement('td');
+            const dateCell = document.createElement('td');
 
-            taskCell.innerHTML   = taskText + (summary ? `<br><small style="color:var(--text-muted);font-size:0.82rem;">${summary}</small>` : '');
+            taskCell.innerHTML = taskText + (summary ? `<br><small style="color:var(--text-muted);font-size:0.82rem;">${summary}</small>` : '');
             statusCell.textContent = 'בתהליך';
-            dateCell.textContent   = date || new Date().toLocaleDateString('he-IL');
+            dateCell.textContent = date || new Date().toLocaleDateString('he-IL');
 
             newRow.appendChild(taskCell);
             newRow.appendChild(statusCell);
             newRow.appendChild(dateCell);
             document.querySelector('.recent-table tbody').appendChild(newRow);
+
+            // עדכן את מספר המשימות בפרופיל
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            if (userProfile) {
+                userProfile.taskCount = (userProfile.taskCount || 0) + 1;
+                localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            }
 
             alert(`משימה "${title}" נוספה בהצלחה!`);
             closeNewTaskModal();
@@ -688,42 +800,51 @@
                 const [taskSubject, taskTitle] = closestTask.title.split(' - ').length > 1
                     ? closestTask.title.split(' - ') : ['', closestTask.title];
 
-                document.getElementById('urgentName').textContent    = taskTitle || 'אין משימות';
+                document.getElementById('urgentName').textContent = taskTitle || 'אין משימות';
                 document.getElementById('urgentSubject').textContent = taskSubject ? 'מקצוע: ' + taskSubject : '';
-                document.getElementById('urgentDate').textContent    = 'מועד הגשה: ' + closestTask.date;
-                document.getElementById('urgentTime').textContent    =
-                    diffDays > 0  ? 'נשארו ' + diffDays + ' ימים' :
-                    diffDays === 0 ? 'היום!'  :
-                                    'עבר! ' + Math.abs(diffDays) + ' ימים';
+                document.getElementById('urgentDate').textContent = 'מועד הגשה: ' + closestTask.date;
+                document.getElementById('urgentTime').textContent =
+                    diffDays > 0 ? 'נשארו ' + diffDays + ' ימים' :
+                        diffDays === 0 ? 'היום!' :
+                            'עבר! ' + Math.abs(diffDays) + ' ימים';
             } else {
-                document.getElementById('urgentName').textContent    = 'אין משימות';
+                document.getElementById('urgentName').textContent = 'אין משימות';
                 document.getElementById('urgentSubject').textContent = '';
-                document.getElementById('urgentDate').textContent    = '';
-                document.getElementById('urgentTime').textContent    = '';
+                document.getElementById('urgentDate').textContent = '';
+                document.getElementById('urgentTime').textContent = '';
             }
-        }
-
-        async function updateAuthArea() {
-            const user = await getCurrentUser();
-            const area = document.getElementById('auth-area');
-            if (user) {
-                const profile = await getProfile(user.id);
-                const displayName = profile?.username || user.email;
-                area.innerHTML = `
-                    <span class="user-badge">שלום, ${displayName}</span>
-                    <button class="logout-btn" onclick="handleLogout()">התנתק</button>
-                `;
-            } else {
-                area.innerHTML = '<button class="cta-button" id="loginBtn" onclick="openLoginModal()">התחברות</button>';
-            }
-        }
-
-        async function handleLogout() {
-            await supabase.auth.signOut();
-            updateAuthArea();
         }
 
         let loginMode = true;
+
+        // עדכון כפתור הכניסה בטעינה דף
+        function updateHeaderButton() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (userProfile && userProfile.username) {
+                loginBtn.textContent = `ברוך הבא ${userProfile.username}`;
+                loginBtn.style.background = 'rgba(37, 99, 235, 0.18)';
+                loginBtn.style.border = '1px solid rgba(37, 99, 235, 0.3)';
+            } else {
+                loginBtn.textContent = 'התחברות';
+                loginBtn.style.background = '';
+                loginBtn.style.border = '';
+            }
+        }
+
+        // פונקציה שתטפל בלחיצה על כפתור הכניסה
+        function handleHeaderButtonClick() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            
+            if (userProfile && userProfile.username) {
+                // המשתמש מחובר - לך לפרופיל
+                window.location.href = 'profile.html';
+            } else {
+                // המשתמש לא מחובר - פתח מודל התחברות
+                openLoginModal();
+            }
+        }
 
         function openLoginModal() {
             loginMode = true;
@@ -736,85 +857,91 @@
         }
 
         function switchToRegister() { loginMode = false; updateModal(); }
-        function switchToLogin()    { loginMode = true;  updateModal(); }
+        function switchToLogin() { loginMode = true; updateModal(); }
 
         function updateModal() {
-            const title                = document.getElementById('modalTitle');
-            const emailGroup           = document.getElementById('emailGroup');
+            const title = document.getElementById('modalTitle');
+            const emailGroup = document.getElementById('emailGroup');
             const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
-            const submitBtn            = document.getElementById('submitBtn');
-            const switchLink           = document.getElementById('switchLink');
+            const submitBtn = document.getElementById('submitBtn');
+            const switchLink = document.getElementById('switchLink');
 
             if (loginMode) {
                 title.textContent = 'התחברות';
-                emailGroup.style.display = 'block';
-                confirmPasswordGroup.style.display = 'none';
-                submitBtn.textContent    = 'התחבר';
-                switchLink.innerHTML     = 'אין לך חשבון? <a href="#" onclick="switchToRegister()" style="color:var(--accent);text-decoration:none;">הירשם</a>';
+                emailGroup.style.display = confirmPasswordGroup.style.display = 'none';
+                submitBtn.textContent = 'התחבר';
+                switchLink.innerHTML = 'אין לך חשבון? <a href="#" onclick="switchToRegister()" style="color:var(--accent);text-decoration:none;">הירשם</a>';
             } else {
                 title.textContent = 'הרשמה';
                 emailGroup.style.display = confirmPasswordGroup.style.display = 'block';
-                submitBtn.textContent    = 'הירשם';
-                switchLink.innerHTML     = 'כבר יש לך חשבון? <a href="#" onclick="switchToLogin()" style="color:var(--accent);text-decoration:none;">התחבר</a>';
+                submitBtn.textContent = 'הירשם';
+                switchLink.innerHTML = 'כבר יש לך חשבון? <a href="#" onclick="switchToLogin()" style="color:var(--accent);text-decoration:none;">התחבר</a>';
             }
         }
 
-        async function handleLogin(event) {
+        function handleLogin(event) {
             event.preventDefault();
-            const username        = document.getElementById('username').value.trim();
-            const emailInput      = document.getElementById('email').value.trim();
-            const password        = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const emailInput = document.getElementById('email').value;
+            const storedEmail = localStorage.getItem('userEmail') || '';
+            const email = loginMode ? storedEmail : emailInput;
 
-            if (!loginMode && password !== confirmPassword) { alert('הסיסמאות לא תואמות'); return; }
+            // קבל נתונים קיימים אם זו התחברות, או צור חדשים אם זו הרשמה
+            let existingProfile = JSON.parse(localStorage.getItem('userProfile') || 'null');
+            
+            const profileData = {
+                username, email,
+                accountType: 'תלמיד',
+                status: 'פעיל',
+                lastAction: loginMode ? 'התחברות' : 'הרשמה',
+                lastActionDate: new Date().toLocaleDateString('he-IL'),
+                // נתונים שנשמרים בהרשמה או משמשים כברירת מחדל
+                fullName: existingProfile?.fullName || username,
+                description: existingProfile?.description || 'תלמיד חדש',
+                projectCount: existingProfile?.projectCount || 0,
+                taskCount: existingProfile?.taskCount || 0,
+                learningScore: existingProfile?.learningScore || '0%'
+            };
 
-            let authResult;
-            if (loginMode) {
-                authResult = await supabase.auth.signInWithPassword({ email: emailInput, password });
-            } else {
-                authResult = await supabase.auth.signUp({
-                    email: emailInput, password,
-                    options: { data: { username } }
-                });
+            if (!loginMode && password !== document.getElementById('confirmPassword').value) {
+                alert('הסיסמאות לא תואמות'); return;
             }
 
-            const { data, error } = authResult;
-            if (error) { alert('שגיאה: ' + error.message); return; }
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            localStorage.setItem('userEmail', email);
 
-            const user = data.user;
-            const today = new Date().toLocaleDateString('he-IL');
-            await insertActivityEntry(user.id, {
-                date: today,
-                action: loginMode ? 'התחברות' : 'הרשמה',
-                details: loginMode ? `התחברת` : `נרשמת כ: ${username} עם אימייל: ${emailInput}`
+            const activityHistory = JSON.parse(localStorage.getItem('activityHistory') || '[]');
+            activityHistory.unshift({
+                date: profileData.lastActionDate,
+                action: profileData.lastAction,
+                details: loginMode ? `התחברת כ: ${username}` : `נרשמת כ: ${username} עם אימייל: ${email}`
             });
+            localStorage.setItem('activityHistory', JSON.stringify(activityHistory.slice(0, 10)));
 
-            alert(loginMode ? 'התחברת בהצלחה!' : `נרשמת בהצלחה כ: ${username}`);
+            alert(loginMode ? `התחברת כ: ${username}` : `נרשמת כ: ${username} עם אימייל: ${email}`);
             closeLoginModal();
-            updateAuthArea();
+            updateHeaderButton(); // עדכן את כפתור הכניסה
         }
 
-        // Expose all functions used in onclick/onsubmit attributes to global scope
-        window.openNewTaskModal  = openNewTaskModal;
-        window.closeNewTaskModal = closeNewTaskModal;
-        window.distributeData    = distributeData;
-        window.generateSummary   = generateSummary;
-        window.handleNewTask     = handleNewTask;
-        window.handleLogout      = handleLogout;
-        window.openLoginModal    = openLoginModal;
-        window.closeLoginModal   = closeLoginModal;
-        window.switchToRegister  = switchToRegister;
-        window.switchToLogin     = switchToLogin;
-        window.handleLogin       = handleLogin;
-
-        (async () => { await updateAuthArea(); })();
-
-        window.onclick = function(event) {
-            const taskModal  = document.getElementById('taskModal');
+        window.onclick = function (event) {
+            const taskModal = document.getElementById('taskModal');
             const loginModal = document.getElementById('loginModal');
-            if (event.target === taskModal)  closeNewTaskModal();
+            if (event.target === taskModal) closeNewTaskModal();
             if (event.target === loginModal) closeLoginModal();
         };
+
+        // עדכן את כפתור הכניסה בטעינה דף
+        document.addEventListener('DOMContentLoaded', function() {
+            updateHeaderButton();
+        });
+        // אם הדף כבר טעון, קרא לפונקציה מיד
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateHeaderButton);
+        } else {
+            updateHeaderButton();
+        }
     </script>
 </body>
+
 </html>
