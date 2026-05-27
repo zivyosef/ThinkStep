@@ -845,34 +845,8 @@
         <button class="cta-button" onclick="window.location.href='index.html'">דף הבית</button>
     </header>
 
-    <!-- Stat Cards -->
-    <div class="stat-row" id="statRow">
-        <div class="stat-card">
-            <div class="stat-icon blue">✅</div>
-            <div class="stat-info">
-                <div class="stat-value" id="statCompleted">0</div>
-                <div class="stat-label">משימות הושלמו</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon green">🔥</div>
-            <div class="stat-info">
-                <div class="stat-value" id="statStreak">0</div>
-                <div class="stat-label">ימי רצף</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon purple">📈</div>
-            <div class="stat-info">
-                <div class="stat-value" id="statWeekly">0</div>
-                <div class="stat-label">פעילויות השבוע</div>
-            </div>
-        </div>
-    </div>
-
     <!-- Progress Section -->
-    <section class="progress-section">
-        <h2>📊 התקדמות שלך</h2>
+    <section class="progress-section"><h2>📊 התקדמות שלך</h2>
 
         <div class="progress-grid">
             <!-- מטרות שבועיות -->
@@ -893,11 +867,16 @@
                 <div class="progress-percentage" id="goalsPercentage">0/0 משימות הושלמו</div>
             </div>
 
-            <!-- גרף פעילות -->
             <div class="progress-card">
-                <div class="progress-card-title">📈 גרף פעילות שבועי</div>
-                <div class="chart-container" id="activityChart"></div>
-                <div class="progress-percentage" id="activityStats">אין נתונים עדיין</div>
+                <div class="progress-card-title">✅ משימות שהושלמו</div>
+                <div class="stat-value" id="progressCompleted">0</div>
+                <div class="stat-label">משימות שהושלמו השבוע</div>
+            </div>
+
+            <div class="progress-card">
+                <div class="progress-card-title">📈 פעילות השבוע</div>
+                <div class="stat-value" id="progressWeeklyActivity">0</div>
+                <div class="stat-label">פעילויות במהלך השבוע האחרון</div>
             </div>
 
             <!-- טיפ יומי -->
@@ -910,13 +889,12 @@
                 <button class="tip-button" onclick="getNewTip()">טיפ חדש</button>
             </div>
         </div>
-    </section>
 
-    <!-- Upcoming Tasks -->
-    <section class="upcoming-section">
-        <h2>📅 משימות קרובות</h2>
-        <div id="upcomingList"></div>
-    </section>
+        <div class="progress-extra">
+            <div class="upcoming-section">
+                <h2>📅 משימות קרובות</h2>
+                <div id="upcomingList"></div>
+            </div>
 
     <!-- Hierarchical Checklist -->
     <section class="checklist-section">
@@ -924,10 +902,11 @@
         <div id="hierarchicalChecklist"></div>
     </section>
 
-    <!-- Project Timeline -->
-    <section class="timeline-section">
-        <h2>🗺️ ציר זמן פרויקט נוכחי</h2>
-        <div id="projectTimeline"></div>
+            <div class="timeline-section">
+                <h2>🗺️ ציר זמן פרויקט נוכחי</h2>
+                <div id="projectTimeline"></div>
+            </div>
+        </div>
     </section>
 
 </div>
@@ -983,7 +962,6 @@ const MILESTONES_LABELS = [
 function initProgress() {
     loadStatCards();
     loadWeeklyGoals();
-    initActivityChart();
     getNewTip();
     loadUpcomingTasks();
     loadProjectTimeline();
@@ -995,26 +973,9 @@ function loadStatCards() {
     const completed  = goals.filter(g => g.completed).length;
     const actData    = JSON.parse(localStorage.getItem('activityData') || '[]');
     const weeklySum  = actData.slice(-7).reduce((s, d) => s + d.count, 0);
-    const streak     = calcStreak(actData);
 
-    document.getElementById('statCompleted').textContent = completed;
-    document.getElementById('statStreak').textContent    = streak;
-    document.getElementById('statWeekly').textContent    = weeklySum;
-}
-
-function calcStreak(actData) {
-    if (!actData.length) return 0;
-    const sorted = [...actData].sort((a, b) => b.date.localeCompare(a.date));
-    let streak = 0;
-    let prev   = null;
-    for (const d of sorted) {
-        if (!d.count) break;
-        if (prev === null) { streak = 1; prev = d.date; continue; }
-        const diff = (new Date(prev) - new Date(d.date)) / 86400000;
-        if (diff === 1) { streak++; prev = d.date; }
-        else break;
-    }
-    return streak;
+    document.getElementById('progressCompleted').textContent    = completed;
+    document.getElementById('progressWeeklyActivity').textContent = weeklySum;
 }
 
 /* ===== WEEKLY GOALS ===== */
@@ -1078,50 +1039,6 @@ function updateGoalsProgress() {
 
     document.getElementById('goalsProgressBar').style.width = pct + '%';
     document.getElementById('goalsPercentage').textContent  = `${completed}/${total} משימות הושלמו`;
-}
-
-/* ===== ACTIVITY CHART ===== */
-function initActivityChart() {
-    let actData = JSON.parse(localStorage.getItem('activityData') || '[]');
-
-    if (actData.length === 0) {
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            actData.push({ date: d.toISOString().split('T')[0], count: Math.floor(Math.random() * 8) });
-        }
-        localStorage.setItem('activityData', JSON.stringify(actData));
-    }
-
-    const chart    = document.getElementById('activityChart');
-    const last7    = actData.slice(-7);
-    const maxCount = Math.max(...last7.map(d => d.count), 1);
-    const days     = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
-
-    chart.innerHTML = last7.map((d, i) => {
-        const heightPct = (d.count / maxCount) * 100;
-        return `<div class="chart-bar" style="height:${heightPct}%">
-            <div class="chart-bar-value">${d.count}</div>
-            <div class="chart-bar-label">${days[i]}</div>
-        </div>`;
-    }).join('');
-
-    const total = last7.reduce((s, d) => s + d.count, 0);
-    document.getElementById('activityStats').textContent = total
-        ? `סה"כ פעילות השבוע: ${total} משימות`
-        : 'אין נתונים עדיין';
-
-    loadStatCards();
-}
-
-function recordActivity() {
-    const actData = JSON.parse(localStorage.getItem('activityData') || '[]');
-    const today   = new Date().toISOString().split('T')[0];
-    let entry     = actData.find(d => d.date === today);
-    if (!entry)  { entry = { date: today, count: 0 }; actData.push(entry); }
-    entry.count++;
-    localStorage.setItem('activityData', JSON.stringify(actData));
-    initActivityChart();
 }
 
 /* ===== DAILY TIP ===== */

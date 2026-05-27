@@ -407,6 +407,486 @@
                 justify-content: center;
             }
         }
+
+.stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+    animation: slideInUp 0.7s ease-out;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.25s ease, border-color 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(37,99,235,0.3);
+}
+
+.stat-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.stat-icon.blue   { background: rgba(37,99,235,0.16); }
+.stat-icon.green  { background: rgba(16,185,129,0.16); }
+.stat-icon.purple { background: rgba(124,58,237,0.16); }
+
+.stat-info { min-width: 0; }
+.stat-value { font-size: 1.8rem; font-weight: 800; color: var(--text-bright); line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+
+/* ===== PROGRESS SECTION ===== */
+.progress-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 28px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-card);
+    animation: slideInUp 0.8s ease-out;
+}
+
+.progress-section h2 {
+    font-size: 1.5rem;
+    color: var(--text-bright);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.progress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+    margin-bottom: 22px;
+}
+
+.progress-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(148,163,184,0.12);
+    border-radius: 18px;
+    padding: 22px;
+    transition: all 0.25s ease;
+}
+
+.progress-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(37,99,235,0.28);
+    background: rgba(255,255,255,0.05);
+}
+
+.progress-card-title {
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.82rem;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* ===== GOALS ===== */
+.goals-input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.goals-input-group input {
+    flex: 1;
+    padding: 9px 13px;
+    border: 1px solid rgba(148,163,184,0.22);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.goals-input-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(37,99,235,0.06);
+}
+
+.goals-input-group button {
+    padding: 9px 14px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.88rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.goals-input-group button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37,99,235,0.4);
+}
+
+.goals-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.goals-reset-btn {
+    flex: 1;
+    padding: 8px;
+    background: rgba(239,68,68,0.1);
+    color: #fca5a5;
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-family: inherit;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.goals-reset-btn:hover { background: rgba(239,68,68,0.18); color: #fecaca; }
+
+.goals-list {
+    max-height: 240px;
+    overflow-y: auto;
+    margin-bottom: 14px;
+}
+
+.goal-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 9px;
+    margin-bottom: 6px;
+    animation: slideIn 0.3s ease;
+    transition: background 0.2s ease;
+}
+
+.goal-item:hover { background: rgba(255,255,255,0.05); }
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.goal-item input[type="checkbox"] {
+    width: 18px; height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+.goal-text { flex: 1; color: var(--text-secondary); font-size: 0.9rem; transition: color 0.2s; }
+.goal-item.completed .goal-text { color: var(--text-muted); text-decoration: line-through; }
+
+.goal-delete {
+    background: none; border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: color 0.2s ease;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.goal-delete:hover { color: #ef4444; }
+
+.progress-bar-container {
+    background: rgba(255,255,255,0.04);
+    border-radius: 999px;
+    overflow: hidden;
+    height: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.progress-percentage {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* ===== CHART ===== */
+.chart-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 140px;
+    margin-bottom: 14px;
+    padding-bottom: 28px;
+}
+
+.chart-bar {
+    flex: 1;
+    background: linear-gradient(180deg, var(--accent), #3b82f6);
+    border-radius: 6px 6px 0 0;
+    min-height: 4px;
+    position: relative;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+}
+
+.chart-bar:hover { filter: brightness(1.25); }
+
+.chart-bar-label {
+    position: absolute;
+    bottom: -22px; left: 50%;
+    transform: translateX(-50%);
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.chart-bar-value {
+    position: absolute;
+    top: -20px; left: 50%;
+    transform: translateX(-50%);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+}
+
+.chart-bar:hover .chart-bar-value { opacity: 1; }
+
+/* ===== TIP ===== */
+.tip-content {
+    background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(124,58,237,0.12));
+    border: 1px solid rgba(37,99,235,0.2);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    animation: fadeIn 0.5s ease;
+}
+
+.tip-icon  { font-size: 2.2rem; margin-bottom: 10px; }
+.tip-text  { color: var(--text-secondary); font-size: 0.93rem; line-height: 1.6; text-align: center; }
+
+.tip-button {
+    width: 100%;
+    padding: 11px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.tip-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
+/* ===== UPCOMING TASKS ===== */
+.upcoming-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 26px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-card);
+    animation: slideInUp 0.9s ease-out;
+}
+
+.upcoming-section h2 {
+    font-size: 1.2rem;
+    color: var(--text-bright);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.upcoming-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.upcoming-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(37,99,235,0.25); }
+.upcoming-item:last-child { margin-bottom: 0; }
+
+.upcoming-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.upcoming-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.upcoming-title { color: var(--text-bright); font-weight: 600; font-size: 0.93rem; margin-bottom: 2px; }
+.upcoming-date  { color: var(--text-muted);  font-size: 0.82rem; }
+
+.upcoming-days {
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.days-urgent  { background: rgba(239,68,68,0.15);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.28); }
+.days-soon    { background: rgba(251,146,60,0.15);  color: #fdba74; border: 1px solid rgba(251,146,60,0.28); }
+.days-ok      { background: rgba(16,185,129,0.15);  color: #6ee7b7; border: 1px solid rgba(16,185,129,0.28); }
+
+.upcoming-empty {
+    text-align: center;
+    padding: 28px 16px;
+    color: var(--text-muted);
+    font-size: 0.93rem;
+}
+
+.upcoming-empty a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.upcoming-empty a:hover { text-decoration: underline; }
+
+/* ===== PROJECT TIMELINE ===== */
+.timeline-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 26px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-card);
+    animation: slideInUp 1s ease-out;
+}
+
+.timeline-section h2 {
+    font-size: 1.2rem;
+    color: var(--text-bright);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.milestone-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.milestone-item:last-child { border-bottom: none; }
+
+.milestone-dot-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.milestone-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    transition: background 0.2s ease;
+}
+
+.milestone-dot.done { background: var(--accent); border-color: var(--accent); }
+.milestone-dot.current { background: var(--purple); border-color: var(--purple); box-shadow: 0 0 0 4px rgba(124,58,237,0.2); }
+
+.milestone-connector {
+    width: 2px;
+    height: 20px;
+    background: var(--border);
+    margin: 2px 0;
+}
+
+.milestone-info { flex: 1; min-width: 0; }
+.milestone-name { color: var(--text-secondary); font-size: 0.93rem; font-weight: 600; margin-bottom: 2px; }
+.milestone-date { color: var(--text-muted); font-size: 0.82rem; }
+
+.milestone-pct {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    min-width: 38px;
+    text-align: left;
+}
+
+.no-project-cta {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-muted);
+}
+
+.no-project-cta .cta-link {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 11px 24px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    color: white;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.93rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.no-project-cta .cta-link:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--accent-glow); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 700px) {
+    .stat-row     { grid-template-columns: 1fr; }
+    .progress-section { padding: 18px; }
+    .progress-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+    .stat-row { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .stat-value { font-size: 1.4rem; }
+}
+
     </style>
 </head>
 
@@ -418,7 +898,7 @@
             <nav>
                 <a href="index.html">דף הבית</a>
                 <a href="HomePage.html">דף עבודה</a>
-                <a href="RecuresiveDecomposition.html">התקדמות</a>
+        
                 <a href="search.html">חיפוש</a>
                 <a href="profile.html" class="active">פרופיל</a>
                 <a href="about.html">אודות</a>
@@ -439,11 +919,10 @@
                     <ul class="stats">
                         <li><b id="projectCount">0</b> פרויקטים</li>
                         <li><b id="taskCount">0</b> משימות שבוצעו</li>
-                        <li><b id="learningScore">0%</b> ציון למידה</li>
                     </ul>
                     <div class="bio">
-                        <b id="userFullName">ישראל ישראלי</b><br>
-                        <span id="userDescription">תלמיד כיתה י"א | מתמחה בביולוגיה 📚</span>
+                        <b id="userFullName"> שם פרטי/b><br>
+                        <span id="userDescription">תיאור המשתמש</span>
                     </div>
 
                     <div class="profile-tabs">
@@ -453,17 +932,6 @@
                 </div>
             </section>
 
-            <!-- Projects Grid -->
-            <div class="projects-grid">
-                <div class="project-card" style="border-top-color:#4caf50;">
-                    <span>עבודת מחקר בביולוגיה</span>
-                </div>
-                <div class="project-card" style="border-top-color:#2196f3;">
-                    <span>סיכום ספרות</span>
-                </div>
-                <div class="project-card" style="border-top-color:#ff9800;">
-                    <span>מטלה באנגלית</span>
-                </div>
             </div>
 
             <!-- Activity History -->
@@ -481,9 +949,68 @@
                 </table>
             </section>
 
-            <a class="back-link" href="index.html">← חזור לדף הבית</a>
         </div>
     </div>
+
+
+    <div class="page">
+    <!-- Progress Section -->
+    <section class="progress-section"><h2>📊 התקדמות שלך</h2>
+
+        <div class="progress-grid">
+            <!-- מטרות שבועיות -->
+            <div class="progress-card">
+                <div class="progress-card-title">🎯 מטרות שבועיות</div>
+                <div class="goals-input-group">
+                    <input type="text" id="goalInput" placeholder="הוסף מטרה חדשה..."
+                           onkeydown="if(event.key==='Enter') addWeeklyGoal()">
+                    <button onclick="addWeeklyGoal()">הוסף</button>
+                </div>
+                <div class="goals-list" id="goalsList"></div>
+                <div class="goals-actions">
+                    <button class="goals-reset-btn" onclick="resetWeeklyGoals()">🗑 אפס מטרות שבועיות</button>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="goalsProgressBar" style="width:0%"></div>
+                </div>
+                <div class="progress-percentage" id="goalsPercentage">0/0 משימות הושלמו</div>
+            </div>
+
+            <div class="progress-card">
+                <div class="progress-card-title">✅ משימות שהושלמו</div>
+                <div class="stat-value" id="progressCompleted">0</div>
+                <div class="stat-label">משימות שהושלמו השבוע</div>
+            </div>
+
+            <div class="progress-card">
+                <div class="progress-card-title">📈 פעילות השבוע</div>
+                <div class="stat-value" id="progressWeeklyActivity">0</div>
+                <div class="stat-label">פעילויות במהלך השבוע האחרון</div>
+            </div>
+
+            <!-- טיפ יומי -->
+            <div class="progress-card">
+                <div class="progress-card-title">💡 טיפ יומי</div>
+                <div class="tip-content">
+                    <div class="tip-icon" id="tipIcon">💡</div>
+                    <div class="tip-text" id="tipText">טוען טיפ...</div>
+                </div>
+                <button class="tip-button" onclick="getNewTip()">טיפ חדש</button>
+            </div>
+        </div>
+
+        <div class="progress-extra">
+            <div class="upcoming-section">
+                <h2>📅 משימות קרובות</h2>
+                <div id="upcomingList"></div>
+            </div>
+
+            <div class="timeline-section">
+                <h2>🗺️ ציר זמן פרויקט נוכחי</h2>
+                <div id="projectTimeline"></div>
+            </div>
+             <a class="back-link" href="index.html">← חזור לדף הבית</a>
+        </div>
 
     <!-- Edit Profile Modal -->
     <div id="editModal" class="modal">
@@ -555,15 +1082,37 @@
             learningScore: '85%',
         };
 
-        const profileData = JSON.parse(localStorage.getItem('userProfile') || 'null') || defaultProfile;
-        const activityHistory = JSON.parse(localStorage.getItem('activityHistory') || '[]');
+        let currentProfileData = defaultProfile;
+        let currentActivityHistory = JSON.parse(localStorage.getItem('activityHistory') || '[]');
 
-        document.getElementById('profileName').textContent = profileData.username;
-        document.getElementById('userFullName').textContent = profileData.fullName || defaultProfile.fullName;
-        document.getElementById('userDescription').textContent = profileData.description || defaultProfile.description;
-        document.getElementById('projectCount').textContent = profileData.projectCount || defaultProfile.projectCount;
-        document.getElementById('taskCount').textContent = profileData.taskCount || defaultProfile.taskCount;
-        document.getElementById('learningScore').textContent = profileData.learningScore || defaultProfile.learningScore;
+        async function initProfile() {
+            const user = await getCurrentUser();
+
+            let profileData     = defaultProfile;
+            let activityHistory = currentActivityHistory.slice();
+
+            const savedProfile = JSON.parse(localStorage.getItem('userProfile') || 'null');
+            if (!user && savedProfile) {
+                profileData = { ...defaultProfile, ...savedProfile };
+            }
+
+            if (user) {
+                const dbProfile = await getProfile(user.id);
+                if (dbProfile) {
+                    profileData = { ...defaultProfile, ...dbProfile, fullName: dbProfile.full_name };
+                }
+                activityHistory = await getActivityHistory(user.id);
+            }
+
+            currentProfileData = profileData;
+            currentActivityHistory = activityHistory.slice();
+
+            document.getElementById('profileName').textContent     = profileData.username;
+            document.getElementById('userFullName').textContent    = profileData.fullName   || defaultProfile.fullName;
+            document.getElementById('userDescription').textContent = profileData.description || defaultProfile.description;
+            document.getElementById('projectCount').textContent    = profileData.projectCount || defaultProfile.projectCount;
+            document.getElementById('taskCount').textContent       = profileData.taskCount    || defaultProfile.taskCount;
+            document.getElementById('learningScore').textContent   = profileData.learningScore || defaultProfile.learningScore;
 
         const tableBody = document.querySelector('tbody');
         tableBody.innerHTML = activityHistory.length
@@ -582,65 +1131,380 @@
             });
         });
 
-        // עדכן את כפתור הכניסה בטעינה דף
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', updateHeaderButton);
-        } else {
-            updateHeaderButton();
+        document.querySelector('.edit-btn').addEventListener('click', () => {
+            const newUsername = prompt('הכנס שם משתמש חדש:', currentProfileData.username);
+            if (newUsername === null) return;
+
+            const newFullName = prompt('הכנס שם מלא:', currentProfileData.fullName);
+            if (newFullName === null) return;
+
+            const newDescription = prompt('הכנס תיאור פרופיל:', currentProfileData.description);
+            if (newDescription === null) return;
+
+            const newProjectCount = prompt('הכנס מספר פרויקטים:', currentProfileData.projectCount);
+            if (newProjectCount === null) return;
+
+            const newTaskCount = prompt('הכנס מספר משימות שבוצעו:', currentProfileData.taskCount);
+            if (newTaskCount === null) return;
+
+            const newLearningScore = prompt('הכנס ציון למידה (לדוגמה: 90%):', currentProfileData.learningScore);
+            if (newLearningScore === null) return;
+
+            currentProfileData.username = newUsername.trim() || currentProfileData.username;
+            currentProfileData.fullName = newFullName.trim() || currentProfileData.fullName;
+            currentProfileData.description = newDescription.trim() || currentProfileData.description;
+            currentProfileData.projectCount = Number(newProjectCount) || currentProfileData.projectCount;
+            currentProfileData.taskCount = Number(newTaskCount) || currentProfileData.taskCount;
+            currentProfileData.learningScore = newLearningScore.trim() || currentProfileData.learningScore;
+
+            localStorage.setItem('userProfile', JSON.stringify(currentProfileData));
+
+            const now = new Date();
+            const date = now.toLocaleDateString('he-IL');
+            currentActivityHistory.unshift({ date, action: 'עדכון פרופיל', details: 'השינוי נשמר בהצלחה' });
+            if (currentActivityHistory.length > 20) currentActivityHistory.length = 20;
+            localStorage.setItem('activityHistory', JSON.stringify(currentActivityHistory));
+
+            document.getElementById('profileName').textContent    = currentProfileData.username;
+            document.getElementById('userFullName').textContent   = currentProfileData.fullName;
+            document.getElementById('userDescription').textContent = currentProfileData.description;
+            document.getElementById('projectCount').textContent   = currentProfileData.projectCount;
+            document.getElementById('taskCount').textContent      = currentProfileData.taskCount;
+            document.getElementById('learningScore').textContent  = currentProfileData.learningScore;
+
+            const tableBody = document.querySelector('tbody');
+            tableBody.innerHTML = currentActivityHistory.length
+                ? currentActivityHistory.map(entry => `
+                    <tr>
+                        <td>${entry.date}</td>
+                        <td>${entry.action}</td>
+                        <td>${entry.details}</td>
+                    </tr>`).join('')
+                : '<tr><td colspan="3" style="color:var(--text-muted);text-align:center;">אין פעולות להצגה עדיין.</td></tr>';
+
+            alert('הפרופיל עודכן ונשמר בהצלחה!');
+        });
+
+        initProfile();
+
+
+        const dailyTips = [
+    { icon: '💡', text: 'פרק את המטרות שלך לחלקים קטנים יותר — כך תישאר ממוקד ומוטיבציה.' },
+    { icon: '🚀', text: 'התחל את היום עם משימה קלה כדי לבנות תנופה!' },
+    { icon: '⏱️', text: 'טכניקת Pomodoro: 25 דקות עבודה, 5 דקות הפסקה. מוכח מדעית.' },
+    { icon: '🎯', text: 'דרג משימות לפי חשיבות ודחיפות — התמקד בחשובות ביותר קודם.' },
+    { icon: '📝', text: 'תעד את ההתקדמות שלך — זה מעורר השראה ומגביר ביטחון.' },
+    { icon: '🌟', text: 'שמור על איזון בין עבודה ומנוחה — המוח זקוק לשניהם.' },
+    { icon: '💪', text: 'כל יום קטן של התקדמות עדיף על יום ללא פעולה.' },
+    { icon: '🔄', text: 'סקור את ההתקדמות שלך בסוף כל יום וכוונן מטרות בהתאם.' }
+];
+
+const MILESTONES_LABELS = [
+    { name: 'הבנת המשימה ובחירת מבנה', p: 0.10 },
+    { name: 'בחירת מקורות',             p: 0.30 },
+    { name: 'איסוף מקורות',              p: 0.50 },
+    { name: 'כתיבת פסקה ראשונה',        p: 0.70 },
+    { name: 'עריכה וסיכום',              p: 0.90 },
+    { name: 'הגשה סופית',               p: 1.00 }
+];
+
+function initProgress() {
+    loadStatCards();
+    loadWeeklyGoals();
+    getNewTip();
+    loadUpcomingTasks();
+    loadProjectTimeline();
+}
+
+/* ===== STAT CARDS ===== */
+function loadStatCards() {
+    const goals      = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const completed  = goals.filter(g => g.completed).length;
+    const actData    = JSON.parse(localStorage.getItem('activityData') || '[]');
+    const weeklySum  = actData.slice(-7).reduce((s, d) => s + d.count, 0);
+
+    document.getElementById('progressCompleted').textContent    = completed;
+    document.getElementById('progressWeeklyActivity').textContent = weeklySum;
+}
+
+/* ===== WEEKLY GOALS ===== */
+function addWeeklyGoal() {
+    const input = document.getElementById('goalInput');
+    const text  = input.value.trim();
+    if (!text) return;
+
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    goals.push({ id: Date.now(), text, completed: false, createdAt: new Date().toISOString() });
+    localStorage.setItem('weeklyGoals', JSON.stringify(goals));
+    input.value = '';
+    renderGoals();
+    updateGoalsProgress();
+    loadStatCards();
+}
+
+function renderGoals() {
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const list  = document.getElementById('goalsList');
+    list.innerHTML = goals.length ? goals.map(g => `
+        <div class="goal-item${g.completed ? ' completed' : ''}">
+            <input type="checkbox" ${g.completed ? 'checked' : ''} onchange="toggleGoal(${g.id})">
+            <div class="goal-text">${escapeHtml(g.text)}</div>
+            <button class="goal-delete" onclick="deleteGoal(${g.id})">✕</button>
+        </div>`).join('') : '<div style="text-align:center;color:var(--text-muted);font-size:0.88rem;padding:12px 0;">אין מטרות עדיין — הוסף אחת!</div>';
+}
+
+function toggleGoal(id) {
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const g     = goals.find(g => g.id === id);
+    if (g) { g.completed = !g.completed; localStorage.setItem('weeklyGoals', JSON.stringify(goals)); }
+    renderGoals();
+    updateGoalsProgress();
+    loadStatCards();
+}
+
+function deleteGoal(id) {
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]').filter(g => g.id !== id);
+    localStorage.setItem('weeklyGoals', JSON.stringify(goals));
+    renderGoals();
+    updateGoalsProgress();
+    loadStatCards();
+}
+
+function resetWeeklyGoals() {
+    if (!confirm('למחוק את כל המטרות השבועיות?')) return;
+    localStorage.removeItem('weeklyGoals');
+    renderGoals();
+    updateGoalsProgress();
+    loadStatCards();
+}
+
+function loadWeeklyGoals() { renderGoals(); updateGoalsProgress(); }
+
+function updateGoalsProgress() {
+    const goals      = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const completed  = goals.filter(g => g.completed).length;
+    const total      = goals.length;
+    const pct        = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+    document.getElementById('goalsProgressBar').style.width = pct + '%';
+    document.getElementById('goalsPercentage').textContent  = `${completed}/${total} משימות הושלמו`;
+}
+
+/* ===== DAILY TIP ===== */
+function getNewTip() {
+    const tip = dailyTips[Math.floor(Math.random() * dailyTips.length)];
+    document.getElementById('tipIcon').textContent = tip.icon;
+    document.getElementById('tipText').textContent = tip.text;
+}
+
+/* ===== UPCOMING TASKS ===== */
+function loadUpcomingTasks() {
+    const container = document.getElementById('upcomingList');
+
+    // Collect tasks: from weeklyGoals with dates + any saved project state
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    // Try to read saved project from decompose_app_state
+    let projectTasks = [];
+    try {
+        const state = JSON.parse(localStorage.getItem('decompose_app_state') || 'null');
+        if (state && state.dueDate && state.topic) {
+            projectTasks.push({
+                title: `עבודה: ${state.topic}`,
+                dueDate: state.dueDate,
+                color: '#a78bfa'
+            });
         }
-        // פונקציות עריכת פרופיל
-        function openEditModal() {
-            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
-            if (userProfile) {
-                document.getElementById('editFullName').value = userProfile.fullName || '';
-                document.getElementById('editDescription').value = userProfile.description || '';
-                document.getElementById('editLearningScore').value = userProfile.learningScore?.replace('%', '') || '';
+    } catch(e) {}
+
+    const allTasks = [
+        ...projectTasks,
+        ...goals.filter(g => !g.completed && g.createdAt).map(g => ({
+            title: g.text,
+            dueDate: null,
+            color: '#60a5fa'
+        }))
+    ].filter(t => t.dueDate !== null || t.color).slice(0, 5);
+
+    if (projectTasks.length === 0 && goals.filter(g => !g.completed).length === 0) {
+        container.innerHTML = `<div class="upcoming-empty">
+            אין משימות קרובות. <a href="HomePage.html">צור פרויקט חדש</a> כדי להתחיל.
+        </div>`;
+        return;
+    }
+
+    // Show pending goals
+    const pendingGoals = goals.filter(g => !g.completed).slice(0, 4);
+    if (pendingGoals.length === 0 && projectTasks.length === 0) {
+        container.innerHTML = `<div class="upcoming-empty">כל המטרות הושלמו! 🎉<br><a href="HomePage.html">פתח פרויקט חדש</a></div>`;
+        return;
+    }
+
+    const items = [
+        ...projectTasks.map(t => {
+            const due   = new Date(t.dueDate);
+            const diff  = Math.ceil((due - today) / 86400000);
+            const cls   = diff <= 2 ? 'days-urgent' : diff <= 7 ? 'days-soon' : 'days-ok';
+            const label = diff < 0 ? 'עבר!' : diff === 0 ? 'היום!' : `עוד ${diff} ימים`;
+            return `<div class="upcoming-item">
+                <div class="upcoming-dot" style="background:${t.color}"></div>
+                <div class="upcoming-text">
+                    <div class="upcoming-title">${escapeHtml(t.title)}</div>
+                    <div class="upcoming-date">הגשה: ${t.dueDate}</div>
+                </div>
+                <span class="upcoming-days ${cls}">${label}</span>
+            </div>`;
+        }),
+        ...pendingGoals.map(g => `<div class="upcoming-item">
+            <div class="upcoming-dot" style="background:#60a5fa"></div>
+            <div class="upcoming-text">
+                <div class="upcoming-title">${escapeHtml(g.text)}</div>
+                <div class="upcoming-date">מטרה שבועית</div>
+            </div>
+            <span class="upcoming-days days-ok">בתהליך</span>
+        </div>`)
+    ];
+
+    container.innerHTML = items.join('') || `<div class="upcoming-empty">אין משימות להצגה. <a href="HomePage.html">פתח פרויקט חדש</a></div>`;
+}
+
+/* ===== PROJECT TIMELINE ===== */
+function loadProjectTimeline() {
+    const container = document.getElementById('projectTimeline');
+
+    let state = null;
+    try { state = JSON.parse(localStorage.getItem('decompose_app_state') || 'null'); } catch(e) {}
+
+    if (!state || !state.dueDate) {
+        container.innerHTML = `<div class="no-project-cta">
+            <div style="font-size:2rem;margin-bottom:10px;">📋</div>
+            <div>עדיין לא התחלת פרויקט.<br>
+                <small style="color:var(--text-muted);">הקישור שלמטה ייפתח את דף העבודה.</small>
+            </div>
+            <a href="HomePage.html" class="cta-link">התחל פרויקט חדש</a>
+        </div>`;
+        return;
+    }
+
+    const today    = new Date(); today.setHours(0,0,0,0);
+    const dueDate  = new Date(state.dueDate);
+    const total    = Math.max(1, Math.round((dueDate - new Date(state.startDate || today)) / 86400000));
+    const elapsed  = Math.round((today - new Date(state.startDate || today)) / 86400000);
+    const progress = Math.min(1, Math.max(0, elapsed / total));
+
+    const items = MILESTONES_LABELS.map((m, i) => {
+        const isDone    = progress >= m.p;
+        const isCurrent = !isDone && (i === 0 || progress >= MILESTONES_LABELS[i-1].p);
+        const milestoneDate = new Date(new Date(state.startDate || today).getTime() + m.p * total * 86400000);
+        const dotClass = isDone ? 'done' : isCurrent ? 'current' : '';
+
+        return `<div class="milestone-item">
+            <div class="milestone-dot-wrap">
+                <div class="milestone-dot ${dotClass}"></div>
+                ${i < MILESTONES_LABELS.length - 1 ? '<div class="milestone-connector"></div>' : ''}
+            </div>
+            <div class="milestone-info">
+                <div class="milestone-name">${m.name}</div>
+                <div class="milestone-date">${milestoneDate.toLocaleDateString('he-IL')}</div>
+            </div>
+            <div class="milestone-pct">${Math.round(m.p*100)}%</div>
+        </div>`;
+    });
+
+    container.innerHTML = `
+        <div style="margin-bottom:16px;color:var(--text-muted);font-size:0.88rem;">
+            פרויקט: <strong style="color:var(--text-bright);">${escapeHtml(state.topic || '')}</strong>
+            | הגשה: <strong style="color:var(--text-bright);">${state.dueDate}</strong>
+        </div>
+        ${items.join('')}
+    `;
+}
+
+function escapeHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initProgress();
+});
+    </script>
+    <script>
+        (function() {
+            const defaultProfile = {
+                username: 'משתמש חדש',
+                fullName: 'ישראל ישראלי',
+                description: 'תלמיד כיתה י"א | מתמחה בביולוגיה 📚',
+                projectCount: 5,
+                taskCount: 12,
+                learningScore: '85%'
+            };
+
+            function getStoredProfile() {
+                return JSON.parse(localStorage.getItem('userProfile') || 'null') || defaultProfile;
             }
-            document.getElementById('editModal').classList.add('show');
-        }
 
-        function closeEditModal() {
-            document.getElementById('editModal').classList.remove('show');
-        }
-
-        function saveProfileChanges(event) {
-            event.preventDefault();
-
-            const fullName = document.getElementById('editFullName').value.trim();
-            const description = document.getElementById('editDescription').value.trim();
-            const learningScore = document.getElementById('editLearningScore').value;
-
-            if (!fullName) {
-                alert('יש להזין שם מלא');
-                return;
+            function saveStoredProfile(profile) {
+                localStorage.setItem('userProfile', JSON.stringify(profile));
             }
 
-            // קבל את הפרופיל הקיים ועדכן אותו
-            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
-            if (userProfile) {
-                userProfile.fullName = fullName;
-                userProfile.description = description;
-                userProfile.learningScore = learningScore ? learningScore + '%' : '0%';
-                
-                localStorage.setItem('userProfile', JSON.stringify(userProfile));
-
-                // עדכן את התצוגה
-                document.getElementById('userFullName').textContent = fullName;
-                document.getElementById('userDescription').textContent = description;
-                document.getElementById('learningScore').textContent = userProfile.learningScore;
-
-                alert('הפרטים שלך עודכנו בהצלחה!');
-                closeEditModal();
+            function renderProfile(profile) {
+                document.getElementById('profileName').textContent = profile.username;
+                document.getElementById('userFullName').textContent = profile.fullName;
+                document.getElementById('userDescription').textContent = profile.description;
+                document.getElementById('projectCount').textContent = profile.projectCount;
+                document.getElementById('taskCount').textContent = profile.taskCount;
+                document.getElementById('learningScore').textContent = profile.learningScore;
             }
-        }
 
-        // סגור מודל בלחיצה מחוץ לו
-        window.onclick = function(event) {
-            const editModal = document.getElementById('editModal');
-            if (event.target === editModal) {
-                closeEditModal();
+            function renderActivityHistory(history) {
+                const tableBody = document.querySelector('tbody');
+                tableBody.innerHTML = history.length
+                    ? history.map(entry => `
+                        <tr>
+                            <td>${entry.date}</td>
+                            <td>${entry.action}</td>
+                            <td>${entry.details}</td>
+                        </tr>`).join('')
+                    : '<tr><td colspan="3" style="color:var(--text-muted);text-align:center;">אין פעולות להצגה עדיין.</td></tr>';
             }
-        };    </script>
+
+            const editBtn = document.querySelector('.edit-btn');
+            if (!editBtn) return;
+
+            editBtn.addEventListener('click', function() {
+                const profile = getStoredProfile();
+
+                const username = prompt('הכנס שם פרטי:', profile.username);
+                if (username === null) return;
+
+                const description = prompt('הכנס תיאור פרופיל:', profile.description);
+                if (description === null) return;
+
+                const updatedProfile = {
+                    ...profile,
+                    username: username.trim() || profile.username,
+                    fullName: username.trim() || profile.fullName,
+                    description: description.trim() || profile.description
+                };
+
+                saveStoredProfile(updatedProfile);
+                renderProfile(updatedProfile);
+
+                const history = JSON.parse(localStorage.getItem('activityHistory') || '[]');
+                history.unshift({
+                    date: new Date().toLocaleDateString('he-IL'),
+                    action: 'עדכון פרופיל',
+                    details: 'השינוי נשמר בהצלחה'
+                });
+                if (history.length > 20) history.length = 20;
+                localStorage.setItem('activityHistory', JSON.stringify(history));
+                renderActivityHistory(history);
+
+                alert('הפרופיל עודכן ונשמר בהצלחה!');
+            });
+        })();
+    </script>
 </body>
 
 </html>
