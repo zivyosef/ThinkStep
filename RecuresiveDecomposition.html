@@ -910,11 +910,8 @@
 
 </div>
 
-<script>
-  window.GEMINI_API_KEY    = 'AIzaSyClpw7Ln7W1VazfnOh-H9xVsRuxM4DRzEs';
-  window.SUPABASE_URL      = 'https://fflgijtemitvpjwiofue.supabase.co';
-  window.SUPABASE_ANON_KEY = 'sb_publishable_5NMPAK52g1LVFZU5fdmQCw_Nf7UXex5';
-</script>
+<script src="./config.js"></script>
+<script type="module" src="./supabase.js"></script>
 
 <!-- "I'm Stuck" floating button -->
 <button class="stuck-fab" onclick="openStuck()">נתקעתי 🤔</button>
@@ -1521,7 +1518,6 @@ document.addEventListener('DOMContentLoaded', function() {
     buildHierarchicalChecklist();
     document.addEventListener('click', recordActivity, { once: false });
 
-    // Listen for storage changes from other tabs (fixes state sync bug)
     window.addEventListener('storage', function(e) {
         if (e.key === 'decompose_app_state' || e.key === CHECKLIST_KEY) {
             buildHierarchicalChecklist();
@@ -1530,6 +1526,20 @@ document.addEventListener('DOMContentLoaded', function() {
             loadStatCards();
         }
     });
+});
+
+// When Supabase is ready, load the user's saved project from cloud
+window.addEventListener('supabase:ready', async () => {
+    try {
+        const user = await window.supabaseHelpers.getCurrentUser();
+        if (!user) return;
+        const state = await window.supabaseHelpers.loadTaskState(user.id);
+        if (!state?.chunks?.length) return;
+        localStorage.setItem('decompose_app_state', JSON.stringify(state));
+        buildHierarchicalChecklist();
+        loadProjectTimeline();
+        loadUpcomingTasks();
+    } catch(e) { /* offline or not logged in — local data is fine */ }
 });
 </script>
 </body>
