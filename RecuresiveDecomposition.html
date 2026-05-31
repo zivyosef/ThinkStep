@@ -1221,7 +1221,45 @@ function loadProjectTimeline() {
         return;
     }
 
-    const today    = new Date(); today.setHours(0,0,0,0);
+    const today      = new Date(); today.setHours(0,0,0,0);
+    const completion = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
+
+    const header = `<div style="margin-bottom:16px;color:var(--text-muted);font-size:0.88rem;">
+        פרויקט: <strong style="color:var(--text-bright);">${escapeHtml(state.topic || '')}</strong>
+        | הגשה: <strong style="color:var(--text-bright);">${state.dueDate}</strong>
+        ${state.savedAt ? `| נשמר: <span style="color:var(--text-muted)">${new Date(state.savedAt).toLocaleDateString('he-IL')}</span>` : ''}
+    </div>`;
+
+    // ── AI timeline mode ──────────────────────────────────────────
+    if (state.timeline && state.timeline.length > 0) {
+        const items = state.timeline.map((item, i) => {
+            const taskId   = `task-${state.chunks?.[i]?.id || i}`;
+            const taskDone = !!completion[taskId];
+            const itemDate = new Date(item.date);
+            const isPast   = itemDate < today;
+            const isDone   = taskDone || isPast;
+            const isCurrent = !isDone && (i === 0 || new Date(state.timeline[i-1].date) <= today);
+            const dotClass  = taskDone ? 'done' : isCurrent ? 'current' : '';
+
+            return `<div class="milestone-item">
+                <div class="milestone-dot-wrap">
+                    <div class="milestone-dot ${dotClass}"></div>
+                    ${i < state.timeline.length - 1 ? '<div class="milestone-connector"></div>' : ''}
+                </div>
+                <div class="milestone-info">
+                    <div class="milestone-name">${escapeHtml(item.title)}</div>
+                    <div class="milestone-date">${itemDate.toLocaleDateString('he-IL')}${item.timeStr ? ` | ${item.timeStr}` : ''}</div>
+                </div>
+                <div class="milestone-pct" style="color:${taskDone?'#10b981':isCurrent?'#a78bfa':''}">
+                    ${taskDone ? '✓' : isCurrent ? '▶' : ''}
+                </div>
+            </div>`;
+        });
+        container.innerHTML = header + items.join('');
+        return;
+    }
+
+    // ── Fallback: computed generic milestones ─────────────────────
     const dueDate  = new Date(state.dueDate);
     const total    = Math.max(1, Math.round((dueDate - new Date(state.startDate || today)) / 86400000));
     const elapsed  = Math.round((today - new Date(state.startDate || today)) / 86400000);
@@ -1230,9 +1268,8 @@ function loadProjectTimeline() {
     const items = MILESTONES_LABELS.map((m, i) => {
         const isDone    = progress >= m.p;
         const isCurrent = !isDone && (i === 0 || progress >= MILESTONES_LABELS[i-1].p);
-        const milestoneDate = new Date(new Date(state.startDate || today).getTime() + m.p * total * 86400000);
-        const dotClass = isDone ? 'done' : isCurrent ? 'current' : '';
-
+        const mDate     = new Date(new Date(state.startDate || today).getTime() + m.p * total * 86400000);
+        const dotClass  = isDone ? 'done' : isCurrent ? 'current' : '';
         return `<div class="milestone-item">
             <div class="milestone-dot-wrap">
                 <div class="milestone-dot ${dotClass}"></div>
@@ -1240,19 +1277,12 @@ function loadProjectTimeline() {
             </div>
             <div class="milestone-info">
                 <div class="milestone-name">${m.name}</div>
-                <div class="milestone-date">${milestoneDate.toLocaleDateString('he-IL')}</div>
+                <div class="milestone-date">${mDate.toLocaleDateString('he-IL')}</div>
             </div>
             <div class="milestone-pct">${Math.round(m.p*100)}%</div>
         </div>`;
     });
-
-    container.innerHTML = `
-        <div style="margin-bottom:16px;color:var(--text-muted);font-size:0.88rem;">
-            פרויקט: <strong style="color:var(--text-bright);">${escapeHtml(state.topic || '')}</strong>
-            | הגשה: <strong style="color:var(--text-bright);">${state.dueDate}</strong>
-        </div>
-        ${items.join('')}
-    `;
+    container.innerHTML = header + items.join('');
 }
 
 function escapeHtml(str) {
@@ -1281,93 +1311,76 @@ function buildHierarchicalChecklist() {
     if (!appState || !appState.chunks || !appState.chunks.length) {
         container.innerHTML = `<div class="no-project-cta">
             <div style="font-size:2rem;margin-bottom:10px">📋</div>
-            <div>עדיין אין פרויקט. <a href="HomePage.html" class="cta-link" style="margin:0;padding:8px 16px;display:inline-block;margin-top:12px">פרק פרויקט חדש</a></div>
+            <div>עדיין אין פרויקט שמור. <a href="HomePage.html" class="cta-link" style="margin:0;padding:8px 16px;display:inline-block;margin-top:12px">פרק פרויקט חדש</a></div>
         </div>`;
         return;
     }
 
-    const { chunks, dueDate, startDate, topic } = appState;
+    const { chunks, dueDate, timeline } = appState;
     const completion = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
     const today = new Date(); today.setHours(0,0,0,0);
-    const due   = new Date(dueDate);
-    const totalMs = Math.max(due - today, 1);
+    const due   = dueDate ? new Date(dueDate) : new Date(today.getTime() + 14*86400000);
 
-    // Distribute chunks evenly across milestone phases
-    const perPhase = Math.ceil(chunks.length / MILESTONE_PHASES.length);
-
-    // Build time blocks: 90-min slots from 09:00
-    function timeBlock(chunkIdx) {
-        const slotStart = new Date(today);
-        slotStart.setHours(9 + Math.floor(chunkIdx * 1.5), (chunkIdx % 2) * 30, 0, 0);
-        const slotEnd = new Date(slotStart.getTime() + 90 * 60 * 1000);
-        const fmt = d => d.toLocaleTimeString('he-IL', { hour:'2-digit', minute:'2-digit', hour12:false });
-        return `${fmt(slotStart)}–${fmt(slotEnd)}`;
+    // Resolve display date for each chunk from saved timeline or fallback
+    function getDateFmt(i) {
+        if (timeline && timeline[i]?.date) {
+            const d = new Date(timeline[i].date);
+            return d.toLocaleDateString('he-IL', { weekday:'short', day:'numeric', month:'short' });
+        }
+        const n = chunks.length;
+        const p = n > 1 ? i / (n - 1) : 0;
+        const d = new Date(today.getTime() + p * Math.max(due - today, 1));
+        return d.toLocaleDateString('he-IL', { weekday:'short', day:'numeric', month:'short' });
     }
 
-    // Parse description into up to 4 step sentences
+    function getTimeBadge(i) {
+        if (timeline && timeline[i]?.timeStr) return timeline[i].timeStr;
+        const s = new Date(today); s.setHours(9 + Math.floor(i * 1.5), (i % 2) * 30, 0, 0);
+        const e = new Date(s.getTime() + 90*60*1000);
+        const f = d => d.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit',hour12:false});
+        return `${f(s)}–${f(e)}`;
+    }
+
     function parseSteps(desc) {
         if (!desc) return [];
         return desc.split(/\.\s+|[\n;]/)
             .map(s => s.replace(/^\d+[.)]\s*/, '').trim())
-            .filter(s => s.length > 5)
-            .slice(0, 4);
+            .filter(s => s.length > 5).slice(0, 4);
     }
 
-    // Count totals for progress bar
     let totalItems = 0, doneItems = 0;
 
-    const phaseHtml = MILESTONE_PHASES.map((phase, pi) => {
-        const phaseId  = `phase-${pi}`;
-        const phaseDone = !!completion[phaseId];
-        totalItems++; if (phaseDone) doneItems++;
+    // Use same task-${id} keys as HomePage so checkboxes are shared
+    const chunksHtml = chunks.map((chunk, i) => {
+        const taskId   = `task-${chunk.id || i}`;
+        const taskDone = !!completion[taskId];
+        totalItems++; if (taskDone) doneItems++;
 
-        const phaseChunks = chunks.slice(pi * perPhase, pi * perPhase + perPhase);
-        const phaseDate   = new Date(today.getTime() + phase.p * totalMs);
-        const dateFmt     = phaseDate.toLocaleDateString('he-IL', { day:'numeric', month:'short' });
-
-        const chunksHtml = phaseChunks.map((chunk, ci) => {
-            const chunkIdx   = pi * perPhase + ci;
-            const chunkId    = `chunk-${chunk.id || chunkIdx}`;
-            const chunkDone  = !!completion[chunkId];
-            totalItems++; if (chunkDone) doneItems++;
-
-            const steps    = parseSteps(chunk.description);
-            const stepsHtml = steps.map((step, si) => {
-                const stepId   = `step-${chunk.id || chunkIdx}-${si}`;
-                const stepDone = !!completion[stepId];
-                totalItems++; if (stepDone) doneItems++;
-                return `<div class="hl-level-3">
-                    <input type="checkbox" id="${stepId}" ${stepDone ? 'checked' : ''}
-                           onchange="toggleChecklistItem('${stepId}',this.checked)">
-                    <label for="${stepId}" class="${stepDone ? 'hl-done' : ''}">
-                        ${escapeHtml(step)}
-                    </label>
-                </div>`;
-            }).join('');
-
-            return `<div class="hl-level-2">
-                <div class="hl-level2-header">
-                    <input type="checkbox" id="${chunkId}" ${chunkDone ? 'checked' : ''}
-                           onchange="toggleChecklistItem('${chunkId}',this.checked)">
-                    <label class="hl-level2-label ${chunkDone ? 'hl-done' : ''}" for="${chunkId}">
-                        ${escapeHtml(chunk.title)}
-                    </label>
-                    <span class="hl-time-badge">${timeBlock(chunkIdx)}</span>
-                </div>
-                ${stepsHtml ? `<div class="hl-children">${stepsHtml}</div>` : ''}
+        const steps = parseSteps(chunk.description);
+        const stepsHtml = steps.map((step, si) => {
+            const stepId   = `step-${chunk.id || i}-${si}`;
+            const stepDone = !!completion[stepId];
+            totalItems++; if (stepDone) doneItems++;
+            return `<div class="hl-level-3">
+                <input type="checkbox" id="${stepId}" ${stepDone ? 'checked' : ''}
+                       onchange="toggleChecklistItem('${stepId}',this.checked)">
+                <label for="${stepId}" class="${stepDone ? 'hl-done' : ''}">
+                    ${escapeHtml(step)}
+                </label>
             </div>`;
         }).join('');
 
         return `<div class="hl-level-1">
             <div class="hl-level1-header">
-                <input type="checkbox" id="${phaseId}" ${phaseDone ? 'checked' : ''}
-                       onchange="toggleChecklistItem('${phaseId}',this.checked)">
-                <label class="hl-level1-label ${phaseDone ? 'hl-done' : ''}" for="${phaseId}">
-                    חלק ${pi + 1} — ${escapeHtml(phase.name)}
+                <input type="checkbox" id="${taskId}" ${taskDone ? 'checked' : ''}
+                       onchange="toggleChecklistItem('${taskId}',this.checked)">
+                <label class="hl-level1-label ${taskDone ? 'hl-done' : ''}" for="${taskId}">
+                    ${escapeHtml(chunk.title)}
                 </label>
-                <span class="hl-date-badge">עד ${dateFmt}</span>
+                <span class="hl-date-badge">${getDateFmt(i)}</span>
+                <span class="hl-time-badge">${getTimeBadge(i)}</span>
             </div>
-            ${chunksHtml ? `<div class="hl-children">${chunksHtml}</div>` : ''}
+            ${stepsHtml ? `<div class="hl-children">${stepsHtml}</div>` : ''}
         </div>`;
     }).join('');
 
@@ -1383,12 +1396,11 @@ function buildHierarchicalChecklist() {
                 <div class="hl-progress-bar" style="width:${pct}%"></div>
             </div>
         </div>
-        <div class="hl-list">${phaseHtml}</div>
+        <div class="hl-list">${chunksHtml}</div>
         <button class="hl-compile-btn" onclick="compileReport()">
             📄 Compile — הורד דוח למורה
         </button>`;
 
-    // Sync the stat card
     document.getElementById('statCompleted').textContent = doneItems;
 }
 

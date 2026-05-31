@@ -4,28 +4,43 @@
  * ============================================================
  */
 
-// ✅ No SDK import needed — uses Gemini REST API directly (more reliable in plain HTML pages)
+// ✅ No SDK import needed — uses OpenRouter REST API directly
 
 const AI_HISTORY_KEY = "my_ai_app_history";
 const MAX_HISTORY = 10;
-const _apiKey = window.GEMINI_API_KEY || import.meta.env?.VITE_GEMINI_API_KEY;
-console.log('🟠 [aiService] מפתח API נטען?', _apiKey ? `כן (${_apiKey.slice(0,8)}...)` : '❌ לא נמצא מפתח API!');
-const GEMINI_MODEL = "gemini-2.5-flash-lite";
-const GEMINI_REST_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
-// Central REST helper — replaces all ai.models.generateContent() calls
-async function geminiRest(prompt, systemInstruction = null) {
-  const body = {
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-  };
+// ── OpenRouter setup (active) ─────────────────────────────────
+const _openRouterKey = window.OPENROUTER_API_KEY;
+const OPENROUTER_MODEL = "google/gemini-2.0-flash-001";
+const OPENROUTER_URL   = "https://openrouter.ai/api/v1/chat/completions";
+console.log('🟠 [aiService] OpenRouter key loaded?', _openRouterKey ? `yes (${_openRouterKey.slice(0,12)}...)` : '❌ key not found!');
+
+// ── Gemini setup (commented out — restore if switching back) ──
+// const _apiKey = window.GEMINI_API_KEY || import.meta.env?.VITE_GEMINI_API_KEY;
+// console.log('🟠 [aiService] מפתח API נטען?', _apiKey ? `כן (${_apiKey.slice(0,8)}...)` : '❌ לא נמצא מפתח API!');
+// const GEMINI_MODEL    = "gemini-2.0-flash-lite";
+// const GEMINI_REST_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+
+// ============================================================
+//  Central REST helper — OpenRouter (active)
+// ============================================================
+async function openRouterRequest(prompt, systemInstruction = null) {
+  const messages = [];
   if (systemInstruction) {
-    body.system_instruction = { parts: [{ text: systemInstruction }] };
+    messages.push({ role: "system", content: systemInstruction });
   }
-  const response = await fetch(`${GEMINI_REST_URL}?key=${_apiKey}`, {
+  messages.push({ role: "user", content: prompt });
+
+  const response = await fetch(OPENROUTER_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${_openRouterKey}`,
+    },
+    body: JSON.stringify({ model: OPENROUTER_MODEL, messages }),
   });
+
   if (response.status === 429) {
     const err = new Error("Rate limit");
     err.status = 429;
@@ -36,16 +51,42 @@ async function geminiRest(prompt, systemInstruction = null) {
     throw new Error(errBody.error?.message || `HTTP ${response.status}`);
   }
   const json = await response.json();
-  return json.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  return json.choices?.[0]?.message?.content || "";
 }
+
+// ── Gemini REST helper (commented out — restore if switching back) ──
+// async function geminiRest(prompt, systemInstruction = null) {
+//   const body = {
+//     contents: [{ role: "user", parts: [{ text: prompt }] }],
+//   };
+//   if (systemInstruction) {
+//     body.system_instruction = { parts: [{ text: systemInstruction }] };
+//   }
+//   const response = await fetch(`${GEMINI_REST_URL}?key=${_apiKey}`, {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(body),
+//   });
+//   if (response.status === 429) {
+//     const err = new Error("Rate limit");
+//     err.status = 429;
+//     throw err;
+//   }
+//   if (!response.ok) {
+//     const errBody = await response.json().catch(() => ({}));
+//     throw new Error(errBody.error?.message || `HTTP ${response.status}`);
+//   }
+//   const json = await response.json();
+//   return json.candidates?.[0]?.content?.parts?.[0]?.text || "";
+// }
+
 
 // ============================================================
 //  sendQuery — נקודת הכניסה המרכזית לכל הבקשות
 // ============================================================
-// הווסף פרמטר retryCount עם ערך ברירת מחדל 0
 async function sendQuery(intent, rawData, userDescription, retryCount = 0) {
-  const MAX_RETRIES = 2; // מקסימום 2 ניסיונות חוזרים (סך הכל 3 ריצות)
-  
+  const MAX_RETRIES = 2;
+
   console.log(`🤖 aiService קיבל בקשה מסוג: ${intent} (ניסיון ${retryCount + 1})`);
 
   const history = loadAIHistory();
@@ -78,47 +119,31 @@ async function sendQuery(intent, rawData, userDescription, retryCount = 0) {
     return result;
 
   } catch (error) {
-    // --- כאן נכנס הקוד המעודכן ---
-    // טיפול בשגיאת מכסה מלאה (429)
     if (error?.status === 429) {
       if (retryCount < MAX_RETRIES) {
-        
-        // --- יישום Exponential Backoff + Jitter ---
-        const baseDelay = 20000; // זמן המתנה בסיסי
-        const exponentialDelay = baseDelay * Math.pow(2, retryCount); 
-        const jitter = Math.floor(Math.random() * 3000); // עד 3 שניות של רעש אקראי
-        const waitTime = exponentialDelay + jitter;
+        const baseDelay      = 60000;
+        const exponentialDelay = baseDelay * Math.pow(2, retryCount);
+        const jitter         = Math.floor(Math.random() * 3000);
+        const waitTime       = exponentialDelay + jitter;
 
-        console.warn(`⏳ שרת עמוס (429). ממתין ${(waitTime / 1000).toFixed(1)} שניות ומנסה שוב... (ניסיון ${retryCount + 1}/${MAX_RETRIES})`);
-        
+        console.warn(`⏳ שרת עמוס (429). ממתין ${(waitTime / 1000).toFixed(1)} שניות... (ניסיון ${retryCount + 1}/${MAX_RETRIES})`);
         await delay(waitTime);
-        // מעבירים את ה-retryCount פלוס 1 לקריאה הבאה
         return sendQuery(intent, rawData, userDescription, retryCount + 1);
       } else {
-        console.error("❌ נעצרו הניסיונות החוזרים: עברת את מקסימום הניסיונות המותרים לשגיאת 429.");
+        console.error("❌ נעצרו הניסיונות החוזרים.");
         return { error: true, message: "השרת עמוס כרגע, אנא נסה שוב בעוד דקה." };
       }
     }
-    
+
     console.error(`❌ שגיאה בביצוע ${intent} — FULL ERROR:`, error);
     return null;
   }
 }
 
 
-
-
 // ============================================================
-//  פונקציה חדשה: validateTaskWithAI
-//  נקראת מ-handleTaskValidation ב-logicManager
+//  validateTaskWithAI
 // ============================================================
-/**
- * שולחת את טקסט המשימה ל-Gemini ומבקשת החלטה:
- * האם המשימה ממוקדת (ירוק), רחבה מעט (צהוב), או רחבה מדי (אדום)?
- *
- * קלט:  taskText (string)
- * פלט:  { score: "red"|"yellow"|"green", label: string, explanation: string }
- */
 async function validateTaskWithAI(taskText) {
   const prompt = `
 אתה עוזר לימודי שעוזר לתלמידים לפרק משימות לחלקים קטנים וניתנים לביצוע.
@@ -140,27 +165,26 @@ async function validateTaskWithAI(taskText) {
 }
 `;
 
-  const rawText = await geminiRest(prompt);
+  const rawText = await openRouterRequest(prompt);
+  // Gemini: const rawText = await geminiRest(prompt);
 
   const text = rawText.trim().replace(/```json|```/g, "").trim();
 
   try {
     const parsed = JSON.parse(text);
-    // וידוא שהשדות הנדרשים קיימים
     if (!["red", "yellow", "green"].includes(parsed.score)) {
       throw new Error("score לא תקין");
     }
     return {
-      score: parsed.score,
-      label: parsed.label || "לא זוהה תיוג",
+      score:       parsed.score,
+      label:       parsed.label || "לא זוהה תיוג",
       explanation: parsed.explanation || "",
     };
   } catch (e) {
     console.error("❌ שגיאה בפירוש תשובת AI לvalidation:", e, "\nתשובה גולמית:", text);
-    // fallback — לפחות להחזיר משהו שמנע קריסה
     return {
-      score: "yellow",
-      label: "לא הצלחנו לנתח את המשימה אוטומטית",
+      score:       "yellow",
+      label:       "לא הצלחנו לנתח את המשימה אוטומטית",
       explanation: "נסה לנסח את המשימה בצורה ספציפית יותר.",
     };
   }
@@ -168,15 +192,8 @@ async function validateTaskWithAI(taskText) {
 
 
 // ============================================================
-//  פונקציה 3: generateSmartDecomposition
+//  generateSmartDecomposition
 // ============================================================
-/**
- * מקבלת את הטקסט הגולמי של המשימה ומחלצת נתונים מובנים:
- * מקצוע, נושא, סוג מטלה, ומקבצים לפירוק.
- *
- * קלט:  rawText (string), currentState (object)
- * פלט:  object עם שדות: subject, topic, assignmentType, chunks
- */
 async function generateSmartDecomposition(rawText, currentState) {
   console.log("📤 שולח ל-AI לפירוק המשימה:", rawText);
   const today = new Date().toISOString().split("T")[0];
@@ -208,23 +225,23 @@ async function generateSmartDecomposition(rawText, currentState) {
 - ספרות / עברית → אלמנטים ספרותיים: עלילה, דמויות, מסר
 - כללי → מבוא, גוף, סיכום
 `;
-  const apiResponse = await geminiRest(prompt);
+
+  const apiResponse = await openRouterRequest(prompt);
+  // Gemini: const apiResponse = await geminiRest(prompt);
   console.log("📥 תשובת AI לפירוק:", apiResponse);
 
   const text = apiResponse.trim().replace(/```json|```/g, "").trim();
 
   try {
     const parsed = JSON.parse(text);
-
-    // מיזוג עם ה-state הקיים
     return {
       ...currentState,
-      subject: parsed.subject || null,
-      topic: parsed.topic || null,
+      subject:        parsed.subject        || null,
+      topic:          parsed.topic          || null,
       assignmentType: parsed.assignmentType || null,
-      pgNumberScope: parsed.pgNumberScope || currentState?.pgNumberScope || null,
-      dueDate: parsed.dueDate || currentState?.dueDate || null,
-      chunks: Array.isArray(parsed.chunks) ? parsed.chunks : [],
+      pgNumberScope:  parsed.pgNumberScope  || currentState?.pgNumberScope || null,
+      dueDate:        parsed.dueDate        || currentState?.dueDate       || null,
+      chunks:         Array.isArray(parsed.chunks) ? parsed.chunks : [],
     };
   } catch (e) {
     console.error("❌ שגיאה בפירוש תשובת AI לפירוק:", e, "\nתשובה גולמית:", text);
@@ -234,14 +251,8 @@ async function generateSmartDecomposition(rawText, currentState) {
 
 
 // ============================================================
-//  פונקציה 4: generateRefinedPrompt
+//  generateRefinedPrompt
 // ============================================================
-/**
- * מקבלת משימה "אדומה" ומנסחת אותה מחדש בצורה ספציפית יותר.
- *
- * קלט:  originalTask (string), analysisLabel (string)
- * פלט:  { refinedText: string, explanation: string }
- */
 async function generateRefinedPrompt(originalTask, analysisLabel) {
   const prompt = `
 אתה עוזר לימודי שמסייע לתלמידים לפרק משימות גדולות לצעדים קטנים.
@@ -263,7 +274,8 @@ async function generateRefinedPrompt(originalTask, analysisLabel) {
 }
 `;
 
-  const rawText = await geminiRest(prompt);
+  const rawText = await openRouterRequest(prompt);
+  // Gemini: const rawText = await geminiRest(prompt);
 
   const text = rawText.trim().replace(/```json|```/g, "").trim();
 
@@ -284,21 +296,13 @@ async function generateRefinedPrompt(originalTask, analysisLabel) {
 
 
 // ============================================================
-//  פונקציה 5: getSocraticResponse
+//  getSocraticResponse
 // ============================================================
-/**
- * מחזירה שאלה מנחה סוקרטית (לא תשובה ישירה!)
- * בהתאם לשאלת המשתמש וההיסטוריה.
- *
- * קלט:  userMessage (string), userDescription (any), history (array)
- * פלט:  string — שאלה מנחה
- */
 async function getSocraticResponse(userMessage, userDescription, history) {
-  // בניית הקשר מההיסטוריה
   const historyContext =
     history && history.length > 0
       ? history
-          .slice(-3) // רק 3 האינטראקציות האחרונות
+          .slice(-3)
           .map((h) => `[${h.intent}]: ${JSON.stringify(h.user).substring(0, 80)}`)
           .join("\n")
       : "אין היסטוריה קודמת.";
@@ -322,19 +326,15 @@ ${historyContext}
 החזר את השאלה בלבד, ללא הסברים נוספים.
 `;
 
-  return (await geminiRest(prompt)).trim();
+  const result = await openRouterRequest(prompt);
+  // Gemini: const result = await geminiRest(prompt);
+  return result.trim();
 }
 
 
 // ============================================================
-//  פונקציה 6: getThinkingModels
+//  getThinkingModels
 // ============================================================
-/**
- * מחזירה זוויות חשיבה בהתאם לנושא.
- *
- * קלט:  subject (string)
- * פלט:  [{ angle: string, description: string }, ...]
- */
 async function getThinkingModels(subject) {
   const prompt = `
 אתה עוזר לימודי לתלמידי תיכון.
@@ -352,7 +352,8 @@ async function getThinkingModels(subject) {
 ]
 `;
 
-  const rawText = await geminiRest(prompt);
+  const rawText = await openRouterRequest(prompt);
+  // Gemini: const rawText = await geminiRest(prompt);
 
   const text = rawText.trim().replace(/```json|```/g, "").trim();
 
@@ -362,10 +363,9 @@ async function getThinkingModels(subject) {
     throw new Error("התשובה אינה מערך");
   } catch (e) {
     console.error("❌ שגיאה בזוויות חשיבה:", e);
-    // fallback כללי
     return [
-      { angle: "מה", description: "מה קרה? מה הנושא המרכזי?" },
-      { angle: "למה", description: "מה הסיבות? מה הרקע?" },
+      { angle: "מה",        description: "מה קרה? מה הנושא המרכזי?" },
+      { angle: "למה",       description: "מה הסיבות? מה הרקע?" },
       { angle: "מה השפעה", description: "מה התוצאות לטווח הארוך?" },
     ];
   }
@@ -373,8 +373,7 @@ async function getThinkingModels(subject) {
 
 
 // ============================================================
-//  פונקציה: requestAnglesFromAI
-//  נקראת ע"י intent: "GET_ANGLES" מ-logicManager
+//  requestAnglesFromAI
 // ============================================================
 async function requestAnglesFromAI(topic) {
   return await getThinkingModels(topic);
@@ -382,8 +381,7 @@ async function requestAnglesFromAI(topic) {
 
 
 // ============================================================
-//  פונקציה: generateSubtasksFromDemands
-//  נקראת ע"י intent: "ANALYZE_DEMANDS"
+//  generateSubtasksFromDemands
 // ============================================================
 async function generateSubtasksFromDemands(demandsText, context) {
   const today = new Date().toISOString().split("T")[0];
@@ -413,7 +411,8 @@ async function generateSubtasksFromDemands(demandsText, context) {
 - ממוינות לפי סדר הגיוני לביצוע
 `;
 
-  const rawText = await geminiRest(prompt);
+  const rawText = await openRouterRequest(prompt);
+  // Gemini: const rawText = await geminiRest(prompt);
 
   const text = rawText.trim().replace(/```json|```/g, "").trim();
 
@@ -429,7 +428,7 @@ async function generateSubtasksFromDemands(demandsText, context) {
 
 
 // ============================================================
-//  היסטוריה
+//  History helpers
 // ============================================================
 function loadAIHistory() {
   const saved = localStorage.getItem(AI_HISTORY_KEY);
@@ -445,14 +444,12 @@ function loadAIHistory() {
 function updateContext(intent, userText, aiResponse) {
   const history = loadAIHistory();
 
-  const interaction = {
+  history.push({
     timestamp: new Date().toISOString(),
-    intent: intent,
-    user: userText,
+    intent:    intent,
+    user:      userText,
     assistant: aiResponse,
-  };
-
-  history.push(interaction);
+  });
 
   if (history.length > MAX_HISTORY) {
     history.shift();
@@ -464,7 +461,7 @@ function updateContext(intent, userText, aiResponse) {
 
 
 // ============================================================
-//  פונקציית עזר: delay
+//  delay helper
 // ============================================================
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -472,7 +469,7 @@ function delay(ms) {
 
 
 // ============================================================
-//  חשיפת פונקציות
+//  Export
 // ============================================================
 const aiService = {
   sendQuery,
