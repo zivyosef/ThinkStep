@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+:root {
+  --sans: system-ui, 'Segoe UI', Roboto, 'Heebo', sans-serif;
+  font-family: var(--sans);
+  color-scheme: light dark;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  background: #f9fafb;
+  direction: rtl;
+}
+
+* {
+  box-sizing: border-box;
+}

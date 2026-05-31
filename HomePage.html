@@ -242,6 +242,139 @@ input:focus {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+/* ===== HIERARCHICAL CHECKLIST ===== */
+.hl-progress-info {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted);
+}
+.hl-pct { font-weight: 800; color: var(--accent); font-size: 0.95rem; }
+.hl-progress-bar-container {
+  height: 7px; background: rgba(255,255,255,0.06); border-radius: 999px;
+  border: 1px solid var(--border); overflow: hidden; margin-bottom: 16px;
+}
+.hl-progress-bar {
+  height: 100%; background: linear-gradient(90deg,#10b981,#3b82f6);
+  border-radius: 999px; transition: width 0.5s ease;
+}
+.hl-list { display: flex; flex-direction: column; gap: 8px; }
+
+.hl-level-1 {
+  background: rgba(37,99,235,0.07); border: 1px solid rgba(37,99,235,0.2);
+  border-radius: 12px; padding: 13px;
+}
+.hl-level-2 {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(148,163,184,0.12);
+  border-radius: 9px; padding: 10px 12px; margin-top: 7px;
+}
+.hl-level-3 {
+  display: flex; align-items: flex-start; gap: 7px;
+  padding: 5px 8px; border-radius: 6px; margin-top: 5px;
+  background: rgba(255,255,255,0.02);
+}
+.hl-level1-header, .hl-level2-header {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.hl-level-1 input[type="checkbox"],
+.hl-level-2 input[type="checkbox"],
+.hl-level-3 input[type="checkbox"] {
+  width: 16px; height: 16px; cursor: pointer;
+  accent-color: #10b981; flex-shrink: 0; margin-top: 1px;
+}
+.hl-level1-label {
+  font-size: 0.9rem; font-weight: 700; color: var(--text-bright); flex: 1; cursor: pointer;
+}
+.hl-level2-label {
+  font-size: 0.86rem; font-weight: 600; color: var(--text-secondary); flex: 1; cursor: pointer;
+}
+.hl-level-3 label {
+  font-size: 0.8rem; color: var(--text-muted); flex: 1; cursor: pointer; line-height: 1.5;
+}
+.hl-done { text-decoration: line-through; opacity: 0.45; }
+.hl-time-badge {
+  font-size: 0.72rem; font-weight: 700; font-family: monospace;
+  color: #60a5fa; background: rgba(37,99,235,0.12);
+  border: 1px solid rgba(37,99,235,0.22); padding: 2px 7px;
+  border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+}
+.hl-date-badge {
+  font-size: 0.72rem; font-weight: 600; color: #a78bfa;
+  background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.22);
+  padding: 2px 7px; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+}
+.hl-children { margin-top: 6px; }
+.hl-compile-btn {
+  margin-top: 16px; width: 100%; padding: 14px;
+  background: linear-gradient(135deg,#059669,#0284c7); color: white;
+  border: none; border-radius: 11px; font-size: 0.95rem; font-weight: 800;
+  font-family: inherit; cursor: pointer; transition: all 0.2s ease;
+}
+.hl-compile-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(5,150,105,0.35); }
+
+/* ===== STUCK COACH ===== */
+.stuck-fab {
+  position: fixed; bottom: 24px; left: 24px; z-index: 999;
+  background: linear-gradient(135deg,#f97316,#ef4444); color: white;
+  border: none; border-radius: 999px; padding: 11px 20px;
+  font-size: 0.9rem; font-weight: 800; font-family: inherit;
+  cursor: pointer; box-shadow: 0 5px 18px rgba(249,115,22,0.4);
+  transition: all 0.2s ease;
+}
+.stuck-fab:hover { transform: translateY(-2px) scale(1.04); }
+
+.stuck-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 999;
+}
+.stuck-panel {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
+  background: var(--bg-card); border-top: 1px solid var(--border);
+  border-radius: 22px 22px 0 0; padding: 18px; max-height: 72vh;
+  display: flex; flex-direction: column; box-shadow: 0 -6px 36px rgba(0,0,0,0.3);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+
+.stuck-panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.stuck-panel-header h3 { font-size:0.95rem; color:var(--text-bright); font-weight:700; }
+.stuck-panel-header p  { font-size:0.74rem; color:var(--text-muted); margin-top:2px; }
+.stuck-close { background:none; border:none; color:var(--text-muted); font-size:1.3rem; cursor:pointer; padding:4px; }
+.stuck-close:hover { color:var(--text-bright); }
+
+.stuck-messages {
+  flex:1; overflow-y:auto; display:flex; flex-direction:column;
+  gap:9px; margin-bottom:12px; max-height:38vh;
+}
+.stuck-msg {
+  max-width:80%; padding:9px 13px; border-radius:14px;
+  font-size:0.84rem; line-height:1.55; white-space:pre-wrap;
+}
+.stuck-msg.assistant {
+  background:rgba(255,255,255,0.06); color:var(--text-secondary);
+  border-radius:14px 14px 14px 4px; align-self:flex-end;
+}
+.stuck-msg.user {
+  background:linear-gradient(135deg,var(--accent),var(--purple)); color:white;
+  border-radius:14px 14px 4px 14px; align-self:flex-start; margin-right:auto;
+}
+.stuck-input-row { display:flex; gap:7px; }
+.stuck-input-row textarea {
+  flex:1; resize:none; padding:9px 12px;
+  border:1px solid rgba(148,163,184,0.22); border-radius:10px;
+  background:rgba(255,255,255,0.05); color:var(--text);
+  font-size:0.84rem; font-family:inherit; line-height:1.4;
+}
+.stuck-input-row textarea:focus { outline:none; border-color:#f97316; background:rgba(249,115,22,0.06); }
+.stuck-send-btn {
+  padding:9px 14px; background:linear-gradient(135deg,#f97316,#ef4444);
+  color:white; border:none; border-radius:10px; font-weight:700;
+  font-family:inherit; cursor:pointer; font-size:0.84rem; align-self:flex-end;
+  transition:all 0.2s ease;
+}
+.stuck-send-btn:hover { transform:translateY(-1px); }
+.stuck-send-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+.stuck-typing { font-style:italic; opacity:0.6; animation:pulse 1.2s infinite; }
+@keyframes pulse { 0%,100%{opacity:0.6;} 50%{opacity:1;} }
 </style>
 </head>
 <body>
@@ -315,27 +448,49 @@ input:focus {
       </div>
     </div>
 
+    <!-- Hierarchical Checklist + Compile -->
+    <div id="checklist-card" class="card hidden">
+      <div class="section-title">✅ רשימת משימות מפורטת</div>
+      <div id="hierarchicalChecklist"></div>
+    </div>
+
   </div><!-- /work-page -->
 </div><!-- /page -->
 
+<!-- "I'm Stuck" FAB -->
+<button class="stuck-fab" onclick="openStuck()">נתקעתי 🤔</button>
+
+<!-- Stuck Coach Panel -->
+<div class="stuck-overlay" id="stuckOverlay" style="display:none" onclick="closeStuck()"></div>
+<div class="stuck-panel" id="stuckPanel" style="display:none" dir="rtl">
+  <div class="stuck-panel-header">
+    <div>
+      <h3>מאמן ה-AI שלך 🧠</h3>
+      <p>אני כאן לעזור לך לחשוב — לא לתת תשובות 😊</p>
+    </div>
+    <button class="stuck-close" onclick="closeStuck()">✕</button>
+  </div>
+  <div class="stuck-messages" id="stuckMessages"></div>
+  <div class="stuck-input-row">
+    <textarea id="stuckInput" rows="2" placeholder="תאר במה נתקעת..."
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendStuck();}"></textarea>
+    <button class="stuck-send-btn" id="stuckSendBtn" onclick="sendStuck()">שלח</button>
+  </div>
+</div>
+
+<script src="./config.js"></script>
+<!-- Load services as isolated modules; each sets window.aiService / window.logicManager -->
+<script type="module" src="./aiService.js"></script>
+<script type="module" src="./logicManager.js"></script>
+
 <script>
-  window.GEMINI_API_KEY    = 'AIzaSyClpw7Ln7W1VazfnOh-H9xVsRuxM4DRzEs';
-  window.SUPABASE_URL      = 'https://fflgijtemitvpjwiofue.supabase.co';
-  window.SUPABASE_ANON_KEY = 'sb_publishable_5NMPAK52g1LVFZU5fdmQCw_Nf7UXex5';
-</script>
-<script type="importmap">
-{
-  "imports": {
-    "@google/genai":         "https://esm.sh/@google/genai",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+/* All page logic is in a plain (non-module) script so that onclick handlers
+   are defined on window immediately — no import-chain failure can block them. */
+const logicManager = new Proxy({}, {
+  get(_, key) {
+    return window.logicManager?.[key];
   }
-}
-</script>
-<script type="module">
-import './aiService.js';
-import logicManager from './logicManager.js';
-import { getCurrentUser, saveTaskState, loadTaskState } from './supabase.js';
-window.supabaseHelpers = { getCurrentUser, saveTaskState, loadTaskState };
+});
 
 const MILESTONES = [
   { name: "הבנת המשימה ובחירת מבנה", p: 0.10 },
@@ -387,18 +542,37 @@ async function handleAnalyzeDemands() {
     dueDate: document.getElementById('date').value,
   };
 
+  if (!window.logicManager || typeof window.logicManager.analyzeDemandsAndCreateSubtasks !== 'function') {
+    alert('המערכת עדיין נטענת, נסה שוב בעוד שנייה...');
+    setLoading('analyze-label', 'analyze-spinner', 'analyze-btn', false);
+    return;
+  }
+
+  // Show checklist card immediately with a loading skeleton
+  const checklistCard = document.getElementById('checklist-card');
+  checklistCard.classList.remove('hidden');
+  document.getElementById('hierarchicalChecklist').innerHTML = `
+    <div style="text-align:center;padding:32px 0;color:#6b7280">
+      <div style="font-size:28px;margin-bottom:10px;animation:spin 1s linear infinite;display:inline-block">⚙️</div>
+      <div style="font-size:15px;font-weight:600">ה-AI בונה את לוח הזמנים...</div>
+      <div style="font-size:12px;margin-top:4px;opacity:.7">זה יכול לקחת עד 10 שניות</div>
+    </div>`;
+
   try {
-    const result = await logicManager.analyzeDemandsAndCreateSubtasks(demandsText, context);
+    const result = await window.logicManager.analyzeDemandsAndCreateSubtasks(demandsText, context);
     subtasks = result.length > 0 ? result : [];
     if (subtasks.length === 0) {
-      alert('לא הצלחנו לנתח את הדרישות. נסה לנסח אותן בצורה ברורה יותר.');
+      document.getElementById('hierarchicalChecklist').innerHTML =
+        `<div style="text-align:center;padding:24px;color:#ef4444">לא הצלחנו לנתח את הדרישות. נסה לנסח אותן בצורה ברורה יותר.</div>`;
     } else {
       renderSubtasks();
       document.getElementById('subtasks-card').classList.remove('hidden');
+      buildChecklist();
     }
   } catch (e) {
     console.error('שגיאה בניתוח דרישות:', e);
-    alert('אירעה שגיאה. בדוק את החיבור לאינטרנט ונסה שוב.');
+    document.getElementById('hierarchicalChecklist').innerHTML =
+      `<div style="text-align:center;padding:24px;color:#ef4444">אירעה שגיאה. בדוק את החיבור לאינטרנט ונסה שוב.</div>`;
   } finally {
     setLoading('analyze-label', 'analyze-spinner', 'analyze-btn', false);
   }
@@ -427,6 +601,7 @@ function escapeHtml(str) {
 function deleteSubtask(i) {
   subtasks.splice(i, 1);
   renderSubtasks();
+  buildChecklist();
 }
 
 function addSubtask() {
@@ -482,12 +657,263 @@ function saveMilestone(i) {
 
 function resetTimeline() { rebuildTimeline(); }
 
-window.handleAnalyzeDemands = handleAnalyzeDemands;
-window.rebuildTimeline      = rebuildTimeline;
-window.resetTimeline        = resetTimeline;
-window.saveMilestone        = saveMilestone;
-window.deleteSubtask        = deleteSubtask;
-window.addSubtask           = addSubtask;
+// (all functions above are global in a plain script — no window.* assignments needed)
+
+/* ================================================================
+   HIERARCHICAL CHECKLIST + COMPILE (Features 1 + 7 + 8)
+   ================================================================ */
+const CHECKLIST_KEY = 'task_checklist_state';
+
+// Compute date + time slot for each task based on real project timeline
+function computeSchedule(subtasks, today, due) {
+  const n         = subtasks.length;
+  const totalDays = Math.max(1, Math.round((due - today) / 86400000));
+
+  // Assign day index for each task (evenly spread)
+  const dayOffsets = subtasks.map((_, i) =>
+    n > 1 ? Math.round((i / (n - 1)) * (totalDays - 1)) : 0
+  );
+
+  return subtasks.map((_, i) => {
+    const dayOffset = dayOffsets[i];
+    const d         = new Date(today.getTime() + dayOffset * 86400000);
+    const dateFmt   = d.toLocaleDateString('he-IL', { weekday:'short', day:'numeric', month:'short' });
+
+    // Slot within the day: count how many earlier tasks share the same day
+    const slot   = dayOffsets.slice(0, i).filter(d => d === dayOffset).length;
+    const startH = 9 + slot * 2;
+    const endH   = startH + 2;
+    const timeStr = `${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00`;
+
+    return { dateFmt, timeStr };
+  });
+}
+
+function buildChecklist() {
+  if (!subtasks.length) return;
+
+  const card = document.getElementById('checklist-card');
+  card.classList.remove('hidden');
+
+  const container  = document.getElementById('hierarchicalChecklist');
+  const completion = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
+  const dateVal    = document.getElementById('date').value;
+  const today      = new Date(); today.setHours(0,0,0,0);
+  const due        = dateVal ? new Date(dateVal) : new Date(today.getTime() + 14 * 86400000);
+
+  const schedule = computeSchedule(subtasks, today, due);
+
+  // Parse description sentences into Level-3 steps
+  function parseSteps(desc) {
+    if (!desc) return [];
+    return desc.split(/\.\s+|[\n;]/)
+      .map(s => s.replace(/^\d+[.)]\s*/, '').trim())
+      .filter(s => s.length > 5).slice(0, 3);
+  }
+
+  let totalItems = 0, doneItems = 0;
+
+  const tasksHtml = subtasks.map((task, i) => {
+    const taskId   = `task-${task.id || i}`;
+    const taskDone = !!completion[taskId];
+    totalItems++; if (taskDone) doneItems++;
+
+    const { dateFmt, timeStr } = schedule[i];
+    const steps     = parseSteps(task.description);
+    const stepsHtml = steps.map((step, si) => {
+      const stepId   = `step-${task.id || i}-${si}`;
+      const stepDone = !!completion[stepId];
+      totalItems++; if (stepDone) doneItems++;
+      return `<div class="hl-level-3">
+        <input type="checkbox" id="${stepId}" ${stepDone ? 'checked' : ''}
+               onchange="window.toggleHL('${stepId}',this.checked)">
+        <label for="${stepId}" class="${stepDone ? 'hl-done' : ''}">${escapeHtml(step)}</label>
+      </div>`;
+    }).join('');
+
+    return `<div class="hl-level-1">
+      <div class="hl-level1-header">
+        <input type="checkbox" id="${taskId}" ${taskDone ? 'checked' : ''}
+               onchange="window.toggleHL('${taskId}',this.checked)">
+        <label class="hl-level1-label ${taskDone ? 'hl-done' : ''}" for="${taskId}">
+          ${escapeHtml(task.title)}
+        </label>
+        <span class="hl-date-badge">${dateFmt}</span>
+        <span class="hl-time-badge">${timeStr}</span>
+      </div>
+      ${stepsHtml ? `<div class="hl-children">${stepsHtml}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const pct = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
+
+  container.innerHTML = `
+    <div class="hl-progress-info">
+      <span>${doneItems} / ${totalItems} משימות</span>
+      <span class="hl-pct">${pct}%</span>
+    </div>
+    <div class="hl-progress-bar-container">
+      <div class="hl-progress-bar" style="width:${pct}%"></div>
+    </div>
+    <div class="hl-list">${tasksHtml}</div>
+    <button class="hl-compile-btn" onclick="window.compileReport()">
+      📄 Compile — הורד דוח למורה
+    </button>`;
+
+  // Save state so RecursiveDecomposition page can also read it
+  const appState = {
+    topic:   document.getElementById('topic').value.trim() || 'פרויקט',
+    subject: document.getElementById('subject').value.trim(),
+    dueDate: dateVal,
+    startDate: new Date().toISOString().split('T')[0],
+    chunks:  subtasks,
+  };
+  localStorage.setItem('decompose_app_state', JSON.stringify(appState));
+}
+
+window.toggleHL = function(id, checked) {
+  const state = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
+  state[id] = checked;
+  localStorage.setItem(CHECKLIST_KEY, JSON.stringify(state));
+  buildChecklist();
+};
+
+window.compileReport = function() {
+  const topic  = document.getElementById('topic').value.trim() || 'פרויקט';
+  const dateVal = document.getElementById('date').value || '';
+  const completion = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const due   = dateVal ? new Date(dateVal) : new Date(today.getTime() + 14*86400000);
+  const schedule = computeSchedule(subtasks, today, due);
+
+  const rows = subtasks.map((task, i) => {
+    const done = !!completion[`task-${task.id||i}`];
+    const { dateFmt, timeStr } = schedule[i];
+    return `<tr>
+      <td style="text-align:center">${done?'✓':'○'}</td>
+      <td style="padding-right:10px;font-size:13px;font-weight:bold">${escapeHtml(task.title)}</td>
+      <td style="color:#6b7280;font-size:12px">${escapeHtml(task.description||'')}</td>
+      <td style="font-family:monospace;font-size:11px;color:#3b82f6;white-space:nowrap">${dateFmt}</td>
+      <td style="font-family:monospace;font-size:11px;color:#3b82f6;white-space:nowrap">${timeStr}</td>
+    </tr>`;
+  }).join('');
+
+  const done  = subtasks.filter((_,i) => !!completion[`task-${_.id||i}`]).length;
+  const total = subtasks.length;
+  const pct   = total ? Math.round(done/total*100) : 0;
+
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office"
+                       xmlns:w="urn:schemas-microsoft-com:office:word">
+<head><meta charset="utf-8">
+<style>
+  body{font-family:Arial,sans-serif;direction:rtl;color:#1f2937}
+  h1{font-size:20px;color:#1d4ed8;margin-bottom:4px}
+  h2{font-size:13px;font-weight:normal;color:#6b7280;margin:0 0 14px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#1d4ed8;color:white;padding:7px 10px;text-align:right}
+  td{padding:6px 10px;border-bottom:1px solid #e5e7eb;vertical-align:top}
+  .summary{margin-top:18px;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px}
+</style></head>
+<body>
+<h1>${escapeHtml(topic)}</h1>
+<h2>תאריך הגשה: ${dateVal||'—'} | נוצר: ${new Date().toLocaleDateString('he-IL')}</h2>
+<table>
+  <thead><tr><th style="width:36px">סטטוס</th><th>משימה</th><th>תיאור</th><th style="white-space:nowrap">תאריך</th><th style="white-space:nowrap">חלון זמן</th></tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+<div class="summary"><strong>סיכום:</strong> ${done} / ${total} משימות הושלמו (${pct}%)</div>
+</body></html>`;
+
+  const blob = new Blob([html], { type:'application/msword;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `${topic.replace(/\s+/g,'-')}-report.doc`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
+/* ================================================================
+   "I'M STUCK" COACH
+   ================================================================ */
+const STUCK_HISTORY = [];
+const COACH_SYSTEM = `אתה מאמן למידה סוקרטי. תפקידך היחיד הוא לעזור לתלמיד לחשוב באופן עצמאי.
+כללים:
+1. לעולם אל תיתן את התשובה הסופית.
+2. שאל בדיוק שאלה אחת מנחה בכל תשובה.
+3. אם התלמיד מבקש "תגיד לי את התשובה" — הכר ברגשותיו ו-redirect עם שאלה.
+4. עד 3 משפטים בכל תשובה.`;
+
+window.openStuck = function() {
+  document.getElementById('stuckPanel').style.display  = 'flex';
+  document.getElementById('stuckOverlay').style.display = 'block';
+  if (STUCK_HISTORY.length === 0) addStuckMsg('assistant', 'היי! נתקעת? זה לגמרי בסדר 🙌\nספר לי מה אתה מנסה לעשות ובמה בדיוק נתקעת.');
+  document.getElementById('stuckInput').focus();
+};
+
+window.closeStuck = function() {
+  document.getElementById('stuckPanel').style.display  = 'none';
+  document.getElementById('stuckOverlay').style.display = 'none';
+};
+
+function addStuckMsg(role, text) {
+  STUCK_HISTORY.push({ role, text });
+  const container = document.getElementById('stuckMessages');
+  const div = document.createElement('div');
+  div.className = `stuck-msg ${role}`;
+  div.textContent = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+window.sendStuck = async function() {
+  const input = document.getElementById('stuckInput');
+  const btn   = document.getElementById('stuckSendBtn');
+  const text  = input.value.trim();
+  if (!text || btn.disabled) return;
+
+  addStuckMsg('user', text);
+  input.value = '';
+  btn.disabled = true;
+
+  const typing = document.createElement('div');
+  typing.className = 'stuck-msg assistant stuck-typing';
+  typing.textContent = 'חושב...';
+  document.getElementById('stuckMessages').appendChild(typing);
+  document.getElementById('stuckMessages').scrollTop = 99999;
+
+  try {
+    const contents = STUCK_HISTORY.slice(0, -1).map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.text }]
+    }));
+    contents.push({ role: 'user', parts: [{ text }] });
+
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${window.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: COACH_SYSTEM }] },
+          contents
+        })
+      }
+    );
+    const json   = await resp.json();
+    const reply  = json.candidates?.[0]?.content?.parts?.[0]?.text || 'מצטער, לא הצלחתי להגיב.';
+    typing.remove();
+    addStuckMsg('assistant', reply);
+  } catch(err) {
+    typing.remove();
+    addStuckMsg('assistant', 'לא הצלחתי להתחבר ל-AI. נסה שוב.');
+    console.error('[StuckCoach]', err);
+  } finally {
+    btn.disabled = false;
+    input.focus();
+  }
+};
 </script>
 
 </body>

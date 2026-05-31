@@ -4,14 +4,40 @@
  * ============================================================
  */
 
-import { GoogleGenAI } from "@google/genai";
+// ✅ No SDK import needed — uses Gemini REST API directly (more reliable in plain HTML pages)
 
 const AI_HISTORY_KEY = "my_ai_app_history";
 const MAX_HISTORY = 10;
 const _apiKey = window.GEMINI_API_KEY || import.meta.env?.VITE_GEMINI_API_KEY;
 console.log('🟠 [aiService] מפתח API נטען?', _apiKey ? `כן (${_apiKey.slice(0,8)}...)` : '❌ לא נמצא מפתח API!');
-const ai = new GoogleGenAI({ apiKey: _apiKey });
-const GEMINI_MODEL = "gemini-2.5-flash-lite";
+const GEMINI_MODEL = "gemini-2.0-flash-lite";
+const GEMINI_REST_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+// Central REST helper — replaces all ai.models.generateContent() calls
+async function geminiRest(prompt, systemInstruction = null) {
+  const body = {
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+  };
+  if (systemInstruction) {
+    body.system_instruction = { parts: [{ text: systemInstruction }] };
+  }
+  const response = await fetch(`${GEMINI_REST_URL}?key=${_apiKey}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (response.status === 429) {
+    const err = new Error("Rate limit");
+    err.status = 429;
+    throw err;
+  }
+  if (!response.ok) {
+    const errBody = await response.json().catch(() => ({}));
+    throw new Error(errBody.error?.message || `HTTP ${response.status}`);
+  }
+  const json = await response.json();
+  return json.candidates?.[0]?.content?.parts?.[0]?.text || "";
+}
 
 // ============================================================
 //  sendQuery — נקודת הכניסה המרכזית לכל הבקשות
@@ -52,16 +78,24 @@ async function sendQuery(intent, rawData, userDescription, retryCount = 0) {
     return result;
 
   } catch (error) {
+    // --- כאן נכנס הקוד המעודכן ---
     // טיפול בשגיאת מכסה מלאה (429)
     if (error?.status === 429) {
       if (retryCount < MAX_RETRIES) {
-        console.warn(`⏳ קוטה מלא — ממתין 30 שניות ומנסה שוב... (ניסיון ${retryCount + 1}/${MAX_RETRIES + 1})`);
-        await delay(30000);
+        
+        // --- יישום Exponential Backoff + Jitter ---
+        const baseDelay = 20000; // זמן המתנה בסיסי
+        const exponentialDelay = baseDelay * Math.pow(2, retryCount); 
+        const jitter = Math.floor(Math.random() * 3000); // עד 3 שניות של רעש אקראי
+        const waitTime = exponentialDelay + jitter;
+
+        console.warn(`⏳ שרת עמוס (429). ממתין ${(waitTime / 1000).toFixed(1)} שניות ומנסה שוב... (ניסיון ${retryCount + 1}/${MAX_RETRIES})`);
+        
+        await delay(waitTime);
         // מעבירים את ה-retryCount פלוס 1 לקריאה הבאה
         return sendQuery(intent, rawData, userDescription, retryCount + 1);
       } else {
         console.error("❌ נעצרו הניסיונות החוזרים: עברת את מקסימום הניסיונות המותרים לשגיאת 429.");
-        // מחזירים אובייקט שגיאה מסודר כדי שה-UI של 'Decompose' יוכל להציג הודעה ידידותית למשתמש
         return { error: true, message: "השרת עמוס כרגע, אנא נסה שוב בעוד דקה." };
       }
     }
@@ -70,6 +104,8 @@ async function sendQuery(intent, rawData, userDescription, retryCount = 0) {
     return null;
   }
 }
+
+
 
 
 // ============================================================
@@ -104,12 +140,9 @@ async function validateTaskWithAI(taskText) {
 }
 `;
 
-  const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents: prompt,
-  });
+  const rawText = await geminiRest(prompt);
 
-  const text = response.text.trim().replace(/```json|```/g, "").trim();
+  const text = rawText.trim().replace(/```json|```/g, "").trim();
 
   try {
     const parsed = JSON.parse(text);
@@ -175,13 +208,10 @@ async function generateSmartDecomposition(rawText, currentState) {
 - ספרות / עברית → אלמנטים ספרותיים: עלילה, דמויות, מסר
 - כללי → מבוא, גוף, סיכום
 `;
-  const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents: prompt,
-  });
-  console.log("📥 תשובת AI לפירוק:", response.text);
+  const apiResponse = await geminiRest(prompt);
+  console.log("📥 תשובת AI לפירוק:", apiResponse);
 
-  const text = response.text.trim().replace(/```json|```/g, "").trim();
+  const text = apiResponse.trim().replace(/```json|```/g, "").trim();
 
   try {
     const parsed = JSON.parse(text);
@@ -198,7 +228,6 @@ async function generateSmartDecomposition(rawText, currentState) {
     };
   } catch (e) {
     console.error("❌ שגיאה בפירוש תשובת AI לפירוק:", e, "\nתשובה גולמית:", text);
-    console.log("📤 שולח ל-AI לפירוק המשימה:", rawText);
     return currentState || null;
   }
 }
@@ -234,12 +263,9 @@ async function generateRefinedPrompt(originalTask, analysisLabel) {
 }
 `;
 
-  const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents: prompt,
-  });
+  const rawText = await geminiRest(prompt);
 
-  const text = response.text.trim().replace(/```json|```/g, "").trim();
+  const text = rawText.trim().replace(/```json|```/g, "").trim();
 
   try {
     const parsed = JSON.parse(text);
@@ -296,12 +322,7 @@ ${historyContext}
 החזר את השאלה בלבד, ללא הסברים נוספים.
 `;
 
-  const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents: prompt,
-  });
-
-  return response.text.trim();
+  return (await geminiRest(prompt)).trim();
 }
 
 
@@ -331,12 +352,9 @@ async function getThinkingModels(subject) {
 ]
 `;
 
-  const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents: prompt,
-  });
+  const rawText = await geminiRest(prompt);
 
-  const text = response.text.trim().replace(/```json|```/g, "").trim();
+  const text = rawText.trim().replace(/```json|```/g, "").trim();
 
   try {
     const parsed = JSON.parse(text);
@@ -395,12 +413,9 @@ async function generateSubtasksFromDemands(demandsText, context) {
 - ממוינות לפי סדר הגיוני לביצוע
 `;
 
-  const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents: prompt,
-  });
+  const rawText = await geminiRest(prompt);
 
-  const text = response.text.trim().replace(/```json|```/g, "").trim();
+  const text = rawText.trim().replace(/```json|```/g, "").trim();
 
   try {
     const parsed = JSON.parse(text);

@@ -485,6 +485,347 @@
     .stat-row { grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .stat-value { font-size: 1.4rem; }
 }
+
+/* ===== HIERARCHICAL CHECKLIST ===== */
+.checklist-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 26px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-card);
+    animation: slideInUp 0.95s ease-out;
+}
+
+.checklist-section h2 {
+    font-size: 1.2rem;
+    color: var(--text-bright);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hl-header {
+    margin-bottom: 18px;
+}
+
+.hl-progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.hl-pct {
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 1rem;
+}
+
+.hl-progress-bar-container {
+    height: 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.hl-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #3b82f6);
+    border-radius: 999px;
+    transition: width 0.5s ease;
+}
+
+/* Level containers */
+.hl-list { display: flex; flex-direction: column; gap: 10px; }
+
+.hl-level-1 {
+    background: rgba(37,99,235,0.07);
+    border: 1px solid rgba(37,99,235,0.2);
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.hl-level-2 {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(148,163,184,0.12);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 8px;
+}
+
+.hl-level-3 {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    margin-top: 5px;
+    background: rgba(255,255,255,0.02);
+}
+
+/* Row headers */
+.hl-level1-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.hl-level2-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 2px;
+}
+
+/* Checkboxes */
+.hl-level-1 input[type="checkbox"],
+.hl-level-2 input[type="checkbox"],
+.hl-level-3 input[type="checkbox"] {
+    width: 18px; height: 18px;
+    cursor: pointer;
+    accent-color: #10b981;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* Labels */
+.hl-level1-label {
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: var(--text-bright);
+    flex: 1;
+    cursor: pointer;
+}
+
+.hl-level2-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    flex: 1;
+    cursor: pointer;
+}
+
+.hl-level-3 label {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    flex: 1;
+    cursor: pointer;
+    line-height: 1.5;
+}
+
+.hl-done {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+/* Badges */
+.hl-time-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: monospace;
+    color: #60a5fa;
+    background: rgba(37,99,235,0.12);
+    border: 1px solid rgba(37,99,235,0.22);
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.hl-date-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a78bfa;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(124,58,237,0.22);
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.hl-children { margin-top: 8px; }
+
+/* Compile button */
+.hl-compile-btn {
+    margin-top: 22px;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #059669, #0284c7);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.02em;
+}
+
+.hl-compile-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(5,150,105,0.4);
+}
+
+.hl-compile-btn:active { transform: translateY(0); }
+
+/* Stuck coach */
+.stuck-fab {
+    position: fixed;
+    bottom: 28px;
+    left: 28px;
+    z-index: 999;
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 13px 22px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(249,115,22,0.45);
+    transition: all 0.2s ease;
+}
+
+.stuck-fab:hover { transform: translateY(-3px) scale(1.04); }
+
+.stuck-panel {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    padding: 20px;
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.35);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+
+.stuck-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.stuck-panel-header h3 { font-size: 1rem; color: var(--text-bright); font-weight: 700; }
+.stuck-panel-header p  { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+.stuck-close {
+    background: none; border: none;
+    color: var(--text-muted); font-size: 1.4rem;
+    cursor: pointer; padding: 4px;
+}
+
+.stuck-close:hover { color: var(--text-bright); }
+
+.stuck-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+    max-height: 40vh;
+}
+
+.stuck-msg {
+    max-width: 82%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+}
+
+.stuck-msg.assistant {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-secondary);
+    border-radius: 16px 16px 16px 4px;
+    align-self: flex-start;
+}
+
+.stuck-msg.user {
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    color: white;
+    border-radius: 16px 16px 4px 16px;
+    align-self: flex-end;
+    margin-right: 0;
+    margin-left: auto;
+}
+
+.stuck-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.stuck-input-row textarea {
+    flex: 1;
+    resize: none;
+    padding: 10px 13px;
+    border: 1px solid rgba(148,163,184,0.22);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    font-size: 0.88rem;
+    font-family: inherit;
+    line-height: 1.4;
+}
+
+.stuck-input-row textarea:focus {
+    outline: none;
+    border-color: #f97316;
+    background: rgba(249,115,22,0.06);
+}
+
+.stuck-send-btn {
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    align-self: flex-end;
+}
+
+.stuck-send-btn:hover { transform: translateY(-1px); }
+.stuck-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.stuck-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 999;
+}
+
+.stuck-typing {
+    font-style: italic;
+    opacity: 0.6;
+    animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse { 0%,100% { opacity:0.6; } 50% { opacity: 1; } }
 </style>
 </head>
 <body>
@@ -577,12 +918,45 @@
         <div id="upcomingList"></div>
     </section>
 
+    <!-- Hierarchical Checklist -->
+    <section class="checklist-section">
+        <h2>✅ רשימת משימות מפורטת</h2>
+        <div id="hierarchicalChecklist"></div>
+    </section>
+
     <!-- Project Timeline -->
     <section class="timeline-section">
         <h2>🗺️ ציר זמן פרויקט נוכחי</h2>
         <div id="projectTimeline"></div>
     </section>
 
+</div>
+
+<script>
+  window.GEMINI_API_KEY    = 'AIzaSyClpw7Ln7W1VazfnOh-H9xVsRuxM4DRzEs';
+  window.SUPABASE_URL      = 'https://fflgijtemitvpjwiofue.supabase.co';
+  window.SUPABASE_ANON_KEY = 'sb_publishable_5NMPAK52g1LVFZU5fdmQCw_Nf7UXex5';
+</script>
+
+<!-- "I'm Stuck" floating button -->
+<button class="stuck-fab" onclick="openStuck()">נתקעתי 🤔</button>
+
+<!-- "I'm Stuck" panel (hidden by default) -->
+<div class="stuck-overlay" id="stuckOverlay" style="display:none" onclick="closeStuck()"></div>
+<div class="stuck-panel" id="stuckPanel" style="display:none" dir="rtl">
+    <div class="stuck-panel-header">
+        <div>
+            <h3>מאמן ה-AI שלך 🧠</h3>
+            <p>אני כאן לעזור לך לחשוב — לא לתת תשובות 😊</p>
+        </div>
+        <button class="stuck-close" onclick="closeStuck()">✕</button>
+    </div>
+    <div class="stuck-messages" id="stuckMessages"></div>
+    <div class="stuck-input-row">
+        <textarea id="stuckInput" rows="2" placeholder="תאר במה נתקעת..."
+                  onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendStuck();}"></textarea>
+        <button class="stuck-send-btn" id="stuckSendBtn" onclick="sendStuck()">שלח</button>
+    </div>
 </div>
 
 <script>
@@ -885,9 +1259,349 @@ function escapeHtml(str) {
     return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+/* ================================================================
+   HIERARCHICAL CHECKLIST (Features 1 + 7 + 8)
+   ================================================================ */
+const CHECKLIST_KEY = 'task_checklist_state';
+
+const MILESTONE_PHASES = [
+    { name: 'הבנת המשימה ובחירת מבנה', p: 0.10 },
+    { name: 'בחירת מקורות',             p: 0.30 },
+    { name: 'איסוף מקורות',              p: 0.50 },
+    { name: 'כתיבת פסקה ראשונה',        p: 0.70 },
+    { name: 'עריכה וסיכום',              p: 0.90 },
+    { name: 'הגשה סופית',               p: 1.00 },
+];
+
+function buildHierarchicalChecklist() {
+    const container = document.getElementById('hierarchicalChecklist');
+    let appState = null;
+    try { appState = JSON.parse(localStorage.getItem('decompose_app_state') || 'null'); } catch(e) {}
+
+    if (!appState || !appState.chunks || !appState.chunks.length) {
+        container.innerHTML = `<div class="no-project-cta">
+            <div style="font-size:2rem;margin-bottom:10px">📋</div>
+            <div>עדיין אין פרויקט. <a href="HomePage.html" class="cta-link" style="margin:0;padding:8px 16px;display:inline-block;margin-top:12px">פרק פרויקט חדש</a></div>
+        </div>`;
+        return;
+    }
+
+    const { chunks, dueDate, startDate, topic } = appState;
+    const completion = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
+    const today = new Date(); today.setHours(0,0,0,0);
+    const due   = new Date(dueDate);
+    const totalMs = Math.max(due - today, 1);
+
+    // Distribute chunks evenly across milestone phases
+    const perPhase = Math.ceil(chunks.length / MILESTONE_PHASES.length);
+
+    // Build time blocks: 90-min slots from 09:00
+    function timeBlock(chunkIdx) {
+        const slotStart = new Date(today);
+        slotStart.setHours(9 + Math.floor(chunkIdx * 1.5), (chunkIdx % 2) * 30, 0, 0);
+        const slotEnd = new Date(slotStart.getTime() + 90 * 60 * 1000);
+        const fmt = d => d.toLocaleTimeString('he-IL', { hour:'2-digit', minute:'2-digit', hour12:false });
+        return `${fmt(slotStart)}–${fmt(slotEnd)}`;
+    }
+
+    // Parse description into up to 4 step sentences
+    function parseSteps(desc) {
+        if (!desc) return [];
+        return desc.split(/\.\s+|[\n;]/)
+            .map(s => s.replace(/^\d+[.)]\s*/, '').trim())
+            .filter(s => s.length > 5)
+            .slice(0, 4);
+    }
+
+    // Count totals for progress bar
+    let totalItems = 0, doneItems = 0;
+
+    const phaseHtml = MILESTONE_PHASES.map((phase, pi) => {
+        const phaseId  = `phase-${pi}`;
+        const phaseDone = !!completion[phaseId];
+        totalItems++; if (phaseDone) doneItems++;
+
+        const phaseChunks = chunks.slice(pi * perPhase, pi * perPhase + perPhase);
+        const phaseDate   = new Date(today.getTime() + phase.p * totalMs);
+        const dateFmt     = phaseDate.toLocaleDateString('he-IL', { day:'numeric', month:'short' });
+
+        const chunksHtml = phaseChunks.map((chunk, ci) => {
+            const chunkIdx   = pi * perPhase + ci;
+            const chunkId    = `chunk-${chunk.id || chunkIdx}`;
+            const chunkDone  = !!completion[chunkId];
+            totalItems++; if (chunkDone) doneItems++;
+
+            const steps    = parseSteps(chunk.description);
+            const stepsHtml = steps.map((step, si) => {
+                const stepId   = `step-${chunk.id || chunkIdx}-${si}`;
+                const stepDone = !!completion[stepId];
+                totalItems++; if (stepDone) doneItems++;
+                return `<div class="hl-level-3">
+                    <input type="checkbox" id="${stepId}" ${stepDone ? 'checked' : ''}
+                           onchange="toggleChecklistItem('${stepId}',this.checked)">
+                    <label for="${stepId}" class="${stepDone ? 'hl-done' : ''}">
+                        ${escapeHtml(step)}
+                    </label>
+                </div>`;
+            }).join('');
+
+            return `<div class="hl-level-2">
+                <div class="hl-level2-header">
+                    <input type="checkbox" id="${chunkId}" ${chunkDone ? 'checked' : ''}
+                           onchange="toggleChecklistItem('${chunkId}',this.checked)">
+                    <label class="hl-level2-label ${chunkDone ? 'hl-done' : ''}" for="${chunkId}">
+                        ${escapeHtml(chunk.title)}
+                    </label>
+                    <span class="hl-time-badge">${timeBlock(chunkIdx)}</span>
+                </div>
+                ${stepsHtml ? `<div class="hl-children">${stepsHtml}</div>` : ''}
+            </div>`;
+        }).join('');
+
+        return `<div class="hl-level-1">
+            <div class="hl-level1-header">
+                <input type="checkbox" id="${phaseId}" ${phaseDone ? 'checked' : ''}
+                       onchange="toggleChecklistItem('${phaseId}',this.checked)">
+                <label class="hl-level1-label ${phaseDone ? 'hl-done' : ''}" for="${phaseId}">
+                    חלק ${pi + 1} — ${escapeHtml(phase.name)}
+                </label>
+                <span class="hl-date-badge">עד ${dateFmt}</span>
+            </div>
+            ${chunksHtml ? `<div class="hl-children">${chunksHtml}</div>` : ''}
+        </div>`;
+    }).join('');
+
+    const pct = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
+
+    container.innerHTML = `
+        <div class="hl-header">
+            <div class="hl-progress-info">
+                <span>${doneItems} / ${totalItems} משימות הושלמו</span>
+                <span class="hl-pct">${pct}%</span>
+            </div>
+            <div class="hl-progress-bar-container">
+                <div class="hl-progress-bar" style="width:${pct}%"></div>
+            </div>
+        </div>
+        <div class="hl-list">${phaseHtml}</div>
+        <button class="hl-compile-btn" onclick="compileReport()">
+            📄 Compile — הורד דוח למורה
+        </button>`;
+
+    // Sync the stat card
+    document.getElementById('statCompleted').textContent = doneItems;
+}
+
+function toggleChecklistItem(id, checked) {
+    const state = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
+    state[id] = checked;
+    localStorage.setItem(CHECKLIST_KEY, JSON.stringify(state));
+    buildHierarchicalChecklist();
+    loadStatCards();
+}
+
+/* --- Compile → Word document --- */
+function compileReport() {
+    let appState = null;
+    try { appState = JSON.parse(localStorage.getItem('decompose_app_state') || 'null'); } catch(e) {}
+    const completion = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
+    const chunks = appState?.chunks || [];
+    const topic  = appState?.topic  || 'פרויקט';
+    const due    = appState?.dueDate || '';
+
+    function timeBlock(i) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const s = new Date(today); s.setHours(9 + Math.floor(i * 1.5), (i % 2) * 30, 0, 0);
+        const e = new Date(s.getTime() + 90*60*1000);
+        const f = d => d.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit',hour12:false});
+        return `${f(s)}–${f(e)}`;
+    }
+
+    const phaseRows = MILESTONE_PHASES.map((ph, pi) => {
+        const perPhase = Math.ceil(chunks.length / MILESTONE_PHASES.length);
+        const phaseChunks = chunks.slice(pi * perPhase, pi * perPhase + perPhase);
+        const phaseDone = !!completion[`phase-${pi}`];
+
+        const chunkRows = phaseChunks.map((chunk, ci) => {
+            const idx = pi * perPhase + ci;
+            const done = !!completion[`chunk-${chunk.id || idx}`];
+            return `<tr>
+                <td style="text-align:center;font-size:16px">${done ? '✓' : '○'}</td>
+                <td style="padding-right:10px;font-size:13px">${escapeHtml(chunk.title)}</td>
+                <td style="color:#6b7280;font-size:12px">${escapeHtml(chunk.description || '')}</td>
+                <td style="font-family:monospace;font-size:11px;color:#3b82f6;white-space:nowrap">${timeBlock(idx)}</td>
+            </tr>`;
+        }).join('');
+
+        return `<tr style="background:#f0f4ff">
+            <td colspan="4" style="padding:8px 12px;font-weight:bold;font-size:14px">
+                ${phaseDone ? '✓' : '○'} חלק ${pi + 1} — ${escapeHtml(ph.name)}
+            </td>
+        </tr>${chunkRows}`;
+    }).join('');
+
+    const totalItems   = chunks.length;
+    const doneItems    = chunks.filter((_,i) => !!completion[`chunk-${_.id || i}`]).length;
+    const pct          = totalItems ? Math.round(doneItems/totalItems*100) : 0;
+
+    const html = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: Arial, sans-serif; direction: rtl; color: #1f2937; }
+  h1   { font-size: 22px; color: #1d4ed8; margin-bottom: 4px; }
+  h2   { font-size: 14px; font-weight: normal; color: #6b7280; margin-top: 0; }
+  table { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 13px; }
+  th    { background: #1d4ed8; color: white; padding: 8px 10px; text-align: right; }
+  td    { padding: 7px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  .summary { margin-top: 20px; padding: 12px 16px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; }
+</style>
+</head>
+<body>
+<h1>${escapeHtml(topic)}</h1>
+<h2>תאריך הגשה: ${due} | נוצר: ${new Date().toLocaleDateString('he-IL')}</h2>
+<table>
+    <thead>
+        <tr>
+            <th style="width:40px">סטטוס</th>
+            <th>משימה</th>
+            <th>תיאור</th>
+            <th style="white-space:nowrap">חלון זמן</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${phaseRows}
+    </tbody>
+</table>
+<div class="summary">
+    <strong>סיכום:</strong> הושלמו ${doneItems} מתוך ${totalItems} משימות (${pct}%)
+</div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `${topic.replace(/\s+/g,'-')}-report.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* ================================================================
+   "I'M STUCK" AI COACH (Feature 9)
+   Socratic rules: never reveal the answer, one question per reply.
+   ================================================================ */
+const STUCK_HISTORY = [];
+const COACH_SYSTEM = `אתה מאמן למידה סוקרטי. תפקידך היחיד הוא לעזור לתלמיד לחשוב באופן עצמאי.
+כללים שאתה חייב לעמוד בהם:
+1. לעולם אל תיתן את התשובה הסופית, הפתרון, או קוד מלא.
+2. שאל בדיוק שאלה אחת מנחה בכל תשובה.
+3. אם התלמיד מבקש "תגיד לי את התשובה", הכר ברגשותיו ו-redirect עם שאלה.
+4. שמור על תשובות קצרות (עד 3 משפטים).`;
+
+let stuckOpen = false;
+
+function openStuck() {
+    stuckOpen = true;
+    document.getElementById('stuckPanel').style.display  = 'flex';
+    document.getElementById('stuckOverlay').style.display = 'block';
+    if (STUCK_HISTORY.length === 0) {
+        addStuckMessage('assistant', 'היי! נתקעת? זה לגמרי בסדר 🙌\nספר לי מה אתה מנסה לעשות ובמה בדיוק נתקעת — ואני אעזור לך לחשוב על זה יחד.');
+    }
+    document.getElementById('stuckInput').focus();
+}
+
+function closeStuck() {
+    stuckOpen = false;
+    document.getElementById('stuckPanel').style.display  = 'none';
+    document.getElementById('stuckOverlay').style.display = 'none';
+}
+
+function addStuckMessage(role, text) {
+    STUCK_HISTORY.push({ role, text });
+    const container = document.getElementById('stuckMessages');
+    const div = document.createElement('div');
+    div.className = `stuck-msg ${role}`;
+    div.textContent = text;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+async function sendStuck() {
+    const input = document.getElementById('stuckInput');
+    const btn   = document.getElementById('stuckSendBtn');
+    const text  = input.value.trim();
+    if (!text || btn.disabled) return;
+
+    addStuckMessage('user', text);
+    input.value = '';
+    btn.disabled = true;
+
+    // Show typing indicator
+    const typing = document.createElement('div');
+    typing.className = 'stuck-msg assistant stuck-typing';
+    typing.textContent = 'חושב...';
+    document.getElementById('stuckMessages').appendChild(typing);
+    document.getElementById('stuckMessages').scrollTop = 99999;
+
+    try {
+        // Build the message history for Gemini
+        const apiKey = window.GEMINI_API_KEY
+            || (typeof import !== 'undefined' ? undefined : undefined)
+            || document.querySelector('meta[name="gemini-key"]')?.content;
+
+        const key = window.GEMINI_API_KEY;
+        if (!key) throw new Error('No API key');
+
+        const contents = STUCK_HISTORY.slice(0, -1).map(m => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: m.text }]
+        }));
+        contents.push({ role: 'user', parts: [{ text }] });
+
+        const resp = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    system_instruction: { parts: [{ text: COACH_SYSTEM }] },
+                    contents
+                })
+            }
+        );
+        const json = await resp.json();
+        const reply = json.candidates?.[0]?.content?.parts?.[0]?.text || 'מצטער, לא הצלחתי להגיב. נסה שוב.';
+        typing.remove();
+        addStuckMessage('assistant', reply);
+    } catch(err) {
+        typing.remove();
+        addStuckMessage('assistant', 'לא הצלחתי להתחבר ל-AI כרגע. בדוק שה-API key מוגדר ונסה שוב.');
+        console.error('[StuckCoach]', err);
+    } finally {
+        btn.disabled = false;
+        input.focus();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initProgress();
+    buildHierarchicalChecklist();
     document.addEventListener('click', recordActivity, { once: false });
+
+    // Listen for storage changes from other tabs (fixes state sync bug)
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'decompose_app_state' || e.key === CHECKLIST_KEY) {
+            buildHierarchicalChecklist();
+            loadUpcomingTasks();
+            loadProjectTimeline();
+            loadStatCards();
+        }
+    });
 });
 </script>
 </body>

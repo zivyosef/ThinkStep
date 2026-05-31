@@ -37,7 +37,7 @@ async function initProject(rawText) {
 
   const normalizedText = rawText.trim().replace(/\s+/g, " ");
 
-  if (!normalizedText) {
+  if (!normalizedText) { 
     handleError(TASK_ERROR_MSG);
     return null;
   }
@@ -57,10 +57,10 @@ async function initProject(rawText) {
   const newState = createNewState();
   newState.rawText = normalizedText;
 
-  console.log('🔵 [logicManager] שולח ל-aiService.sendQuery...');
-  console.log('🔵 [logicManager] aiService זמין?', typeof aiService, typeof aiService?.sendQuery);
+  console.log('🔵 [logicManager] שולח ל-window.aiService.sendQuery...');
+  console.log('🔵 [logicManager] aiService זמין?', typeof window.aiService, typeof window.aiService?.sendQuery);
   try {
-    const currentState = await aiService.sendQuery(
+    const currentState = await window.aiService.sendQuery(
       "DECOMPOSE_INITIAL",
       normalizedText,
       newState
@@ -271,7 +271,7 @@ async function handleTaskValidation(taskId, taskText) {
   if (needsAI) {
     try {
       console.log("🤖 שולח ל-AI לאימות...");
-      const aiValidation = await aiService.sendQuery("VALIDATE_TASK", normalizedTaskText);
+      const aiValidation = await window.aiService.sendQuery("VALIDATE_TASK", normalizedTaskText);
 
       if (aiValidation && aiValidation.score) {
         finalScore = aiValidation.score;
@@ -293,7 +293,7 @@ async function handleTaskValidation(taskId, taskText) {
   if (finalScore === "red") {
     try {
       console.log("💡 מבקש הצעת שיפור מה-AI...");
-      aiSuggestion = await aiService.sendQuery("SUGGEST_IMPROVEMENT", {
+      aiSuggestion = await window.aiService.sendQuery("SUGGEST_IMPROVEMENT", {
         taskText: normalizedTaskText,
         reason: finalLabel,
       });
@@ -409,7 +409,7 @@ async function requestAIAngles(topic) {
   }
 
   try {
-    const result = await aiService.sendQuery("GET_ANGLES", normalizedTopic);
+    const result = await window.aiService.sendQuery("GET_ANGLES", normalizedTopic);
 
     if (!result || !Array.isArray(result) || result.length === 0) {
       console.error("צוות D לא החזיר זוויות — בדקו את aiService.js");
@@ -434,7 +434,7 @@ async function analyzeDemandsAndCreateSubtasks(demandsText, context) {
   }
 
   try {
-    const result = await aiService.sendQuery("ANALYZE_DEMANDS", demandsText.trim(), context);
+    const result = await window.aiService.sendQuery("ANALYZE_DEMANDS", demandsText.trim(), context);
     if (!result || !Array.isArray(result)) return [];
     return result;
   } catch (error) {
@@ -512,7 +512,7 @@ async function checkAndSendDailyReminder(accessToken, currentChunk) {
   if (success) {
     localStorage.setItem(CALENDAR_LAST_SENT_KEY, now.toISOString());
   }
-}ס
+}
 // ============================================================
 //  פונקציה 7: syncStateToStorage
 // ============================================================
