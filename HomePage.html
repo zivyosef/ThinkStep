@@ -8,15 +8,48 @@
 <style>
 /* ===== PAGE LAYOUT ===== */
 .work-page {
-  max-width: 580px;
+  max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
   padding-bottom: 40px;
+  align-items: start;
 }
 
-/* ===== CARDS ===== */
+/* Each column = one unified surface */
+.work-col {
+  background: var(--bg-card);
+  border: 1px solid rgba(148, 252, 196, 0.18);
+  border-radius: 22px;
+  padding: 32px 28px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 32px rgba(7,11,22,0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;        /* flex gap — hidden cards don't create a gap */
+}
+
+/* Strip all individual card box styling inside columns */
+.work-col .card,
+.work-col .card-accent {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.work-col .card:hover { border: none; }
+
+@media (max-width: 900px) {
+  .work-page {
+    grid-template-columns: 1fr;
+    max-width: 680px;
+  }
+}
+
+/* ===== FALLBACK CARD (used outside work-col if any) ===== */
 .card {
   background: var(--bg-card);
   border: 1px solid rgba(148, 252, 196, 0.7);
@@ -25,8 +58,6 @@
   box-shadow: 0 4px 16px rgba(7,11,22,0.18);
   transition: border-color 0.2s ease;
 }
-
-.card:hover { border-color: rgba(148,252,196,0.9); }
 
 .card-accent {
   background: rgba(20, 30, 55, 0.85);
@@ -109,10 +140,14 @@ input:focus {
 
 /* ===== SECTION TITLE ===== */
 .section-title {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--text-bright);
-  margin-bottom: 14px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 /* ===== ROW LAYOUT ===== */
@@ -236,11 +271,13 @@ input:focus {
 /* ===== CARD HEADER ===== */
 .card-header-row {
   font-size: 13px;
-  color: rgba(148,163,184,0.9);
-  margin-bottom: 12px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 /* ===== HIERARCHICAL CHECKLIST ===== */
@@ -303,13 +340,34 @@ input:focus {
   padding: 2px 7px; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
 }
 .hl-children { margin-top: 6px; }
+.hl-btn-row {
+  display: flex; gap: 10px; margin-top: 16px;
+}
+.hl-save-btn {
+  flex: 1; padding: 14px;
+  background: linear-gradient(135deg,#7c3aed,#2563eb); color: white;
+  border: none; border-radius: 11px; font-size: 0.95rem; font-weight: 800;
+  font-family: inherit; cursor: pointer; transition: all 0.2s ease;
+}
+.hl-save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
 .hl-compile-btn {
-  margin-top: 16px; width: 100%; padding: 14px;
+  flex: 1; padding: 14px;
   background: linear-gradient(135deg,#059669,#0284c7); color: white;
   border: none; border-radius: 11px; font-size: 0.95rem; font-weight: 800;
   font-family: inherit; cursor: pointer; transition: all 0.2s ease;
 }
 .hl-compile-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(5,150,105,0.35); }
+
+/* Save toast */
+.save-toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg,#7c3aed,#2563eb); color: white;
+  padding: 12px 28px; border-radius: 999px; font-weight: 700; font-size: 0.9rem;
+  z-index: 2000; box-shadow: 0 6px 24px rgba(124,58,237,0.45);
+  animation: toastIn 0.3s ease;
+  pointer-events: none;
+}
+@keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(8px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
 
 /* ===== STUCK COACH ===== */
 .stuck-fab {
@@ -395,63 +453,73 @@ input:focus {
 
   <div class="work-page">
 
-    <!-- כרטיס פרטי משימה -->
-    <div class="card-accent">
-      <div class="card-header-row">פרטי המשימה</div>
-      <div class="row">
-        <div><label>מקצוע</label><input type="text" id="subject" placeholder="היסטוריה, מדע..."></div>
-        <div><label>נושא</label><input type="text" id="topic" placeholder="נושא העבודה"></div>
+    <!-- ═══ עמודה שמאל: קלט ✦ סיכום ✦ משימות ═══ -->
+    <div class="work-col">
+
+      <!-- כרטיס פרטי משימה -->
+      <div class="card-accent">
+        <div class="card-header-row">פרטי המשימה</div>
+        <div class="row">
+          <div><label>מקצוע</label><input type="text" id="subject" placeholder="היסטוריה, מדע..."></div>
+          <div><label>נושא</label><input type="text" id="topic" placeholder="נושא העבודה"></div>
+        </div>
+        <div class="row">
+          <div><label>מספר עמודים</label><input type="number" id="pages" placeholder="5" min="1" max="1000"></div>
+          <div><label>תאריך הגשה</label><input type="date" id="date"></div>
+        </div>
+
+        <hr class="demands-divider">
+
+        <label>דרישות העבודה</label>
+        <textarea id="demands-input" rows="4" placeholder="הדבק כאן את הנחיות המורה / דרישות המטלה..."></textarea>
+        <button class="btn" id="analyze-btn" onclick="handleAnalyzeDemands()">
+          <span id="analyze-spinner" class="spinner hidden"></span>
+          <span id="analyze-label">נתח וצור משימות</span>
+        </button>
       </div>
-      <div class="row">
-        <div><label>מספר עמודים</label><input type="number" id="pages" placeholder="5" min="1" max="1000"></div>
-        <div><label>תאריך הגשה</label><input type="date" id="date"></div>
+
+      <!-- סיכום -->
+      <div id="summary-card" class="card hidden">
+        <div class="section-title">סיכום המשימה</div>
+        <div id="summary-content"></div>
       </div>
 
-      <hr class="demands-divider">
-
-      <label>דרישות העבודה</label>
-      <textarea id="demands-input" rows="3" placeholder="הדבק כאן את הנחיות המורה / דרישות המטלה..."></textarea>
-      <button class="btn" id="analyze-btn" onclick="handleAnalyzeDemands()">
-        <span id="analyze-spinner" class="spinner hidden"></span>
-        <span id="analyze-label">נתח וצור משימות</span>
-      </button>
-    </div>
-
-    <!-- סיכום -->
-    <div id="summary-card" class="card hidden">
-      <div class="section-title">סיכום המשימה</div>
-      <div id="summary-content"></div>
-    </div>
-
-    <!-- משימות לביצוע -->
-    <div id="subtasks-card" class="card hidden">
-      <div class="section-title">משימות לביצוע</div>
-      <div id="subtasks-list"></div>
-      <div class="subtask-add-row">
-        <button class="btn btn-outline" onclick="addSubtask()">+ הוסף משימה</button>
+      <!-- משימות לביצוע -->
+      <div id="subtasks-card" class="card hidden">
+        <div class="section-title">משימות לביצוע</div>
+        <div id="subtasks-list"></div>
+        <div class="subtask-add-row">
+          <button class="btn btn-outline" onclick="addSubtask()">+ הוסף משימה</button>
+        </div>
       </div>
-    </div>
 
-    <!-- לוח זמנים -->
-    <div class="card">
-      <div class="section-title">לוח זמנים מותאם אישית</div>
-      <p style="font-size:14px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
-        המערכת בונה תוכנית לפי תאריך ההגשה — אפשר לשנות כל שלב ידנית.
-      </p>
-      <div id="timeline-list">
-        <div class="timeline-empty">עדיין לא נבנה לוח זמנים.</div>
-      </div>
-      <div class="timeline-actions">
-        <button class="btn btn-outline" onclick="rebuildTimeline()">בנה לוח זמנים</button>
-        <button class="btn btn-outline" onclick="resetTimeline()">אפס שינויים</button>
-      </div>
-    </div>
+    </div><!-- /work-col left -->
 
-    <!-- Hierarchical Checklist + Compile -->
-    <div id="checklist-card" class="card hidden">
-      <div class="section-title">✅ רשימת משימות מפורטת</div>
-      <div id="hierarchicalChecklist"></div>
-    </div>
+    <!-- ═══ עמודה ימין: לוח זמנים ✦ רשימת משימות ═══ -->
+    <div class="work-col">
+
+      <!-- לוח זמנים -->
+      <div class="card">
+        <div class="section-title">לוח זמנים מותאם אישית</div>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+          המערכת בונה תוכנית לפי תאריך ההגשה — אפשר לשנות כל שלב ידנית.
+        </p>
+        <div id="timeline-list">
+          <div class="timeline-empty">עדיין לא נבנה לוח זמנים.</div>
+        </div>
+        <div class="timeline-actions">
+          <button class="btn btn-outline" onclick="rebuildTimeline()">בנה לוח זמנים</button>
+          <button class="btn btn-outline" onclick="resetTimeline()">אפס שינויים</button>
+        </div>
+      </div>
+
+      <!-- Hierarchical Checklist + Compile -->
+      <div id="checklist-card" class="card hidden">
+        <div class="section-title">✅ רשימת משימות מפורטת</div>
+        <div id="hierarchicalChecklist"></div>
+      </div>
+
+    </div><!-- /work-col right -->
 
   </div><!-- /work-page -->
 </div><!-- /page -->
@@ -478,29 +546,13 @@ input:focus {
 </div>
 
 <script src="./config.js"></script>
-<!-- Load services as isolated modules; each sets window.aiService / window.logicManager -->
+<!-- Load services as isolated modules -->
+<script type="module" src="./supabase.js"></script>
 <script type="module" src="./aiService.js"></script>
 <script type="module" src="./logicManager.js"></script>
 
 <script>
-  window.GEMINI_API_KEY    = 'AIzaSyClpw7Ln7W1VazfnOh-H9xVsRuxM4DRzEs';
-  window.TAVILY_API_KEY    = 'your-tavily-api-key-here';
-  window.SUPABASE_URL      = 'https://fflgijtemitvpjwiofue.supabase.co';
-  window.SUPABASE_ANON_KEY = 'sb_publishable_5NMPAK52g1LVFZU5fdmQCw_Nf7UXex5';
-</script>
-<script type="importmap">
-{
-  "imports": {
-    "@google/genai":         "https://esm.sh/@google/genai",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
-  }
-}
-</script>
-<script type="module">
-import './aiService.js';
-import logicManager from './logicManager.js';
-import { getCurrentUser, saveTaskState, loadTaskState } from './supabase.js';
-window.supabaseHelpers = { getCurrentUser, saveTaskState, loadTaskState };
+/* All page logic in a plain script — functions must be global for onclick handlers */
 
 const MILESTONES = [
   { name: "הבנת המשימה ובחירת מבנה", p: 0.10 },
@@ -577,7 +629,8 @@ async function handleAnalyzeDemands() {
     } else {
       renderSubtasks();
       document.getElementById('subtasks-card').classList.remove('hidden');
-      buildChecklist();
+      rebuildTimeline(); // builds timeline from AI subtasks with spread dates
+      buildChecklist();  // reads those dates from currentTimeline
     }
   } catch (e) {
     console.error('שגיאה בניתוח דרישות:', e);
@@ -611,6 +664,7 @@ function escapeHtml(str) {
 function deleteSubtask(i) {
   subtasks.splice(i, 1);
   renderSubtasks();
+  rebuildTimeline();
   buildChecklist();
 }
 
@@ -618,6 +672,7 @@ function addSubtask() {
   subtasks.push({ id: `task-${Date.now()}`, title: '', description: '' });
   renderSubtasks();
   document.getElementById('subtasks-card').classList.remove('hidden');
+  rebuildTimeline();
   const items = document.querySelectorAll('.subtask-item input[type="text"]');
   if (items.length) items[items.length - 1].focus();
 }
@@ -638,14 +693,25 @@ function rebuildTimeline() {
     return;
   }
 
-  const today     = new Date();
-  const totalDays = Math.max(0, Math.round((finalDate - today) / 86400000));
+  const today = new Date(); today.setHours(0,0,0,0);
 
-  currentTimeline = MILESTONES.map(m => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + Math.round(totalDays * m.p));
-    return { milestone: m.name, date: d.toISOString().split('T')[0] };
-  });
+  if (subtasks.length > 0) {
+    // ── AI subtasks mode: spread tasks across the available time ──
+    const sched = computeSchedule(subtasks, today, finalDate);
+    currentTimeline = subtasks.map((task, i) => ({
+      title:   task.title,
+      date:    sched[i].isoDate,
+      timeStr: sched[i].timeStr,
+    }));
+  } else {
+    // ── Fallback: fixed milestone percentages ──
+    const totalDays = Math.max(0, Math.round((finalDate - today) / 86400000));
+    currentTimeline = MILESTONES.map(m => {
+      const d = new Date(today);
+      d.setDate(today.getDate() + Math.round(totalDays * m.p));
+      return { title: m.name, date: d.toISOString().split('T')[0], timeStr: null };
+    });
+  }
 
   renderTimeline();
 }
@@ -653,8 +719,8 @@ function rebuildTimeline() {
 function renderTimeline() {
   document.getElementById('timeline-list').innerHTML = currentTimeline.map((item, i) => `
     <div class="timeline-item">
-      <strong>${item.milestone}</strong>
-      <input type="date" value="${item.date}" aria-label="${item.milestone}" id="tl-${i}">
+      <strong>${item.title}</strong>
+      <input type="date" value="${item.date}" aria-label="${item.title}" id="tl-${i}">
       <button class="btn btn-outline btn-sm" onclick="saveMilestone(${i})">שמור</button>
     </div>`).join('');
 }
@@ -663,6 +729,7 @@ function saveMilestone(i) {
   const val = document.getElementById(`tl-${i}`).value;
   if (val) currentTimeline[i].date = val;
   renderTimeline();
+  buildChecklist(); // sync checklist dates when user edits timeline
 }
 
 function resetTimeline() { rebuildTimeline(); }
@@ -679,7 +746,6 @@ function computeSchedule(subtasks, today, due) {
   const n         = subtasks.length;
   const totalDays = Math.max(1, Math.round((due - today) / 86400000));
 
-  // Assign day index for each task (evenly spread)
   const dayOffsets = subtasks.map((_, i) =>
     n > 1 ? Math.round((i / (n - 1)) * (totalDays - 1)) : 0
   );
@@ -687,15 +753,15 @@ function computeSchedule(subtasks, today, due) {
   return subtasks.map((_, i) => {
     const dayOffset = dayOffsets[i];
     const d         = new Date(today.getTime() + dayOffset * 86400000);
+    const isoDate   = d.toISOString().split('T')[0];
     const dateFmt   = d.toLocaleDateString('he-IL', { weekday:'short', day:'numeric', month:'short' });
 
-    // Slot within the day: count how many earlier tasks share the same day
-    const slot   = dayOffsets.slice(0, i).filter(d => d === dayOffset).length;
+    const slot   = dayOffsets.slice(0, i).filter(o => o === dayOffset).length;
     const startH = 9 + slot * 2;
     const endH   = startH + 2;
     const timeStr = `${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00`;
 
-    return { dateFmt, timeStr };
+    return { isoDate, dateFmt, timeStr };
   });
 }
 
@@ -711,7 +777,18 @@ function buildChecklist() {
   const today      = new Date(); today.setHours(0,0,0,0);
   const due        = dateVal ? new Date(dateVal) : new Date(today.getTime() + 14 * 86400000);
 
-  const schedule = computeSchedule(subtasks, today, due);
+  // Use currentTimeline dates when they match; fall back to a fresh computeSchedule
+  const baseSchedule = computeSchedule(subtasks, today, due);
+  const schedule = baseSchedule.map((s, i) => {
+    if (currentTimeline.length === subtasks.length && currentTimeline[i]?.date) {
+      const d = new Date(currentTimeline[i].date);
+      return {
+        dateFmt: d.toLocaleDateString('he-IL', { weekday:'short', day:'numeric', month:'short' }),
+        timeStr: currentTimeline[i].timeStr || s.timeStr,
+      };
+    }
+    return s;
+  });
 
   // Parse description sentences into Level-3 steps
   function parseSteps(desc) {
@@ -766,17 +843,19 @@ function buildChecklist() {
       <div class="hl-progress-bar" style="width:${pct}%"></div>
     </div>
     <div class="hl-list">${tasksHtml}</div>
-    <button class="hl-compile-btn" onclick="window.compileReport()">
-      📄 Compile — הורד דוח למורה
-    </button>`;
+    <div class="hl-btn-row">
+      <button class="hl-save-btn"    onclick="window.saveProgress()">💾 שמור התקדמות</button>
+      <button class="hl-compile-btn" onclick="window.compileReport()">📄 הורד דוח</button>
+    </div>`;
 
   // Save state so RecursiveDecomposition page can also read it
   const appState = {
-    topic:   document.getElementById('topic').value.trim() || 'פרויקט',
-    subject: document.getElementById('subject').value.trim(),
-    dueDate: dateVal,
+    topic:     document.getElementById('topic').value.trim() || 'פרויקט',
+    subject:   document.getElementById('subject').value.trim(),
+    dueDate:   dateVal,
     startDate: new Date().toISOString().split('T')[0],
-    chunks:  subtasks,
+    chunks:    subtasks,
+    timeline:  currentTimeline,
   };
   localStorage.setItem('decompose_app_state', JSON.stringify(appState));
 }
@@ -795,7 +874,17 @@ window.compileReport = function() {
 
   const today = new Date(); today.setHours(0,0,0,0);
   const due   = dateVal ? new Date(dateVal) : new Date(today.getTime() + 14*86400000);
-  const schedule = computeSchedule(subtasks, today, due);
+  const baseSchedule = computeSchedule(subtasks, today, due);
+  const schedule = baseSchedule.map((s, i) => {
+    if (currentTimeline.length === subtasks.length && currentTimeline[i]?.date) {
+      const d = new Date(currentTimeline[i].date);
+      return {
+        dateFmt: d.toLocaleDateString('he-IL', { weekday:'short', day:'numeric', month:'short' }),
+        timeStr: currentTimeline[i].timeStr || s.timeStr,
+      };
+    }
+    return s;
+  });
 
   const rows = subtasks.map((task, i) => {
     const done = !!completion[`task-${task.id||i}`];
@@ -843,6 +932,69 @@ window.compileReport = function() {
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
+
+window.saveProgress = async function() {
+  if (!subtasks.length) { alert('אין עדיין משימות לשמירה — נתח קודם את דרישות העבודה.'); return; }
+  const appState = {
+    topic:     document.getElementById('topic').value.trim() || 'פרויקט',
+    subject:   document.getElementById('subject').value.trim(),
+    dueDate:   document.getElementById('date').value,
+    startDate: new Date().toISOString().split('T')[0],
+    chunks:    subtasks,
+    timeline:  currentTimeline,
+    savedAt:   new Date().toISOString(),
+  };
+
+  // Always save locally
+  localStorage.setItem('decompose_app_state', JSON.stringify(appState));
+
+  // Try cloud save
+  if (window.supabaseHelpers) {
+    try {
+      const user = await window.supabaseHelpers.getCurrentUser();
+      if (user) {
+        const ok = await window.supabaseHelpers.saveTaskState(user.id, appState);
+        showSaveToast(ok ? '☁️ נשמר בענן — נגיש מכל מכשיר' : '✓ נשמר מקומית בלבד');
+      } else {
+        showSaveToast('✓ נשמר מקומית — <a href="profile.html" style="color:white;text-decoration:underline">התחבר</a> כדי לשמור בענן');
+      }
+    } catch { showSaveToast('✓ נשמר מקומית בלבד'); }
+  } else {
+    showSaveToast('✓ ההתקדמות נשמרה');
+  }
+};
+
+// Auto-load saved state from cloud when supabase is ready
+window.addEventListener('supabase:ready', async () => {
+  try {
+    const user = await window.supabaseHelpers.getCurrentUser();
+    if (!user) return;
+    const state = await window.supabaseHelpers.loadTaskState(user.id);
+    if (!state || !state.chunks?.length) return;
+    // Restore state into page
+    if (state.topic)   document.getElementById('topic').value   = state.topic;
+    if (state.subject) document.getElementById('subject').value = state.subject;
+    if (state.dueDate) document.getElementById('date').value    = state.dueDate;
+    subtasks = state.chunks;
+    if (state.timeline) currentTimeline = state.timeline;
+    localStorage.setItem('decompose_app_state', JSON.stringify(state));
+    renderSubtasks();
+    document.getElementById('subtasks-card').classList.remove('hidden');
+    rebuildTimeline();
+    buildChecklist();
+    showSaveToast('☁️ הפרויקט הקודם שלך נטען מהענן');
+  } catch(e) { console.warn('cloud load skipped:', e); }
+});
+
+function showSaveToast(msg) {
+  const existing = document.querySelector('.save-toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'save-toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
 
 /* ================================================================
    "I'M STUCK" COACH
@@ -894,25 +1046,44 @@ window.sendStuck = async function() {
   document.getElementById('stuckMessages').scrollTop = 99999;
 
   try {
-    const contents = STUCK_HISTORY.slice(0, -1).map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.text }]
+    // ── OpenRouter (active) ───────────────────────────────────
+    const messages = [{ role: 'system', content: COACH_SYSTEM }];
+    STUCK_HISTORY.slice(0, -1).forEach(m => messages.push({
+      role: m.role === 'assistant' ? 'assistant' : 'user',
+      content: m.text
     }));
-    contents.push({ role: 'user', parts: [{ text }] });
+    messages.push({ role: 'user', content: text });
 
-    const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${window.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: COACH_SYSTEM }] },
-          contents
-        })
-      }
-    );
-    const json   = await resp.json();
-    const reply  = json.candidates?.[0]?.content?.parts?.[0]?.text || 'מצטער, לא הצלחתי להגיב.';
+    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${window.OPENROUTER_API_KEY}`,
+      },
+      body: JSON.stringify({ model: 'google/gemini-2.0-flash-001', messages })
+    });
+    const json  = await resp.json();
+    const reply = json.choices?.[0]?.message?.content || 'מצטער, לא הצלחתי להגיב.';
+
+    // ── Gemini (commented out — restore if switching back) ────
+    // const contents = STUCK_HISTORY.slice(0, -1).map(m => ({
+    //   role: m.role === 'assistant' ? 'model' : 'user',
+    //   parts: [{ text: m.text }]
+    // }));
+    // contents.push({ role: 'user', parts: [{ text }] });
+    // const resp = await fetch(
+    //   `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${window.GEMINI_API_KEY}`,
+    //   {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({
+    //       system_instruction: { parts: [{ text: COACH_SYSTEM }] },
+    //       contents
+    //     })
+    //   }
+    // );
+    // const json   = await resp.json();
+    // const reply  = json.candidates?.[0]?.content?.parts?.[0]?.text || 'מצטער, לא הצלחתי להגיב.';
     typing.remove();
     addStuckMsg('assistant', reply);
   } catch(err) {
