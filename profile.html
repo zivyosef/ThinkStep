@@ -107,6 +107,76 @@
         .no-project-msg a { color: var(--accent); font-weight: 600; text-decoration: none; }
         .no-project-msg a:hover { text-decoration: underline; }
 
+        /* ── Weekly goals + tip grid ─────────────────────────── */
+        .extras-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+        .progress-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(148,252,196,0.7);
+            border-radius: 18px; padding: 22px; transition: all 0.25s;
+        }
+        .progress-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.05); }
+        .progress-card-title {
+            color: var(--text-muted); font-weight: 700; font-size: 0.82rem;
+            margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--text-bright); line-height: 1; margin-bottom: 4px; }
+        .stat-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+        .goals-input-group { display: flex; gap: 8px; margin-bottom: 14px; }
+        .goals-input-group input {
+            flex: 1; padding: 9px 13px; border: 1px solid rgba(148,163,184,0.22);
+            border-radius: 10px; background: rgba(255,255,255,0.05); color: var(--text);
+            font-size: 0.9rem; font-family: inherit; transition: border-color 0.2s;
+        }
+        .goals-input-group input:focus { outline: none; border-color: var(--accent); }
+        .goals-input-group button {
+            padding: 9px 14px; background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white; border: none; border-radius: 10px; cursor: pointer;
+            font-weight: 700; font-size: 0.88rem; font-family: inherit; transition: all 0.2s;
+        }
+        .goals-list { max-height: 220px; overflow-y: auto; margin-bottom: 14px; }
+        .goal-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+            background: rgba(255,255,255,0.03); border-radius: 9px; margin-bottom: 6px; transition: background 0.2s;
+        }
+        .goal-item:hover { background: rgba(255,255,255,0.05); }
+        .goal-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
+        .goal-text { flex: 1; color: var(--text-secondary); font-size: 0.9rem; }
+        .goal-item.completed .goal-text { color: var(--text-muted); text-decoration: line-through; }
+        .goal-delete { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 2px 4px; border-radius: 4px; transition: color 0.2s; }
+        .goal-delete:hover { color: #ef4444; }
+        .goals-reset-btn {
+            width: 100%; padding: 8px; background: rgba(239,68,68,0.1);
+            color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); border-radius: 8px;
+            cursor: pointer; font-size: 0.82rem; font-family: inherit; font-weight: 600;
+            margin-bottom: 10px; transition: all 0.2s;
+        }
+        .goals-reset-btn:hover { background: rgba(239,68,68,0.18); }
+        .progress-bar-container {
+            background: rgba(255,255,255,0.04); border-radius: 999px;
+            overflow: hidden; height: 10px; border: 1px solid var(--border); margin-bottom: 8px;
+        }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: 999px; transition: width 0.4s; }
+        .progress-percentage { color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+        .tip-content {
+            background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(124,58,237,0.12));
+            border: 1px solid rgba(37,99,235,0.2); border-radius: 14px; padding: 18px;
+            margin-bottom: 14px; min-height: 90px; display: flex; flex-direction: column; justify-content: center;
+        }
+        .tip-icon { font-size: 2.2rem; margin-bottom: 10px; }
+        .tip-text { color: var(--text-secondary); font-size: 0.93rem; line-height: 1.6; text-align: center; }
+        .tip-button {
+            width: 100%; padding: 11px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: white; border: none; border-radius: 10px; cursor: pointer;
+            font-weight: 700; font-size: 0.9rem; font-family: inherit; transition: all 0.2s;
+        }
+        .tip-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
         @media (max-width: 600px) { .profile-header { flex-direction: column; } }
     </style>
 </head>
@@ -117,14 +187,24 @@
         <nav>
             <a href="index.html">דף הבית</a>
             <a href="HomePage.html">דף עבודה</a>
-            <a href="RecuresiveDecomposition.html">התקדמות</a>
             <a href="writing.html">כתיבה</a>
             <a href="search.html">חיפוש</a>
             <a href="profile.html" class="active">פרופיל</a>
             <a href="about.html">אודות</a>
         </nav>
-        <button class="cta-button" onclick="window.location.href='index.html'">דף הבית</button>
+        <button class="cta-button" id="welcomeBtn" onclick="window.location.href='index.html'">דף הבית</button>
     </header>
+    <script>
+      (function(){
+        const p = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        const name = p.username || p.fullName;
+        if (name) {
+          const btn = document.getElementById('welcomeBtn');
+          btn.textContent = 'ברוך הבא: ' + name;
+          btn.onclick = function(){ window.location.href = 'profile.html'; };
+        }
+      })();
+    </script>
 
     <div class="profile-container">
 
@@ -172,6 +252,42 @@
                 <div class="section-title">הפרויקט השמור שלך</div>
                 <div id="projectContent">
                     <div style="text-align:center;padding:24px;color:var(--text-muted)">טוען...</div>
+                </div>
+            </div>
+
+            <!-- extras: goals + completed + tip -->
+            <div class="extras-grid">
+                <!-- מטרות שבועיות -->
+                <div class="progress-card">
+                    <div class="progress-card-title">🎯 מטרות שבועיות</div>
+                    <div class="goals-input-group">
+                        <input type="text" id="goalInput" placeholder="הוסף מטרה חדשה..."
+                               onkeydown="if(event.key==='Enter') addWeeklyGoal()">
+                        <button onclick="addWeeklyGoal()">הוסף</button>
+                    </div>
+                    <div class="goals-list" id="goalsList"></div>
+                    <button class="goals-reset-btn" onclick="resetWeeklyGoals()">🗑 אפס מטרות שבועיות</button>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="goalsProgressBar" style="width:0%"></div>
+                    </div>
+                    <div class="progress-percentage" id="goalsPercentage">0/0 משימות הושלמו</div>
+                </div>
+
+                <!-- משימות שהושלמו -->
+                <div class="progress-card">
+                    <div class="progress-card-title">✅ משימות שהושלמו</div>
+                    <div class="stat-value" id="progressCompleted">0</div>
+                    <div class="stat-label">משימות שהושלמו השבוע</div>
+                </div>
+
+                <!-- טיפ יומי -->
+                <div class="progress-card">
+                    <div class="progress-card-title">💡 טיפ יומי</div>
+                    <div class="tip-content">
+                        <div class="tip-icon" id="tipIcon">💡</div>
+                        <div class="tip-text" id="tipText">טוען טיפ...</div>
+                    </div>
+                    <button class="tip-button" onclick="getNewTip()">טיפ חדש</button>
                 </div>
             </div>
         </div>
@@ -225,8 +341,11 @@ function xlateErr(m) {
 
 async function handleLogout() {
     await window.supabaseHelpers?.signOut();
+    localStorage.removeItem('userProfile');
     document.getElementById('profileView').style.display = 'none';
     document.getElementById('authGate').style.display    = 'block';
+    const btn = document.getElementById('welcomeBtn');
+    if (btn) { btn.textContent = 'דף הבית'; btn.onclick = () => window.location.href = 'index.html'; }
 }
 
 async function showProfileView() {
@@ -235,10 +354,17 @@ async function showProfileView() {
     document.getElementById('authGate').style.display    = 'none';
     document.getElementById('profileView').style.display = 'block';
     const name = user.user_metadata?.display_name || user.email.split('@')[0];
+    localStorage.setItem('userProfile', JSON.stringify({ username: name, email: user.email }));
+    const btn = document.getElementById('welcomeBtn');
+    if (btn) { btn.textContent = 'ברוך הבא: ' + name; btn.onclick = () => window.location.href = 'profile.html'; }
     document.getElementById('profileName').textContent   = name;
     document.getElementById('profileEmail').textContent  = user.email;
     document.getElementById('profileAvatar').textContent = name.charAt(0).toUpperCase();
     renderProject(user.id);
+    renderGoals();
+    updateGoalsProgress();
+    loadStatCards();
+    getNewTip();
 }
 
 async function renderProject(userId) {
@@ -285,6 +411,90 @@ async function renderProject(userId) {
 }
 
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ===== WEEKLY GOALS ===== */
+function addWeeklyGoal() {
+    const input = document.getElementById('goalInput');
+    const text  = input.value.trim();
+    if (!text) return;
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    goals.push({ id: Date.now(), text, completed: false });
+    localStorage.setItem('weeklyGoals', JSON.stringify(goals));
+    input.value = '';
+    renderGoals();
+    updateGoalsProgress();
+    loadStatCards();
+}
+
+function renderGoals() {
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const list  = document.getElementById('goalsList');
+    if (!list) return;
+    list.innerHTML = goals.length ? goals.map(g => `
+        <div class="goal-item${g.completed ? ' completed' : ''}">
+            <input type="checkbox" ${g.completed ? 'checked' : ''} onchange="toggleGoal(${g.id})">
+            <div class="goal-text">${esc(g.text)}</div>
+            <button class="goal-delete" onclick="deleteGoal(${g.id})">✕</button>
+        </div>`).join('') :
+        '<div style="text-align:center;color:var(--text-muted);font-size:0.88rem;padding:12px 0;">אין מטרות עדיין — הוסף אחת!</div>';
+}
+
+function toggleGoal(id) {
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const g = goals.find(g => g.id === id);
+    if (g) { g.completed = !g.completed; localStorage.setItem('weeklyGoals', JSON.stringify(goals)); }
+    renderGoals(); updateGoalsProgress(); loadStatCards();
+}
+
+function deleteGoal(id) {
+    const goals = JSON.parse(localStorage.getItem('weeklyGoals') || '[]').filter(g => g.id !== id);
+    localStorage.setItem('weeklyGoals', JSON.stringify(goals));
+    renderGoals(); updateGoalsProgress(); loadStatCards();
+}
+
+function resetWeeklyGoals() {
+    if (!confirm('למחוק את כל המטרות השבועיות?')) return;
+    localStorage.removeItem('weeklyGoals');
+    renderGoals(); updateGoalsProgress(); loadStatCards();
+}
+
+function updateGoalsProgress() {
+    const goals     = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const completed = goals.filter(g => g.completed).length;
+    const total     = goals.length;
+    const pct       = total === 0 ? 0 : Math.round((completed / total) * 100);
+    const bar = document.getElementById('goalsProgressBar');
+    const pctEl = document.getElementById('goalsPercentage');
+    if (bar) bar.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = `${completed}/${total} משימות הושלמו`;
+}
+
+function loadStatCards() {
+    const goals     = JSON.parse(localStorage.getItem('weeklyGoals') || '[]');
+    const completed = goals.filter(g => g.completed).length;
+    const el = document.getElementById('progressCompleted');
+    if (el) el.textContent = completed;
+}
+
+/* ===== DAILY TIP ===== */
+const dailyTips = [
+    { icon: '💡', text: 'פרק את המטרות שלך לחלקים קטנים יותר — כך תישאר ממוקד ומוטיבציה.' },
+    { icon: '🚀', text: 'התחל את היום עם משימה קלה כדי לבנות תנופה!' },
+    { icon: '⏱️', text: 'טכניקת Pomodoro: 25 דקות עבודה, 5 דקות הפסקה. מוכח מדעית.' },
+    { icon: '🎯', text: 'דרג משימות לפי חשיבות ודחיפות — התמקד בחשובות ביותר קודם.' },
+    { icon: '📝', text: 'תעד את ההתקדמות שלך — זה מעורר השראה ומגביר ביטחון.' },
+    { icon: '🌟', text: 'שמור על איזון בין עבודה ומנוחה — המוח זקוק לשניהם.' },
+    { icon: '💪', text: 'כל יום קטן של התקדמות עדיף על יום ללא פעולה.' },
+    { icon: '🔄', text: 'סקור את ההתקדמות שלך בסוף כל יום וכוונן מטרות בהתאם.' }
+];
+
+function getNewTip() {
+    const tip = dailyTips[Math.floor(Math.random() * dailyTips.length)];
+    const icon = document.getElementById('tipIcon');
+    const text = document.getElementById('tipText');
+    if (icon) icon.textContent = tip.icon;
+    if (text) text.textContent = tip.text;
+}
 
 window.addEventListener('supabase:ready', () => {
     window.supabaseHelpers.getCurrentUser().then(u => { if (u) showProfileView(); });

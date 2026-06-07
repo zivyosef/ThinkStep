@@ -37,7 +37,7 @@ async function initProject(rawText) {
 
   const normalizedText = rawText.trim().replace(/\s+/g, " ");
 
-  if (!normalizedText) { 
+  if (!normalizedText) {
     handleError(TASK_ERROR_MSG);
     return null;
   }
@@ -57,10 +57,10 @@ async function initProject(rawText) {
   const newState = createNewState();
   newState.rawText = normalizedText;
 
-  console.log('🔵 [logicManager] שולח ל-window.aiService.sendQuery...');
-  console.log('🔵 [logicManager] aiService זמין?', typeof window.aiService, typeof window.aiService?.sendQuery);
+  console.log('🔵 [logicManager] שולח ל-aiService.sendQuery...');
+  console.log('🔵 [logicManager] aiService זמין?', typeof aiService, typeof aiService?.sendQuery);
   try {
-    const currentState = await window.aiService.sendQuery(
+    const currentState = await aiService.sendQuery(
       "DECOMPOSE_INITIAL",
       normalizedText,
       newState
@@ -271,7 +271,7 @@ async function handleTaskValidation(taskId, taskText) {
   if (needsAI) {
     try {
       console.log("🤖 שולח ל-AI לאימות...");
-      const aiValidation = await window.aiService.sendQuery("VALIDATE_TASK", normalizedTaskText);
+      const aiValidation = await aiService.sendQuery("VALIDATE_TASK", normalizedTaskText);
 
       if (aiValidation && aiValidation.score) {
         finalScore = aiValidation.score;
@@ -293,7 +293,7 @@ async function handleTaskValidation(taskId, taskText) {
   if (finalScore === "red") {
     try {
       console.log("💡 מבקש הצעת שיפור מה-AI...");
-      aiSuggestion = await window.aiService.sendQuery("SUGGEST_IMPROVEMENT", {
+      aiSuggestion = await aiService.sendQuery("SUGGEST_IMPROVEMENT", {
         taskText: normalizedTaskText,
         reason: finalLabel,
       });
@@ -409,7 +409,7 @@ async function requestAIAngles(topic) {
   }
 
   try {
-    const result = await window.aiService.sendQuery("GET_ANGLES", normalizedTopic);
+    const result = await aiService.sendQuery("GET_ANGLES", normalizedTopic);
 
     if (!result || !Array.isArray(result) || result.length === 0) {
       console.error("צוות D לא החזיר זוויות — בדקו את aiService.js");
@@ -434,7 +434,7 @@ async function analyzeDemandsAndCreateSubtasks(demandsText, context) {
   }
 
   try {
-    const result = await window.aiService.sendQuery("ANALYZE_DEMANDS", demandsText.trim(), context);
+    const result = await aiService.sendQuery("ANALYZE_DEMANDS", demandsText.trim(), context);
     if (!result || !Array.isArray(result)) return [];
     return result;
   } catch (error) {
@@ -512,7 +512,7 @@ async function checkAndSendDailyReminder(accessToken, currentChunk) {
   if (success) {
     localStorage.setItem(CALENDAR_LAST_SENT_KEY, now.toISOString());
   }
-}
+}ס
 // ============================================================
 //  פונקציה 7: syncStateToStorage
 // ============================================================
@@ -561,57 +561,6 @@ async function loadStateFromStorage() {
   }
 }
 
-
-// ============================================================
-//  פונקציה 8: fetchTavilySources (פנייה ישירה מהדפדפן)
-// ============================================================
-async function fetchTavilySources(state) {
-  if (!state || !state.topic) {
-    console.warn("⚠️ לא ניתן לחפש מקורות: חסר נושא (topic) במצב האפליקציה הנוכחי.");
-    return [];
-  }
-
-  console.log(`🔵 [logicManager] מפעיל חישוף מקורות ישיר מול Tavily עבור הנושא: ${state.topic}`);
-
-  // הנדסת שאילתה דינמית ישירות בדפדפן
-  const optimizedQuery = `"${state.topic}" reliable academic sources bibliography ${state.subject || ''} ${state.assignmentType || ''}`.trim().replace(/\s+/g, ' ');
-  console.log(`🔍 שאילתת חיפוש מיוטבת ל-Tavily: ${optimizedQuery}`);
-
-  // שליפת המפתח מתוך ה-window (נגדיר אותו ב-HomePage.html)
-  const apiKey = window.TAVILY_API_KEY;
-  if (!apiKey) {
-    console.error("❌ לא נמצא מפתח API עבור Tavily ב-window.TAVILY_API_KEY");
-    return [];
-  }
-
-  try {
-    // פנייה ישירה לשרתים של Tavily ללא תיווך שרת פנימי
-    const response = await fetch('https://api.tavily.com/search', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        api_key: apiKey,
-        query: optimizedQuery,
-        search_depth: "advanced"
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`תגובת שרת Tavily לא תקינה: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log("✅ מקורות התקבלו מ-Tavily בהצלחה:", data.results);
-    return data.results || [];
-
-  } catch (error) {
-    console.error("❌ שגיאה בשליפת מקורות מ-Tavily:", error);
-    return [];
-  }
-}
-
 // החשפת הפונקציות בגרסה המעודכנת
 const logicManager = {
   initProject,
@@ -627,7 +576,6 @@ const logicManager = {
   analyzeDemandsAndCreateSubtasks,
   syncStateToStorage,
   loadStateFromStorage,
-  fetchTavilySources, 
 };
 
 window.logicManager = logicManager;

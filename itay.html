@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAPITAL SURGE — Financial Strategy Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+
+  <style>
+  /* ══════════════════════════════════════════════════════════════
+     CAPITAL SURGE — CSS
+  ══════════════════════════════════════════════════════════════ */
+
+  :root {
+    --bg-deep:        #080c12;
+    --bg-mid:         #0d1420;
+    --bg-card:        #111927;
+    --bg-card-hover:  #162135;
+    --bg-tile:        #0f1c2e;
+    --border:         #1e3050;
+    --border-bright:  #2a4a72;
+    --gold:           #f0b429;
+    --gold-dim:       #a07820;
+    --green:          #00e676;
+    --green-dim:      #00994d;
+    --red:            #ff3d5a;
+    --red-dim:        #8b0020;
+    --blue:           #2979ff;
+    --blue-dim:       #1a4fa0;
+    --cyan:           #00e5ff;
+    --purple:         #aa00ff;
+    --orange:         #ff6d00;
+    --text-primary:   #e8f0fe;
+    --text-secondary: #7090b0;
+    --text-muted:     #3a5060;
+    --font-display:   'Bebas Neue', sans-serif;
+    --font-ui:        'Syne', sans-serif;
+    --font-data:      'DM Mono', monospace;
+    --tile-size:      64px;
+    --corner-size:    88px;
+    --board-inner:    calc(var(--tile-size) * 9 + var(--corner-size) * 2);
+    --radius:         8px;
+    --radius-lg:      14px;
+    --shadow:         0 4px 20px rgba(0,0,0,0.6);
+    --glow-gold:      0 0 20px rgba(240,180,41,0.3);
+    --glow-green:     0 0 16px rgba(0,230,118,0.25);
+    --glow-blue:      0 0 16px rgba(41,121,255,0.3);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: 13px;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+  .hidden { display: none !important; }
+  .green  { color: var(--green); }
+  .red    { color: var(--red); }
+  .gold   { color: var(--gold); }
+
+  /* ── NAVBAR ── */
+  .navbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 52px;
+    background: var(--bg-mid);
+    border-bottom: 1px solid var(--border);
+    position: relative; z-index: 100; flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-display); font-size: 22px;
+    letter-spacing: 2px; color: var(--text-primary);
+  }
+  .logo-bull { color: var(--green); font-size: 16px; filter: drop-shadow(var(--glow-green)); }
+  .logo-text em { color: var(--gold); font-style: normal; }
+  .nav-center { display: flex; gap: 12px; align-items: center; }
+  .nav-badge {
+    font-family: var(--font-data); font-size: 11px; letter-spacing: 1px;
+    padding: 4px 10px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 4px; color: var(--text-secondary);
+  }
+  .nav-badge.turn { border-color: var(--blue-dim); color: var(--cyan); animation: pulse-badge 2s infinite; }
+  @keyframes pulse-badge { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+  .nav-right { display: flex; align-items: center; gap: 20px; }
+  .nav-stat { display: flex; flex-direction: column; align-items: flex-end; }
+  .nav-label { font-family: var(--font-data); font-size: 9px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; }
+  .nav-value { font-family: var(--font-data); font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  .nav-value.gold { color: var(--gold); }
+  .nav-settings {
+    background: none; border: 1px solid var(--border); color: var(--text-secondary);
+    width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
+    font-size: 16px; transition: all 0.2s;
+  }
+  .nav-settings:hover { border-color: var(--blue); color: var(--cyan); background: var(--bg-card); }
+
+  /* ── LAYOUT ── */
+  .game-layout {
+    display: grid; grid-template-columns: 260px 1fr 280px;
+    height: calc(100vh - 52px); overflow: hidden;
+  }
+  .panel-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px; margin-bottom: 8px;
+  }
+  .card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .card-title { font-family: var(--font-display); font-size: 14px; letter-spacing: 2px; color: var(--text-secondary); }
+  .card-subtitle { font-family: var(--font-data); font-size: 11px; color: var(--gold); }
+
+  /* ── LEFT PANEL ── */
+  .left-panel { padding: 12px; overflow-y: auto; border-right: 1px solid var(--border); background: var(--bg-mid); }
+  .player-card { display: flex; gap: 12px; align-items: flex-start; }
+  .player-avatar { position: relative; flex-shrink: 0; }
+  .avatar-icon {
+    font-size: 32px; display: block; width: 52px; height: 52px;
+    line-height: 52px; text-align: center;
+    background: var(--bg-deep); border-radius: 50%;
+    border: 2px solid var(--gold-dim);
+  }
+  .avatar-ring {
+    position: absolute; inset: -4px; border-radius: 50%;
+    border: 2px solid var(--gold); opacity: 0.4;
+    animation: spin-ring 6s linear infinite;
+  }
+  @keyframes spin-ring { to { transform: rotate(360deg); } }
+  .player-stats { flex: 1; }
+  .player-name { font-family: var(--font-display); font-size: 18px; letter-spacing: 2px; color: var(--text-primary); margin-bottom: 8px; }
+  .stat-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .stat-label { font-family: var(--font-data); font-size: 9px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; }
+  .stat-value { font-family: var(--font-data); font-size: 12px; color: var(--text-primary); }
+  .stat-value.gold  { color: var(--gold); }
+  .stat-value.green { color: var(--green); }
+
+  .portfolio-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
+  .tab-btn {
+    flex: 1; padding: 5px; background: var(--bg-deep);
+    border: 1px solid var(--border); color: var(--text-muted);
+    font-family: var(--font-data); font-size: 9px; letter-spacing: 1px;
+    cursor: pointer; border-radius: 4px; transition: all 0.2s;
+  }
+  .tab-btn.active, .tab-btn:hover { border-color: var(--blue); color: var(--cyan); background: rgba(41,121,255,0.08); }
+  .portfolio-list { max-height: 180px; overflow-y: auto; }
+  .portfolio-empty { color: var(--text-muted); font-family: var(--font-data); font-size: 11px; text-align: center; padding: 20px 0; }
+  .portfolio-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 8px; background: var(--bg-deep); border-radius: 5px;
+    margin-bottom: 4px; border-left: 3px solid transparent; transition: border-color 0.2s;
+  }
+  .portfolio-item.profit { border-left-color: var(--green); }
+  .portfolio-item.loss   { border-left-color: var(--red); }
+  .pi-name { font-family: var(--font-ui); font-size: 11px; font-weight: 600; color: var(--text-primary); }
+  .pi-value { font-family: var(--font-data); font-size: 11px; }
+  .pi-delta { font-family: var(--font-data); font-size: 9px; }
+  .pi-delta.profit { color: var(--green); }
+  .pi-delta.loss   { color: var(--red); }
+
+  .chart-card canvas { width: 100%; height: 80px; display: block; border-radius: 4px; background: var(--bg-deep); }
+  .chart-labels { display: flex; justify-content: space-between; margin-top: 4px; font-family: var(--font-data); font-size: 9px; }
+
+  /* ── BOARD CENTER ── */
+  .board-container {
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; position: relative;
+    background: radial-gradient(ellipse at center, #0a1628 0%, #060a10 100%);
+  }
+  .board-container::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(30,48,80,0.15) 1px,transparent 1px), linear-gradient(90deg,rgba(30,48,80,0.15) 1px,transparent 1px);
+    background-size: 40px 40px; pointer-events: none;
+  }
+  .board {
+    position: relative; width: var(--board-inner); height: var(--board-inner);
+    flex-shrink: 0; border: 2px solid var(--border-bright); border-radius: 4px;
+    box-shadow: 0 0 60px rgba(41,121,255,0.15), 0 0 120px rgba(0,0,0,0.8), inset 0 0 60px rgba(0,0,0,0.4);
+  }
+
+  .tile {
+    position: absolute; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border: 1px solid var(--border); background: var(--bg-tile);
+    cursor: pointer; overflow: hidden;
+    transition: transform 0.15s, background 0.15s, border-color 0.15s;
+    font-size: 10px; text-align: center; padding: 2px; user-select: none;
+  }
+  .tile:hover { background: var(--bg-card-hover); border-color: var(--border-bright); transform: scale(1.05); z-index: 10; }
+  .tile::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+  .tile-stock::before      { background: var(--blue); }
+  .tile-realestate::before { background: var(--gold); }
+  .tile-dividend::before   { background: var(--green); }
+  .tile-crash::before      { background: var(--red); }
+  .tile-passive::before    { background: var(--purple); }
+  .tile-risk::before       { background: var(--orange); }
+  .tile-special::before    { background: var(--cyan); }
+  .tile-corner::before     { background: transparent; }
+  .tile-icon  { font-size: 18px; margin-top: 5px; line-height: 1; }
+  .tile-name  { font-family: var(--font-data); font-size: 8px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; line-height: 1.2; max-width: 100%; word-break: break-word; }
+  .tile-value { font-family: var(--font-data); font-size: 9px; color: var(--gold); font-weight: 500; }
+  .tile-corner { background: var(--bg-mid); border-color: var(--border-bright) !important; }
+  .tile-corner .tile-icon { font-size: 28px; }
+  .tile-corner .tile-name { font-size: 9px; color: var(--text-primary); }
+  .tile.has-player { border-color: var(--gold) !important; background: rgba(240,180,41,0.08) !important; }
+
+  .board-center {
+    position: absolute; top: var(--corner-size); left: var(--corner-size); right: var(--corner-size); bottom: var(--corner-size);
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at center,#0c1e35 0%,#060e18 100%);
+    border: 1px solid var(--border);
+  }
+  .center-logo { text-align: center; }
+  .center-bull { font-size: 40px; filter: drop-shadow(0 0 20px rgba(0,230,118,0.5)); animation: float-bull 3s ease-in-out infinite; }
+  @keyframes float-bull { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+  .center-title { font-family: var(--font-display); font-size: 36px; letter-spacing: 4px; line-height: 1; color: var(--text-primary); }
+  .center-title em { font-style: normal; color: var(--gold); }
+  .center-subtitle { font-family: var(--font-data); font-size: 10px; letter-spacing: 3px; color: var(--text-muted); margin: 6px 0 8px; }
+  .center-skyline { font-size: 28px; opacity: 0.4; margin-bottom: 12px; }
+  .market-ticker { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .ticker-item { font-family: var(--font-data); font-size: 10px; letter-spacing: 0.5px; padding: 2px 6px; background: rgba(0,0,0,0.3); border-radius: 3px; border: 1px solid var(--border); }
+  .ticker-item.green { color: var(--green); border-color: var(--green-dim); }
+  .ticker-item.red   { color: var(--red);   border-color: var(--red-dim); }
+  .player-token { position: absolute; top: 8px; right: 8px; font-size: 20px; filter: drop-shadow(var(--glow-gold)); animation: token-pulse 2s ease-in-out infinite; pointer-events: none; }
+  @keyframes token-pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.15); } }
+
+  .tile-popup {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--bg-card); border: 1px solid var(--border-bright);
+    border-radius: var(--radius-lg); padding: 16px; min-width: 220px;
+    box-shadow: var(--shadow); z-index: 50;
+  }
+  .popup-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .popup-icon { font-size: 22px; }
+  .popup-name { font-family: var(--font-display); font-size: 16px; letter-spacing: 1px; }
+  .popup-body { font-family: var(--font-data); font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+  .popup-close { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; transition: color 0.2s; }
+  .popup-close:hover { color: var(--red); }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel { padding: 12px; overflow-y: auto; border-left: 1px solid var(--border); background: var(--bg-mid); }
+  .dice-area { display: flex; justify-content: center; gap: 16px; margin: 10px 0; }
+  .die { width: 56px; height: 56px; background: var(--bg-deep); border: 2px solid var(--border-bright); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: transform 0.1s; }
+  .die.rolling { animation: die-shake 0.5s ease-in-out; }
+  @keyframes die-shake { 0% { transform:rotate(0)scale(1); } 20% { transform:rotate(-15deg)scale(1.1); } 40% { transform:rotate(15deg)scale(1.1); } 60% { transform:rotate(-10deg)scale(1.05); } 80% { transform:rotate(10deg)scale(1.05); } 100% { transform:rotate(0)scale(1); } }
+  .die-face { font-size: 32px; line-height: 1; }
+  .dice-result { text-align: center; font-family: var(--font-data); font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+  .dice-special { display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(240,180,41,0.1); border: 1px solid var(--gold-dim); border-radius: 6px; padding: 6px; animation: glow-gold 1s ease-in-out infinite alternate; }
+  @keyframes glow-gold { from { box-shadow:0 0 5px rgba(240,180,41,0.2); } to { box-shadow:0 0 20px rgba(240,180,41,0.5); } }
+  .special-text { font-family: var(--font-display); font-size: 13px; color: var(--gold); letter-spacing: 1px; }
+
+  .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .action-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 8px; border: 1px solid var(--border); background: var(--bg-deep);
+    color: var(--text-secondary); cursor: pointer; border-radius: var(--radius);
+    font-family: var(--font-data); font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .action-btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0); transition: background 0.15s; }
+  .action-btn:hover::after  { background: rgba(255,255,255,0.04); }
+  .action-btn:active::after { background: rgba(255,255,255,0.08); }
+  .action-btn .btn-icon  { font-size: 20px; }
+  .action-btn .btn-label { font-size: 9px; color: inherit; }
+  .action-btn.primary { grid-column: 1/-1; flex-direction: row; justify-content: center; gap: 8px; border-color: var(--blue); color: var(--cyan); background: rgba(41,121,255,0.08); font-size: 12px; padding: 12px; }
+  .action-btn.primary:hover:not(:disabled) { background: rgba(41,121,255,0.18); box-shadow: var(--glow-blue); }
+  .action-btn.buy   { border-color: var(--green-dim); color: var(--green); background: rgba(0,230,118,0.05); }
+  .action-btn.buy:hover:not(:disabled)  { background: rgba(0,230,118,0.12); box-shadow: var(--glow-green); }
+  .action-btn.sell  { border-color: var(--red-dim); color: var(--red); background: rgba(255,61,90,0.05); }
+  .action-btn.sell:hover:not(:disabled) { background: rgba(255,61,90,0.12); }
+  .action-btn.view  { border-color: var(--gold-dim); color: var(--gold); background: rgba(240,180,41,0.05); }
+  .action-btn.view:hover:not(:disabled) { background: rgba(240,180,41,0.12); }
+  .action-btn.end:hover:not(:disabled)  { border-color: var(--cyan); color: var(--cyan); }
+  .action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .event-log { max-height: 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+  .log-entry { font-family: var(--font-data); font-size: 10px; padding: 5px 8px; border-radius: 4px; border-left: 3px solid transparent; background: var(--bg-deep); line-height: 1.4; color: var(--text-secondary); }
+  .log-entry.info    { border-left-color: var(--blue); }
+  .log-entry.profit  { border-left-color: var(--green); color: var(--green); }
+  .log-entry.loss    { border-left-color: var(--red); color: var(--red); }
+  .log-entry.event   { border-left-color: var(--gold); color: var(--gold); }
+  .log-entry.special { border-left-color: var(--purple); color: var(--cyan); }
+
+  .market-status { display: flex; flex-direction: column; gap: 6px; }
+  .market-item { display: flex; justify-content: space-between; align-items: center; }
+  .market-label { font-family: var(--font-data); font-size: 9px; letter-spacing: 1px; color: var(--text-muted); }
+  .market-val   { font-family: var(--font-data); font-size: 11px; color: var(--text-primary); }
+
+  /* ── MODALS ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .modal { background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: var(--radius-lg); padding: 24px; min-width: 340px; max-width: 480px; box-shadow: 0 20px 80px rgba(0,0,0,0.8); animation: modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes modal-in { from { transform:scale(0.85);opacity:0; } to { transform:scale(1);opacity:1; } }
+  .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .modal-icon  { font-size: 24px; }
+  .modal-title { font-family: var(--font-display); font-size: 20px; letter-spacing: 2px; flex: 1; }
+  .modal-close { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; transition: color 0.2s; }
+  .modal-close:hover { color: var(--red); }
+  .modal-body { display: flex; flex-direction: column; gap: 14px; }
+  .modal-asset-name { font-family: var(--font-display); font-size: 18px; letter-spacing: 1px; }
+  .modal-asset-desc { font-family: var(--font-data); font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+  .modal-price-row { display: flex; justify-content: space-between; font-family: var(--font-data); font-size: 12px; padding: 8px; background: var(--bg-deep); border-radius: 6px; color: var(--text-secondary); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .modal-actions .action-btn { flex: 1; flex-direction: row; justify-content: center; gap: 8px; padding: 10px; }
+
+  .event-modal { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .event-modal-icon { font-size: 52px; animation: event-bounce 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes event-bounce { from { transform:scale(0)rotate(-20deg); } to { transform:scale(1)rotate(0); } }
+  .event-modal-title { font-family: var(--font-display); font-size: 28px; letter-spacing: 3px; }
+  .event-modal-desc  { font-family: var(--font-ui); font-size: 13px; color: var(--text-secondary); max-width: 320px; line-height: 1.6; }
+  .event-modal-effect { font-family: var(--font-data); font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 6px; }
+  .event-modal-effect.positive { background: rgba(0,230,118,0.1); color: var(--green); border: 1px solid var(--green-dim); }
+  .event-modal-effect.negative { background: rgba(255,61,90,0.1);  color: var(--red);   border: 1px solid var(--red-dim); }
+
+  .settings-modal { min-width: 360px; }
+  .settings-row { display: flex; flex-direction: column; gap: 6px; }
+  .settings-row label { font-family: var(--font-data); font-size: 9px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; }
+  .settings-input { background: var(--bg-deep); border: 1px solid var(--border-bright); border-radius: 6px; color: var(--text-primary); font-family: var(--font-data); font-size: 13px; padding: 8px 12px; outline: none; transition: border-color 0.2s; width: 100%; }
+  .settings-input:focus { border-color: var(--blue); }
+  .settings-input option { background: var(--bg-card); }
+
+  @media (max-height: 900px) { :root { --tile-size:54px; --corner-size:74px; } }
+  @media (max-height: 780px) { :root { --tile-size:48px; --corner-size:66px; } }
+  @media (max-width: 1400px) { :root { --tile-size:54px; --corner-size:74px; } .game-layout { grid-template-columns: 240px 1fr 260px; } }
+  @media (max-width: 1200px) { :root { --tile-size:48px; --corner-size:64px; } .game-layout { grid-template-columns: 220px 1fr 240px; } }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       TOP NAVIGATION BAR
+  ══════════════════════════════════════════ -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <span class="logo-bull">▲</span>
+      <span class="logo-text">CAPITAL<em>SURGE</em></span>
+    </div>
+    <div class="nav-center">
+      <span class="nav-badge">ROUND <span id="nav-round">1</span></span>
+      <span class="nav-badge turn">PLAYER TURN</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-stat">
+        <span class="nav-label">PLAYER</span>
+        <span class="nav-value" id="nav-player-name">INVESTOR</span>
+      </div>
+      <div class="nav-stat">
+        <span class="nav-label">BALANCE</span>
+        <span class="nav-value gold" id="nav-balance">$10,000</span>
+      </div>
+      <button class="nav-settings" id="btn-settings" title="Settings">⚙</button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════
+       MAIN GAME LAYOUT
+  ══════════════════════════════════════════ -->
+  <main class="game-layout">
+
+    <!-- ── LEFT: PLAYER INFO + PORTFOLIO ── -->
+    <aside class="left-panel">
+      <section class="panel-card player-card">
+        <div class="player-avatar" id="player-avatar">
+          <span class="avatar-icon">👤</span>
+          <div class="avatar-ring"></div>
+        </div>
+        <div class="player-stats">
+          <div class="player-name" id="player-display-name">INVESTOR</div>
+          <div class="stat-row"><span class="stat-label">CASH</span><span class="stat-value gold" id="stat-cash">$10,000</span></div>
+          <div class="stat-row"><span class="stat-label">PORTFOLIO</span><span class="stat-value" id="stat-portfolio">$0</span></div>
+          <div class="stat-row"><span class="stat-label">PASSIVE/TURN</span><span class="stat-value green" id="stat-passive">$0</span></div>
+          <div class="stat-row"><span class="stat-label">ASSETS OWNED</span><span class="stat-value" id="stat-assets">0</span></div>
+        </div>
+      </section>
+
+      <section class="panel-card portfolio-card">
+        <div class="card-header">
+          <span class="card-title">PORTFOLIO</span>
+          <span class="card-subtitle" id="portfolio-total-label">TOTAL: $0</span>
+        </div>
+        <div class="portfolio-tabs">
+          <button class="tab-btn active" data-tab="stocks">STOCKS</button>
+          <button class="tab-btn" data-tab="realestate">REAL ESTATE</button>
+        </div>
+        <div class="portfolio-list" id="portfolio-stocks">
+          <div class="portfolio-empty">No stocks owned yet.</div>
+        </div>
+        <div class="portfolio-list hidden" id="portfolio-realestate">
+          <div class="portfolio-empty">No real estate owned yet.</div>
+        </div>
+      </section>
+
+      <section class="panel-card chart-card">
+        <div class="card-header"><span class="card-title">NET WORTH TREND</span></div>
+        <canvas id="mini-chart" width="240" height="80"></canvas>
+        <div class="chart-labels">
+          <span class="green" id="chart-high">HIGH —</span>
+          <span class="red"   id="chart-low">LOW —</span>
+        </div>
+      </section>
+    </aside>
+
+    <!-- ── CENTER: GAME BOARD ── -->
+    <section class="board-container">
+      <div class="board" id="game-board">
+        <div class="board-center" id="board-center">
+          <div class="center-logo">
+            <div class="center-bull">📈</div>
+            <div class="center-title">CAPITAL<br><em>SURGE</em></div>
+            <div class="center-subtitle">FINANCIAL STRATEGY</div>
+            <div class="center-skyline">🏙</div>
+            <div class="market-ticker" id="market-ticker">
+              <span class="ticker-item green">AAPL +2.4%</span>
+              <span class="ticker-item red">TSLA -1.1%</span>
+              <span class="ticker-item green">SPY +0.8%</span>
+              <span class="ticker-item red">AMZN -0.5%</span>
+              <span class="ticker-item green">NVDA +5.2%</span>
+            </div>
+          </div>
+          <div class="player-token" id="player-token" data-position="0">💎</div>
+        </div>
+      </div>
+      <div class="tile-popup hidden" id="tile-popup">
+        <div class="popup-header">
+          <span class="popup-icon" id="popup-icon">📊</span>
+          <span class="popup-name" id="popup-name">Tile Name</span>
+        </div>
+        <div class="popup-body" id="popup-body">Description here.</div>
+        <button class="popup-close" id="popup-close">✕</button>
+      </div>
+    </section>
+
+    <!-- ── RIGHT: DICE + ACTIONS + LOG ── -->
+    <aside class="right-panel">
+      <section class="panel-card dice-card">
+        <div class="card-header"><span class="card-title">ROLL THE DICE</span></div>
+        <div class="dice-area">
+          <div class="die" id="die-1"><div class="die-face" id="die-face-1">⚀</div></div>
+          <div class="die" id="die-2"><div class="die-face" id="die-face-2">⚀</div></div>
+        </div>
+        <div class="dice-result" id="dice-result">Roll to move!</div>
+        <div class="dice-special hidden" id="dice-special">
+          <span class="special-icon">💰</span>
+          <span class="special-text">DIVIDEND ROLL!</span>
+        </div>
+      </section>
+
+      <section class="panel-card actions-card">
+        <div class="card-header"><span class="card-title">ACTIONS</span></div>
+        <div class="actions-grid">
+          <button class="action-btn primary" id="btn-roll"><span class="btn-icon">🎲</span><span class="btn-label">ROLL DICE</span></button>
+          <button class="action-btn buy" id="btn-buy" disabled><span class="btn-icon">💹</span><span class="btn-label">BUY ASSET</span></button>
+          <button class="action-btn sell" id="btn-sell" disabled><span class="btn-icon">📉</span><span class="btn-label">SELL ASSET</span></button>
+          <button class="action-btn view" id="btn-portfolio"><span class="btn-icon">📋</span><span class="btn-label">VIEW PORTFOLIO</span></button>
+          <button class="action-btn end" id="btn-end-turn" disabled><span class="btn-icon">⏭</span><span class="btn-label">END TURN</span></button>
+        </div>
+      </section>
+
+      <section class="panel-card log-card">
+        <div class="card-header"><span class="card-title">EVENT LOG</span></div>
+        <div class="event-log" id="event-log">
+          <div class="log-entry info">Game started. Roll the dice to begin!</div>
+        </div>
+      </section>
+
+      <section class="panel-card market-card">
+        <div class="card-header"><span class="card-title">MARKET STATUS</span></div>
+        <div class="market-status">
+          <div class="market-item"><span class="market-label">CONDITIONS</span><span class="market-val green" id="market-condition">BULL MARKET 🐂</span></div>
+          <div class="market-item"><span class="market-label">VOLATILITY</span><span class="market-val" id="market-volatility">LOW</span></div>
+          <div class="market-item"><span class="market-label">INTEREST RATE</span><span class="market-val" id="market-rate">5.25%</span></div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <!-- ══════════════════════════════════════════
+       MODALS
+  ══════════════════════════════════════════ -->
+
+  <!-- Buy Modal -->
+  <div class="modal-overlay hidden" id="modal-overlay">
+    <div class="modal" id="modal-buysell">
+      <div class="modal-header">
+        <span class="modal-icon" id="modal-icon">💹</span>
+        <span class="modal-title" id="modal-title">BUY ASSET</span>
+        <button class="modal-close" id="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-asset-name" id="modal-asset-name">Asset Name</div>
+        <div class="modal-asset-desc" id="modal-asset-desc">Description</div>
+        <div class="modal-price-row"><span>PRICE</span><span class="gold" id="modal-price">$0</span></div>
+        <div class="modal-price-row"><span>YOUR CASH</span><span class="green" id="modal-cash">$0</span></div>
+        <div class="modal-actions">
+          <button class="action-btn buy" id="modal-confirm-buy">CONFIRM BUY</button>
+          <button class="action-btn end" id="modal-cancel">CANCEL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Modal -->
+  <div class="modal-overlay hidden" id="event-modal-overlay">
+    <div class="modal event-modal" id="event-modal">
+      <div class="event-modal-icon" id="event-modal-icon">⚡</div>
+      <div class="event-modal-title" id="event-modal-title">MARKET EVENT</div>
+      <div class="event-modal-desc"  id="event-modal-desc">Something happened!</div>
+      <div class="event-modal-effect" id="event-modal-effect"></div>
+      <button class="action-btn primary" id="event-modal-ok">ACKNOWLEDGE</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay hidden" id="settings-overlay">
+    <div class="modal settings-modal">
+      <div class="modal-header">
+        <span class="modal-title">SETTINGS</span>
+        <button class="modal-close" id="settings-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-row">
+          <label>PLAYER NAME</label>
+          <input type="text" id="settings-name-input" class="settings-input" value="INVESTOR" maxlength="12" />
+        </div>
+        <div class="settings-row">
+          <label>STARTING CASH</label>
+          <select id="settings-cash" class="settings-input">
+            <option value="5000">$5,000 (Hard)</option>
+            <option value="10000" selected>$10,000 (Normal)</option>
+            <option value="20000">$20,000 (Easy)</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="action-btn primary" id="settings-save">SAVE &amp; RESTART</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       JAVASCRIPT GAME LOGIC
+  ══════════════════════════════════════════ -->
+  <script>
+  'use strict';
+
+  /* ── 1. TILE DEFINITIONS ── */
+  const TILES = [
+    { id:0,  type:'corner',     name:'START',         icon:'🏁', desc:'Collect $200 salary as you pass!', value:0 },
+    { id:1,  type:'stock',      name:'BIG TECH',      icon:'💻', desc:'Buy shares in a leading tech conglomerate. High growth, high risk.', value:600 },
+    { id:2,  type:'risk',       name:'MARGIN CALL',   icon:'📞', desc:'Your leveraged position is called. Pay up or lose an asset.', value:-300 },
+    { id:3,  type:'realestate', name:'DOWNTOWN LOFT', icon:'🏙', desc:'Premium urban real estate in the financial district.', value:800 },
+    { id:4,  type:'dividend',   name:'DIVIDEND DAY',  icon:'💰', desc:'Portfolio dividends arrive. Collect passive income.', value:200 },
+    { id:5,  type:'special',    name:'MARKET IPO',    icon:'🚀', desc:'Hot IPO hits the market. Invest early for massive gains!', value:500 },
+    { id:6,  type:'stock',      name:'ENERGY ETF',    icon:'⚡', desc:'Diversified energy sector fund. Stable long-term hold.', value:400 },
+    { id:7,  type:'crash',      name:'BEAR ATTACK',   icon:'🐻', desc:'Market correction hits hard. All stock values drop 15%.', value:-400 },
+    { id:8,  type:'passive',    name:'ROYALTY FUND',  icon:'👑', desc:'Earn royalties from your intellectual property holdings.', value:300 },
+    { id:9,  type:'realestate', name:'SUBURB VILLA',  icon:'🏡', desc:'Residential property in a growing suburb. Steady rental income.', value:500 },
+    { id:10, type:'corner',     name:'AUDIT',         icon:'🔍', desc:'Tax audit! Pay $150 in penalties.', value:-150 },
+    { id:11, type:'stock',      name:'PHARMA LABS',   icon:'💊', desc:'Biopharmaceutical stock. High-risk, high-reward play.', value:550 },
+    { id:12, type:'dividend',   name:'BOND COUPON',   icon:'📄', desc:'Treasury bond coupon payment. Safe, steady income.', value:150 },
+    { id:13, type:'risk',       name:'LAWSUIT',       icon:'⚖️', desc:'Corporate lawsuit! Pay legal fees of $250.', value:-250 },
+    { id:14, type:'realestate', name:'COMMERCIAL HUB',icon:'🏢', desc:'Prime commercial real estate generating rental yields.', value:900 },
+    { id:15, type:'special',    name:'CENTRAL BANK',  icon:'🏦', desc:'Fed rate announcement! Market conditions shift dramatically.', value:0 },
+    { id:16, type:'passive',    name:'PATENT ROYALTY',icon:'🧬', desc:'Tech patent earns you ongoing royalty streams.', value:350 },
+    { id:17, type:'stock',      name:'FINTECH PLAY',  icon:'📱', desc:'Disruptive fintech startup with massive upside potential.', value:700 },
+    { id:18, type:'crash',      name:'CRYPTO CRASH',  icon:'📉', desc:'Crypto markets implode. Lose 20% of portfolio value.', value:-500 },
+    { id:19, type:'realestate', name:'WATERFRONT',    icon:'🌊', desc:'Waterfront luxury property. Premium location, premium price.', value:1100 },
+    { id:20, type:'corner',     name:'HEDGE FUND',    icon:'🛡️', desc:'Hedge fund protects your assets. No losses this turn.', value:0 },
+    { id:21, type:'stock',      name:'AUTO SECTOR',   icon:'🚗', desc:'EV revolution play. Volatile but massively growing.', value:600 },
+    { id:22, type:'dividend',   name:'REIT PAYOUT',   icon:'🏗️', desc:'Real Estate Investment Trust distributes quarterly dividends.', value:250 },
+    { id:23, type:'risk',       name:'INFLATION HIT', icon:'📊', desc:'Inflation erodes purchasing power. Lose $200.', value:-200 },
+    { id:24, type:'passive',    name:'SOLAR FARM',    icon:'☀️', desc:'Renewable energy generates passive income indefinitely.', value:400 },
+    { id:25, type:'special',    name:'MERGER DEAL',   icon:'🤝', desc:'Corporate merger! One of your stocks boosts in value.', value:0 },
+    { id:26, type:'stock',      name:'MEDIA EMPIRE',  icon:'📺', desc:'Streaming and content giant with global reach.', value:500 },
+    { id:27, type:'crash',      name:'RECESSION',     icon:'🌩️', desc:'Economic recession begins. Lose $400 and assets drop in value.', value:-400 },
+    { id:28, type:'realestate', name:'PENTHOUSE',     icon:'🌆', desc:'Manhattan penthouse. The crown jewel of real estate.', value:1400 },
+    { id:29, type:'dividend',   name:'DIVIDEND RAIN', icon:'🌧️', desc:'All dividend stocks pay double this turn.', value:300 },
+    { id:30, type:'corner',     name:'WINDFALL',      icon:'💎', desc:'Inheritance windfall! Collect $500 bonus.', value:500 },
+    { id:31, type:'stock',      name:'SPACE VENTURES',icon:'🛸', desc:'Futuristic space industry stock. Ultra high-risk, ultra high-reward.', value:800 },
+    { id:32, type:'passive',    name:'BRAND LICENSE', icon:'™️', desc:'Your brand licensing deals generate continuous royalties.', value:450 },
+    { id:33, type:'risk',       name:'FRAUD FINE',    icon:'🚨', desc:'Regulatory fine for compliance violations. Pay $350.', value:-350 },
+    { id:34, type:'realestate', name:'RESORT ISLAND', icon:'🏝️', desc:'Luxury resort island property. Maximum rental yield.', value:1600 },
+    { id:35, type:'special',    name:'STOCK SPLIT',   icon:'✂️', desc:'Your best stock splits 2-for-1. Portfolio value spikes!', value:0 },
+    { id:36, type:'stock',      name:'RETAIL GIANT',  icon:'🛍️', desc:'Dominant e-commerce and brick-and-mortar retailer.', value:450 },
+    { id:37, type:'crash',      name:'BLACK MONDAY',  icon:'🕳️', desc:'Historic market crash. Lose 25% of total portfolio value.', value:-600 },
+    { id:38, type:'passive',    name:'TOLL ROAD',     icon:'🛣️', desc:'Infrastructure investment paying steady toll income.', value:500 },
+    { id:39, type:'dividend',   name:'YIELD HARVEST', icon:'🌾', desc:'Agricultural and commodity dividends. Collect passive income.', value:220 },
+  ];
+
+  const DIE_FACES   = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+  const SPECIAL_FACE = '💰';
+  const PASS_GO_BONUS = 200;
+
+  /* ── 2. GAME STATE ── */
+  let state = {
+    playerName: 'INVESTOR', cash: 10000, startingCash: 10000,
+    position: 0, round: 1, turnPhase: 'roll',
+    portfolio: { stocks: [], realestate: [] },
+    passiveIncome: 0, netWorthHistory: [],
+    currentTile: null, marketCondition: 'BULL MARKET 🐂',
+    volatility: 'LOW', interestRate: 5.25,
+    hasRolled: false, lastDiceRoll: [1,1], dividendRollActive: false,
+  };
+
+  /* ── 3. BOARD RENDERING ── */
+  function renderBoard() {
+    const board = document.getElementById('game-board');
+    const CS = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--corner-size')) || 88;
+    const TS = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tile-size'))   || 64;
+
+    function makeTile(tile) {
+      const el = document.createElement('div');
+      el.className = `tile tile-${tile.type}`;
+      el.id = `tile-${tile.id}`;
+      el.dataset.tileId = tile.id;
+      if (tile.type === 'corner') el.classList.add('tile-corner');
+      el.innerHTML = `
+        <div class="tile-icon">${tile.icon}</div>
+        <div class="tile-name">${tile.name}</div>
+        ${tile.value !== 0 ? `<div class="tile-value">${tile.value > 0 ? '+$'+tile.value : '-$'+Math.abs(tile.value)}</div>` : ''}
+      `;
+      el.addEventListener('click', () => showTilePopup(tile));
+      return el;
+    }
+
+    function positionTile(el, tile) {
+      const s = el.style;
+      const id = tile.id;
+      if (id <= 10) {
+        s.bottom = '0px';
+        if (id === 0)  { s.right='0px'; s.width=CS+'px'; s.height=CS+'px'; }
+        else if (id === 10) { s.left='0px'; s.width=CS+'px'; s.height=CS+'px'; }
+        else { s.right=(CS+(9-id)*TS)+'px'; s.width=TS+'px'; s.height=CS+'px'; }
+      } else if (id <= 20) {
+        if (id === 20) { s.left='0px'; s.top='0px'; s.width=CS+'px'; s.height=CS+'px'; }
+        else { s.left='0px'; s.bottom=(CS+(id-11)*TS)+'px'; s.width=CS+'px'; s.height=TS+'px'; }
+      } else if (id <= 30) {
+        if (id === 30) { s.right='0px'; s.top='0px'; s.width=CS+'px'; s.height=CS+'px'; }
+        else { s.left=(CS+(id-21)*TS)+'px'; s.top='0px'; s.width=TS+'px'; s.height=CS+'px'; }
+      } else {
+        s.right='0px'; s.top=(CS+(id-31)*TS)+'px'; s.width=CS+'px'; s.height=TS+'px';
+      }
+    }
+
+    TILES.forEach(tile => {
+      const el = makeTile(tile);
+      positionTile(el, tile);
+      board.appendChild(el);
+    });
+
+    updatePlayerTokenOnBoard(state.position);
+  }
+
+  /* ── 4. DICE SYSTEM ── */
+  function rollDice() {
+    if (state.hasRolled) { logEvent('You already rolled this turn!', 'info'); return; }
+    const d1El = document.getElementById('die-1'),  d2El = document.getElementById('die-2');
+    const d1F  = document.getElementById('die-face-1'), d2F = document.getElementById('die-face-2');
+    const resEl = document.getElementById('dice-result'), spEl = document.getElementById('dice-special');
+
+    d1El.classList.add('rolling'); d2El.classList.add('rolling');
+    spEl.classList.add('hidden');
+    document.getElementById('btn-roll').disabled = true;
+
+    let frames = 0;
+    const iv = setInterval(() => {
+      d1F.textContent = DIE_FACES[Math.floor(Math.random()*6)];
+      d2F.textContent = DIE_FACES[Math.floor(Math.random()*6)];
+      if (++frames >= 8) { clearInterval(iv); settleRoll(d1El,d2El,d1F,d2F,resEl,spEl); }
+    }, 80);
+  }
+
+  function settleRoll(d1El,d2El,d1F,d2F,resEl,spEl) {
+    const v1 = Math.ceil(Math.random()*6), v2 = Math.ceil(Math.random()*6);
+    state.lastDiceRoll = [v1, v2];
+    const isDividend = Math.random() < 0.125;
+    state.dividendRollActive = isDividend;
+
+    d1F.textContent = isDividend ? SPECIAL_FACE : DIE_FACES[v1-1];
+    d2F.textContent = DIE_FACES[v2-1];
+    d1El.classList.remove('rolling'); d2El.classList.remove('rolling');
+
+    const total = v1 + v2;
+    resEl.textContent = isDividend ? `DIVIDEND ROLL! Move ${v2} spaces` : `Rolled ${v1} + ${v2} = ${total}`;
+    if (isDividend) spEl.classList.remove('hidden');
+
+    state.hasRolled = true;
+    logEvent(`🎲 Rolled ${isDividend ? '💰 DIVIDEND! +' : ''}${isDividend ? v2 : total} — moving ${isDividend ? v2 : total} spaces`, 'info');
+    movePlayer(isDividend ? v2 : total, isDividend);
+    document.getElementById('btn-end-turn').disabled = false;
+  }
+
+  /* ── 5. MOVEMENT & TILE LANDING ── */
+  function movePlayer(steps, isDividend) {
+    const oldPos = state.position;
+    const newPos = (oldPos + steps) % 40;
+    if (newPos < oldPos || (oldPos + steps) >= 40) {
+      state.cash += PASS_GO_BONUS;
+      logEvent(`💵 Passed START — collected $${PASS_GO_BONUS} salary!`, 'profit');
+      state.round++;
+      document.getElementById('nav-round').textContent = state.round;
+      shiftMarketConditions();
+    }
+    state.position = newPos;
+    state.currentTile = TILES[newPos];
+    animateTokenMove(oldPos, newPos, isDividend);
+  }
+
+  function animateTokenMove(from, to, isDividend) {
+    let current = from;
+    function step() {
+      current = (current + 1) % 40;
+      updatePlayerTokenOnBoard(current);
+      if (current !== to) setTimeout(step, 120);
+      else setTimeout(() => landOnTile(state.currentTile, isDividend), 200);
+    }
+    step();
+  }
+
+  function updatePlayerTokenOnBoard(pos) {
+    document.querySelectorAll('.tile.has-player').forEach(el => el.classList.remove('has-player'));
+    const el = document.getElementById(`tile-${pos}`);
+    if (el) el.classList.add('has-player');
+  }
+
+  function landOnTile(tile, isDividend) {
+    const mult = isDividend ? 2 : 1;
+    switch (tile.type) {
+      case 'stock':
+      case 'realestate':
+        logEvent(`${tile.type==='stock'?'📊':'🏠'} Landed on ${tile.name}. You can BUY this ${tile.type==='stock'?'stock':'property'}.`, 'info');
+        document.getElementById('btn-buy').disabled = false;
+        if (state.portfolio.stocks.length + state.portfolio.realestate.length > 0) document.getElementById('btn-sell').disabled = false;
+        break;
+      case 'dividend':
+        const div = tile.value * mult;
+        state.cash += div;
+        logEvent(`💰 DIVIDEND: +$${div}${mult>1?' (DOUBLED!)':''}`, 'profit');
+        showEventModal('💰','DIVIDEND RECEIVED','Your investments paid out.',`+$${div}`,'positive');
+        break;
+      case 'crash':
+        const loss = Math.abs(tile.value);
+        state.cash = Math.max(0, state.cash - loss);
+        devaluePortfolio(0.12);
+        logEvent(`📉 ${tile.name}: Lost $${loss} + portfolio devalued.`, 'loss');
+        showEventModal(tile.icon, tile.name.toUpperCase(), tile.desc, `-$${loss} + Portfolio -12%`, 'negative');
+        break;
+      case 'passive':
+        const pa = tile.value * mult;
+        state.passiveIncome += Math.floor(pa/10);
+        state.cash += pa;
+        logEvent(`👑 Passive income: +$${pa}`, 'profit');
+        showEventModal(tile.icon,'PASSIVE INCOME',tile.desc,`+$${pa}`,'positive');
+        break;
+      case 'risk':
+        const rl = Math.abs(tile.value);
+        state.cash = Math.max(0, state.cash - rl);
+        logEvent(`⚠️ ${tile.name}: Lost $${rl}`, 'loss');
+        showEventModal(tile.icon, tile.name.toUpperCase(), tile.desc, `-$${rl}`, 'negative');
+        break;
+      case 'special':
+        handleSpecialTile(tile);
+        break;
+      case 'corner':
+        handleCornerTile(tile);
+        break;
+    }
+    if (state.passiveIncome > 0) state.cash += state.passiveIncome;
+    updateUI(); recordNetWorth();
+  }
+
+  function handleSpecialTile(tile) {
+    switch (tile.id) {
+      case 5:
+        const ipo = Math.floor(Math.random()*400)+200;
+        state.cash += ipo;
+        logEvent(`🚀 IPO Windfall: +$${ipo}!`, 'profit');
+        showEventModal('🚀','HOT IPO!',tile.desc,`+$${ipo}`,'positive');
+        break;
+      case 15:
+        const rc = Math.random()<0.5 ? 0.25 : -0.25;
+        state.interestRate = Math.max(0, state.interestRate + rc).toFixed(2);
+        logEvent(`🏦 Fed rate ${rc>0?'RAISED':'CUT'} to ${state.interestRate}%`, 'event');
+        showEventModal('🏦','FED ANNOUNCEMENT',tile.desc,`Rate now ${state.interestRate}%`,rc<0?'positive':'negative');
+        break;
+      case 25:
+        const boost = getRandomPortfolioStock();
+        if (boost) {
+          boost.currentValue = Math.floor(boost.currentValue*1.8);
+          logEvent(`🤝 MERGER! ${boost.name} value +80%!`, 'profit');
+          showEventModal('🤝','MERGER DEAL!',`${boost.name} was acquired!`,`+80% on ${boost.name}`,'positive');
+        } else { state.cash += 200; logEvent(`🤝 Merger bonus: +$200`, 'profit'); }
+        break;
+      case 35:
+        const split = getRandomPortfolioStock();
+        if (split) {
+          split.quantity = (split.quantity||1)*2;
+          split.currentValue = Math.floor(split.currentValue*1.5);
+          logEvent(`✂️ STOCK SPLIT! ${split.name} splits 2-for-1!`, 'profit');
+          showEventModal('✂️','STOCK SPLIT!','Your holding splits!',`${split.name} × 2 shares`,'positive');
+        } else { state.cash += 150; logEvent(`✂️ Split bonus: +$150`, 'profit'); }
+        break;
+    }
+  }
+
+  function handleCornerTile(tile) {
+    switch (tile.id) {
+      case 0:  state.cash += PASS_GO_BONUS; logEvent(`🏁 Landed on START — collected $${PASS_GO_BONUS}!`, 'profit'); break;
+      case 10: if (state.cash>150) { state.cash-=150; logEvent('🔍 TAX AUDIT — paid $150.','loss'); showEventModal('🔍','TAX AUDIT',tile.desc,'-$150','negative'); } break;
+      case 20: logEvent('🛡️ HEDGE FUND — protected this turn!','event'); break;
+      case 30: state.cash+=500; logEvent('💎 WINDFALL — collected $500!','profit'); showEventModal('💎','WINDFALL!',tile.desc,'+$500','positive'); break;
+    }
+  }
+
+  /* ── 6. BUY / SELL ── */
+  function openBuyModal() {
+    const tile = state.currentTile;
+    if (!tile || (tile.type!=='stock' && tile.type!=='realestate')) { logEvent('Nothing to buy here.','info'); return; }
+    document.getElementById('modal-icon').textContent       = tile.icon;
+    document.getElementById('modal-title').textContent      = `BUY ${tile.type==='stock'?'STOCK':'PROPERTY'}`;
+    document.getElementById('modal-asset-name').textContent = tile.name;
+    document.getElementById('modal-asset-desc').textContent = tile.desc;
+    document.getElementById('modal-price').textContent      = `$${tile.value}`;
+    document.getElementById('modal-cash').textContent       = `$${state.cash.toLocaleString()}`;
+    document.getElementById('modal-confirm-buy').onclick = () => executeBuy(tile);
+    document.getElementById('modal-cancel').onclick = closeModal;
+    document.getElementById('modal-close').onclick  = closeModal;
+    document.getElementById('modal-overlay').classList.remove('hidden');
+  }
+
+  function executeBuy(tile) {
+    if (state.cash < tile.value) { logEvent(`❌ Insufficient funds. Need $${tile.value}.`,'loss'); closeModal(); return; }
+    state.cash -= tile.value;
+    if (tile.type === 'stock') {
+      const ex = state.portfolio.stocks.find(s => s.id===tile.id);
+      if (ex) { ex.quantity=(ex.quantity||1)+1; ex.currentValue=Math.floor(ex.currentValue*1.1); }
+      else state.portfolio.stocks.push({id:tile.id,name:tile.name,icon:tile.icon,buyPrice:tile.value,currentValue:tile.value,quantity:1});
+      state.passiveIncome += Math.floor(tile.value*0.005);
+      logEvent(`✅ Bought ${tile.name} stock for $${tile.value}`,'profit');
+    } else {
+      state.portfolio.realestate.push({id:tile.id,name:tile.name,icon:tile.icon,buyPrice:tile.value,currentValue:tile.value});
+      state.passiveIncome += Math.floor(tile.value*0.008);
+      logEvent(`✅ Bought ${tile.name} property for $${tile.value}`,'profit');
+    }
+    closeModal();
+    document.getElementById('btn-sell').disabled = false;
+    updateUI(); renderPortfolio(); recordNetWorth();
+  }
+
+  function openSellModal() {
+    const all = [
+      ...state.portfolio.stocks.map(s=>({...s,cat:'stocks'})),
+      ...state.portfolio.realestate.map(r=>({...r,cat:'realestate'}))
+    ];
+    if (!all.length) { logEvent('No assets to sell.','info'); return; }
+    all.sort((a,b)=>b.currentValue-a.currentValue);
+    const asset = all[0];
+    const sale  = Math.floor(asset.currentValue*(0.9+Math.random()*0.2));
+    state.cash += sale;
+    if (asset.cat==='stocks') {
+      const i = state.portfolio.stocks.findIndex(s=>s.id===asset.id);
+      if (i>-1) state.portfolio.stocks.splice(i,1);
+    } else {
+      const i = state.portfolio.realestate.findIndex(r=>r.id===asset.id);
+      if (i>-1) state.portfolio.realestate.splice(i,1);
+    }
+    const pnl = sale - asset.buyPrice;
+    logEvent(`💸 Sold ${asset.name} for $${sale} (P&L: ${pnl>=0?'+':''}$${pnl})`, pnl>=0?'profit':'loss');
+    updateUI(); renderPortfolio(); recordNetWorth();
+  }
+
+  /* ── 7. PORTFOLIO ── */
+  function getPortfolioValue() {
+    let t = 0;
+    state.portfolio.stocks.forEach(s => t += s.currentValue*(s.quantity||1));
+    state.portfolio.realestate.forEach(r => t += r.currentValue);
+    return t;
+  }
+
+  function devaluePortfolio(pct) {
+    state.portfolio.stocks.forEach(s     => s.currentValue = Math.floor(s.currentValue*(1-pct)));
+    state.portfolio.realestate.forEach(r => r.currentValue = Math.floor(r.currentValue*(1-pct*0.5)));
+  }
+
+  function getRandomPortfolioStock() {
+    if (!state.portfolio.stocks.length) return null;
+    return state.portfolio.stocks[Math.floor(Math.random()*state.portfolio.stocks.length)];
+  }
+
+  function appreciatePortfolio() {
+    const m = state.marketCondition.includes('BULL') ? 1.04 : 0.98;
+    state.portfolio.stocks.forEach(s => s.currentValue = Math.floor(s.currentValue*m*(0.9+Math.random()*0.2)));
+    state.portfolio.realestate.forEach(r => r.currentValue = Math.floor(r.currentValue*1.01));
+  }
+
+  function renderPortfolio() {
+    const sEl = document.getElementById('portfolio-stocks');
+    sEl.innerHTML = state.portfolio.stocks.length === 0
+      ? '<div class="portfolio-empty">No stocks owned yet.</div>'
+      : state.portfolio.stocks.map(s => {
+          const pnl = s.currentValue - s.buyPrice;
+          const pct = ((pnl/s.buyPrice)*100).toFixed(1);
+          const cls = pnl>=0?'profit':'loss';
+          return `<div class="portfolio-item ${cls}"><div><div class="pi-name">${s.icon} ${s.name}</div><div class="pi-delta ${cls}">${pnl>=0?'+':''}${pct}% ×${s.quantity||1}</div></div><div class="pi-value ${cls}">$${(s.currentValue*(s.quantity||1)).toLocaleString()}</div></div>`;
+        }).join('');
+
+    const rEl = document.getElementById('portfolio-realestate');
+    rEl.innerHTML = state.portfolio.realestate.length === 0
+      ? '<div class="portfolio-empty">No real estate owned yet.</div>'
+      : state.portfolio.realestate.map(r => {
+          const pnl = r.currentValue - r.buyPrice;
+          const pct = ((pnl/r.buyPrice)*100).toFixed(1);
+          const cls = pnl>=0?'profit':'loss';
+          return `<div class="portfolio-item ${cls}"><div><div class="pi-name">${r.icon} ${r.name}</div><div class="pi-delta ${cls}">${pnl>=0?'+':''}${pct}%</div></div><div class="pi-value ${cls}">$${r.currentValue.toLocaleString()}</div></div>`;
+        }).join('');
+  }
+
+  /* ── 8. EVENT LOG ── */
+  function logEvent(msg, type='info') {
+    const log = document.getElementById('event-log');
+    const e = document.createElement('div');
+    e.className = `log-entry ${type}`;
+    e.textContent = msg;
+    log.insertBefore(e, log.firstChild);
+    while (log.children.length > 20) log.removeChild(log.lastChild);
+  }
+
+  /* ── 9. MINI CHART ── */
+  function recordNetWorth() {
+    state.netWorthHistory.push(state.cash + getPortfolioValue());
+    if (state.netWorthHistory.length > 20) state.netWorthHistory.shift();
+    drawMiniChart();
+  }
+
+  function drawMiniChart() {
+    const canvas = document.getElementById('mini-chart');
+    const ctx = canvas.getContext('2d');
+    const data = state.netWorthHistory;
+    if (data.length < 2) return;
+    const W=canvas.width, H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const min=Math.min(...data), max=Math.max(...data), range=max-min||1;
+    const isUp = data[data.length-1] >= data[0];
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0, isUp?'rgba(0,230,118,0.3)':'rgba(255,61,90,0.3)');
+    grad.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath();
+    data.forEach((v,i) => {
+      const x=(i/(data.length-1))*W, y=H-((v-min)/range)*(H-8)-4;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.lineTo(W,H); ctx.closePath();
+    ctx.fillStyle=grad; ctx.fill();
+    ctx.beginPath();
+    data.forEach((v,i) => {
+      const x=(i/(data.length-1))*W, y=H-((v-min)/range)*(H-8)-4;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle=isUp?'#00e676':'#ff3d5a'; ctx.lineWidth=2; ctx.stroke();
+    document.getElementById('chart-high').textContent=`HIGH $${max.toLocaleString()}`;
+    document.getElementById('chart-low').textContent =`LOW $${min.toLocaleString()}`;
+  }
+
+  /* ── 10. UI UPDATES ── */
+  function updateUI() {
+    const pv = getPortfolioValue();
+    const ta = state.portfolio.stocks.length + state.portfolio.realestate.length;
+    document.getElementById('nav-balance').textContent        = '$'+state.cash.toLocaleString();
+    document.getElementById('nav-player-name').textContent    = state.playerName;
+    document.getElementById('stat-cash').textContent          = '$'+state.cash.toLocaleString();
+    document.getElementById('stat-portfolio').textContent     = '$'+pv.toLocaleString();
+    document.getElementById('stat-passive').textContent       = '+$'+state.passiveIncome+'/turn';
+    document.getElementById('stat-assets').textContent        = ta;
+    document.getElementById('player-display-name').textContent= state.playerName;
+    document.getElementById('portfolio-total-label').textContent='TOTAL: $'+pv.toLocaleString();
+    document.getElementById('market-condition').textContent   = state.marketCondition;
+    document.getElementById('market-volatility').textContent  = state.volatility;
+    document.getElementById('market-rate').textContent        = state.interestRate+'%';
+    const mc = document.getElementById('market-condition');
+    mc.className = 'market-val '+(state.marketCondition.includes('BULL')?'green':'red');
+    if (ta===0) document.getElementById('btn-sell').disabled = true;
+  }
+
+  function endTurn() {
+    if (!state.hasRolled) { logEvent('Roll the dice first!','info'); return; }
+    if (state.passiveIncome > 0) { state.cash+=state.passiveIncome; logEvent(`💹 Passive income: +$${state.passiveIncome}`,'profit'); }
+    appreciatePortfolio(); renderPortfolio();
+    state.hasRolled=false; state.dividendRollActive=false; state.currentTile=null;
+    document.getElementById('btn-roll').disabled    = false;
+    document.getElementById('btn-buy').disabled     = true;
+    document.getElementById('btn-end-turn').disabled= true;
+    document.getElementById('dice-result').textContent = 'Roll to move!';
+    document.getElementById('dice-special').classList.add('hidden');
+    logEvent(`--- END OF TURN. Round ${state.round} ---`,'event');
+    updateUI(); recordNetWorth();
+  }
+
+  function shiftMarketConditions() {
+    const r = Math.random();
+    if (r < 0.1)       { state.marketCondition='BEAR MARKET 🐻'; state.volatility='HIGH';    logEvent('⚠️ Market turned BEARISH!','loss'); }
+    else if (r < 0.25) { state.marketCondition='VOLATILE 🌩️';    state.volatility='EXTREME'; logEvent('🌩️ Market highly volatile!','event'); }
+    else               { state.marketCondition='BULL MARKET 🐂'; state.volatility='LOW';     if (r>0.9) logEvent('🐂 Bull market surge!','profit'); }
+  }
+
+  /* ── 11. MODALS ── */
+  function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
+
+  function showEventModal(icon, title, desc, effect, type) {
+    document.getElementById('event-modal-icon').textContent  = icon;
+    document.getElementById('event-modal-title').textContent = title;
+    document.getElementById('event-modal-desc').textContent  = desc;
+    const el = document.getElementById('event-modal-effect');
+    el.textContent = effect; el.className = `event-modal-effect ${type}`;
+    document.getElementById('event-modal-overlay').classList.remove('hidden');
+  }
+
+  function closeEventModal() { document.getElementById('event-modal-overlay').classList.add('hidden'); updateUI(); }
+
+  function showTilePopup(tile) {
+    document.getElementById('popup-icon').textContent = tile.icon;
+    document.getElementById('popup-name').textContent = tile.name;
+    document.getElementById('popup-body').innerHTML = `
+      <strong>${tile.desc}</strong><br><br>
+      Type: <em>${tile.type.toUpperCase()}</em><br>
+      ${tile.value!==0?`Value: <span class="${tile.value>0?'green':'red'}">${tile.value>0?'+$'+tile.value:'-$'+Math.abs(tile.value)}</span>`:''}
+    `;
+    document.getElementById('tile-popup').classList.remove('hidden');
+  }
+
+  /* ── 12. SETTINGS ── */
+  function openSettings() {
+    document.getElementById('settings-overlay').classList.remove('hidden');
+    document.getElementById('settings-name-input').value = state.playerName;
+  }
+
+  function saveSettings() {
+    const name = (document.getElementById('settings-name-input').value.trim() || 'INVESTOR').toUpperCase();
+    const cash = parseInt(document.getElementById('settings-cash').value);
+    Object.assign(state, { playerName:name, cash, startingCash:cash, position:0, round:1,
+      portfolio:{stocks:[],realestate:[]}, passiveIncome:0, netWorthHistory:[cash],
+      hasRolled:false, currentTile:null });
+    document.getElementById('settings-overlay').classList.add('hidden');
+    document.getElementById('event-log').innerHTML = '<div class="log-entry info">New game started. Good luck!</div>';
+    document.getElementById('nav-round').textContent = 1;
+    document.getElementById('btn-roll').disabled     = false;
+    document.getElementById('btn-buy').disabled      = true;
+    document.getElementById('btn-sell').disabled     = true;
+    document.getElementById('btn-end-turn').disabled = true;
+    updatePlayerTokenOnBoard(0);
+    updateUI(); renderPortfolio(); drawMiniChart();
+    logEvent('🎮 New game started!','info');
+  }
+
+  /* ── INIT ── */
+  document.addEventListener('DOMContentLoaded', () => {
+    renderBoard();
+
+    document.getElementById('btn-roll').addEventListener('click', rollDice);
+    document.getElementById('btn-buy').addEventListener('click', openBuyModal);
+    document.getElementById('btn-sell').addEventListener('click', openSellModal);
+    document.getElementById('btn-end-turn').addEventListener('click', endTurn);
+    document.getElementById('btn-portfolio').addEventListener('click', () => { renderPortfolio(); logEvent('📋 Portfolio reviewed.','info'); });
+    document.getElementById('event-modal-ok').addEventListener('click', closeEventModal);
+    document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target===document.getElementById('modal-overlay')) closeModal(); });
+    document.getElementById('popup-close').addEventListener('click', () => document.getElementById('tile-popup').classList.add('hidden'));
+    document.getElementById('btn-settings').addEventListener('click', openSettings);
+    document.getElementById('settings-close').addEventListener('click', () => document.getElementById('settings-overlay').classList.add('hidden'));
+    document.getElementById('settings-save').addEventListener('click', saveSettings);
+
+    // Portfolio tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        document.getElementById('portfolio-stocks').classList.toggle('hidden',    tab!=='stocks');
+        document.getElementById('portfolio-realestate').classList.toggle('hidden', tab!=='realestate');
+      });
+    });
+
+    recordNetWorth(); updateUI();
+    logEvent('🎮 Welcome to CAPITAL SURGE! Roll the dice to begin!','special');
+  });
+  </script>
+</body>
+</html>

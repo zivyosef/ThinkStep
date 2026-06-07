@@ -335,12 +335,23 @@
       <a href="index.html">דף הבית</a>
       <a href="HomePage.html">דף עבודה</a>
       <a href="writing.html" class="active">כתיבה</a>
-      <a href="RecuresiveDecomposition.html">התקדמות</a>
+      <a href="search.html">חיפוש</a>
       <a href="profile.html">פרופיל</a>
       <a href="about.html">אודות</a>
     </nav>
-    <button class="cta-button" onclick="window.location.href='index.html'">דף הבית</button>
+    <button class="cta-button" id="welcomeBtn" onclick="window.location.href='index.html'">דף הבית</button>
   </header>
+  <script>
+    (function(){
+      const p = JSON.parse(localStorage.getItem('userProfile') || '{}');
+      const name = p.username || p.fullName;
+      if (name) {
+        const btn = document.getElementById('welcomeBtn');
+        btn.textContent = 'ברוך הבא: ' + name;
+        btn.onclick = function(){ window.location.href = 'profile.html'; };
+      }
+    })();
+  </script>
 
   <div class="writing-page">
 

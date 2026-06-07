@@ -11,7 +11,7 @@ const MAX_HISTORY = 10;
 
 // ── OpenRouter setup (active) ─────────────────────────────────
 const _openRouterKey = window.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = "google/gemini-2.0-flash-001";
+const OPENROUTER_MODEL = "perceptron/perceptron-mk1";
 const OPENROUTER_URL   = "https://openrouter.ai/api/v1/chat/completions";
 console.log('🟠 [aiService] OpenRouter key loaded?', _openRouterKey ? `yes (${_openRouterKey.slice(0,12)}...)` : '❌ key not found!');
 
@@ -385,7 +385,7 @@ async function requestAnglesFromAI(topic) {
 // ============================================================
 async function generateSubtasksFromDemands(demandsText, context) {
   const today = new Date().toISOString().split("T")[0];
-  const { subject, topic, pages, dueDate } = context || {};
+  const { subject, topic, pages, dueDate, feedback } = context || {};
 
   const prompt = `
 אתה עוזר לימודי לתלמידי תיכון.
@@ -398,7 +398,7 @@ async function generateSubtasksFromDemands(demandsText, context) {
 - מספר עמודים: ${pages || "לא צוין"}
 - תאריך הגשה: ${dueDate || "לא צוין"}
 - תאריך היום: ${today}
-
+${feedback ? `\nהמשתמש ביקש לשנות את התוצאה הקודמת:\n"${feedback}"\nיש להתחשב בהערה זו בעת בניית המשימות.\n` : ""}
 פרק את הדרישות לרשימת משימות ספציפיות וניתנות לביצוע.
 החזר JSON בלבד, ללא markdown:
 [

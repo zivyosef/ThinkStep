@@ -1,142 +1,200 @@
-// server.js
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const { tavily } = require('@tavily/core');
+/**
+ * ============================================================
+ * sources.js — Tavily Direct API (ללא שרת) - גרסה מתוקנת ומאובטחת
+ * ============================================================
+ */
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+const TAVILY_API_KEY = "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"
 
-const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY });
-
-app.post('/api/fetch-project-sources', async (req, res) => {
-  try {
-    const { subject, assignmentType, topic } = req.body;
-
-    if (!topic) {
-      return res.status(400).json({ error: "Missing topic for source generation." });
-    }
-
- //Dynamic Query Engineering: Construct an ideal search string for Tavily
-    // Example: "The French Revolution bibliography academic sources History essay"
-    const optimizedQuery = `"${topic}" reliable academic sources bibliography ${subject || ''} ${assignmentType || ''}`.trim().replace(/\s+/g, ' ');
-
-    console.log(`🔍 Routing Tavily Search Query: ${optimizedQuery}`);
-
-    const response = await tvly.search(optimizedQuery, {
-      searchDepth: "advanced", // Advanced finds higher quMources
-      includeDomains: [],      // Optional: Add specific educational extensions if preferred
-    });
-
-    res.json(response.results);
-  } catch (error) {
-    console.error(, error);
-    res.status(500).json({ error: "Failed to "Tavily Integration Error:"compile background sources." });
-  }
-});
-
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Secure Tavily proxy active on port ${PORT}`));
-
-
-
-================================================================
-// ============================================================
-//  פונקציה 8: fetchTavilySources
-//  נכתב עבור שילוב מקורות חכם מבוסס נושא, סוג מטלה ומקצוע
-// ============================================================
-async function fetchTavilySources(state) {
+export async function fetchTavilySources(state, profile = null) {
   if (!state || !state.topic) {
-    console.warn("⚠️ לא ניתן לחפש מקורות: חסר נושא (topic) במצב האפליקציה הנוכחי.");
+    console.warn("⚠️ לא ניתן לחפש מקורות: חסר נושא (topic).");
     return [];
   }
 
-  console.log(`🔵 [logicManager] מפעיל חיפוש מקורות עבור הנושא: ${state.topic}`);
+  // 1. הפקת שאילתה ממוקדת ורשימת דומיינים מותרים
+  const { query, include_domains } = generateOptimizedQuery(state, profile);
+
+  console.log(`🔍 Searching Tavily for query: "${query}"`);
 
   try {
-    // קריאה לשרת הפנימי שמגן על המפתח של Tavily
-    // שים לב: שנה את ה-URL במידה והשרת רץ בכתובת אחרת או בפרודקשן
-    const response = await fetch('http://localhost:3000/api/fetch-project-sources', {
-      method: 'POST',
+    // 2. בניית גוף הבקשה ל-API
+    const requestBody = {
+      api_key: TAVILY_API_KEY,
+      query: query,
+      search_depth: "advanced", // עומק מתקדם למציאת חומרים איכותיים
+      max_results: 8,
+      include_answer: false,
+      include_raw_content: false
+    };
+
+    // הזרקת סינון דומיינים איכותיים בלבד כדי למנוע תוצאות זבל
+    if (include_domains && include_domains.length > 0) {
+      requestBody.include_domains = include_domains;
+    }
+
+    const response = await fetch("https://api.tavily.com/search", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        subject: state.subject,
-        assignmentType: state.assignmentType,
-        topic: state.topic
-      })
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
-      throw new Error(`תגובת שרת לא תקינה: ${response.status}`);
+      const errorText = await response.text();
+      console.error("❌ Tavily Error:", response.status, errorText);
+      return [];
     }
 
-    const sources = await response.json();
-    console.log("✅ מקורות התקבלו מ-Tavily בהצלחה:", sources);
-    return sources;
+    const data = await response.json();
 
- } catch (error) {
-    console.error("Tavily Integration Error:", error);
-    res.status(500).json({ error: "Failed to compile background sources." });
+    console.log("✅ Tavily Response:", data);
+
+    return (data.results || []).map(result => ({
+      title: result.title || "מקור מידע",
+      url: result.url || "#",
+      content: result.content || ""
+    }));
+
+  } catch (error) {
+    console.error("❌ Network Error:", error);
+    return [];
   }
-
-
-
-========================================================================
-
-
-// החשפת הפונקציות בגרסה המעודכנת
-const logicManager = {
-  initProject,
-  validatePageCount,
-  validateDueDate,
-  analyzeActionability,
-  handleTaskValidation,
-  calculateBackwardTimeline,
-  createEditableTimelinePlan,
-  updateTimelineMilestone,
-  normalizeTimelineDate,
-  requestAIAngles,
-  analyzeDemandsAndCreateSubtasks,
-  syncStateToStorage,
-  loadStateFromStorage,
-  fetchTavilySources, // <-- הוסף שורה זו
-};
-
-
-
-
-=====================================================================
-
-async function handleUserCreationWorkflow(userRawText) {
-  // 1. נתח את הטקסט הראשוני של המשתמש בעזרת הלוגיקה של אלון ומאיר
-  const projectState = await logicManager.initProject(userRawText);
-  
-  if (!projectState) return; // עצור במקרה של שגיאת ולידציה
-
-  // 2. שמור את המצב הנוכחי ללוקאל סטורג' כרגיל
-  logicManager.syncStateToStorage(projectState);
-
-  // 3. שלוף אוטומטית מקורות מותאמים אישית מ-Tavily
-  const recommendedSources = await logicManager.fetchTavilySources(projectState);
-
-  // 4. הצג את המקורות על המסך
-  renderSourcesToUI(recommendedSources);
 }
 
-function renderSourcesToUI(sources) {
+export function generateOptimizedQuery(state, profile) {
+  const topic = state.topic || '';
+  const subject = state.subject || '';
+  const educationLevel = profile?.education_level || 'school';
+  const mainLanguage = profile?.main_language || 'he';
+
+  // בניית מחרוזת חיפוש נקייה מהצפת מילים מיותרות
+  let queryParts = [`"${topic}"`];
+  if (subject) queryParts.push(subject);
+  
+  const cleanQuery = queryParts.join(' ').trim().replace(/\s+/g, ' ');
+
+  // הגדרת רשימת דומיינים מבוקרים ואיכותיים למניעת מקורות לא רלוונטיים
+  let include_domains = [];
+
+  if (mainLanguage === 'he') {
+    if (educationLevel === 'college' || educationLevel === 'university') {
+      // דומיינים אקדמיים ישראליים מובילים לסטודנטים
+      include_domains = [
+        "he.wikipedia.org", "wikipedia.org", "tau.ac.il", "huji.ac.il", 
+        "technion.ac.il", "bgu.ac.il", "biu.ac.il", "haifa.ac.il", 
+        "openu.ac.il", "nli.org.il", "researchgate.net"
+      ];
+    } else {
+      // אתרי תוכן לימודי, מפוקח ומהימן לתלמידי בתי ספר ותיכון בישראל
+      include_domains = [
+        "he.wikipedia.org", "wikipedia.org", "cet.ac.il", "snunit.k12.il", 
+        "edu.gov.il", "nli.org.il", "yadvashem.org"
+      ];
+    }
+  } else {
+    // הגדרות ברירת מחדל למשתמשי אנגלית
+    if (educationLevel === 'college' || educationLevel === 'university') {
+      include_domains = ["wikipedia.org", "britannica.com", "ncbi.nlm.nih.gov", "researchgate.net", "jstor.org"];
+    } else {
+      include_domains = ["wikipedia.org", "britannica.com", "khanacademy.org", "history.com"];
+    }
+  }
+
+  // החזרת אובייקט מסודר עם השאילתה המנוקה והדומיינים הרלוונטיים
+  return {
+    query: cleanQuery,
+    include_domains: include_domains
+  };
+}
+
+export function renderSourcesToUI(sources) {
   const container = document.getElementById('sources-view');
-  if(!sources || sources.length === 0) {
-    container.innerHTML = "<p>לא נמצאו מקורות רלוונטיים בצורה אוטומטית.</p>";
+
+  if (!container) {
+    console.error("sources-view element not found");
     return;
   }
 
-  container.innerHTML = sources.map(src => `
-    <div class="source-item" style="border-right: 4px solid #3b82f6; padding: 10px; margin: 10px 0; background: #f8fafc;">
-      <h4><a href="${src.url}" target="_blank" style="color:#1d4ed8; text-decoration:none;">${src.title}</a></h4>
-      <p style="font-size:0.9em; color:#475569;">${src.content}</p>
-    </div>
-  `).join('');
+  if (!sources || sources.length === 0) {
+    container.innerHTML =
+      "<p style='color:#ef4444;'>לא נמצאו מקורות רלוונטיים.</p>";
+    return;
+  }
+
+  container.innerHTML = '';
+
+  sources.forEach(src => {
+    const item = document.createElement('div');
+    item.className = 'source-item';
+    Object.assign(item.style, {
+      borderRight: '4px solid #3b82f6',
+      padding: '10px',
+      margin: '10px 0',
+      background: 'rgba(255,255,255,0.02)',
+      borderRadius: '4px 8px 8px 4px'
+    });
+
+    const h4 = document.createElement('h4');
+    h4.style.margin = '0 0 5px 0';
+
+    const link = document.createElement('a');
+    link.href = src.url || '#';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.style.color = '#60a5fa';
+    link.style.textDecoration = 'none';
+    link.style.fontWeight = 'bold';
+    link.textContent = src.title || 'מקור מידע';
+
+    h4.appendChild(link);
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.textContent = 'הצג תקציר';
+    Object.assign(toggleBtn.style, {
+      marginLeft: '10px',
+      padding: '6px 8px',
+      fontSize: '0.85em',
+      cursor: 'pointer',
+      borderRadius: '6px',
+      border: '1px solid rgba(148,163,184,0.12)',
+      background: 'rgba(255,255,255,0.02)',
+      color: '#cbd5e1'
+    });
+
+    h4.appendChild(toggleBtn);
+
+    const abstract = document.createElement('p');
+    abstract.style.fontSize = '0.9em';
+    abstract.style.color = '#cbd5e1';
+    abstract.style.margin = '8px 0 0 0';
+    abstract.style.lineHeight = '1.4';
+    abstract.style.display = 'none';
+    abstract.textContent = src.content ? src.content : '';
+
+    toggleBtn.addEventListener('click', () => {
+      const isHidden = abstract.style.display === 'none';
+      abstract.style.display = isHidden ? 'block' : 'none';
+      toggleBtn.textContent = isHidden ? 'הסתר תקציר' : 'הצג תקציר';
+      toggleBtn.setAttribute('aria-expanded', String(isHidden));
+    });
+
+    item.appendChild(h4);
+    item.appendChild(abstract);
+
+    container.appendChild(item);
+  });
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }

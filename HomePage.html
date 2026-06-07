@@ -6,19 +6,16 @@
 <title>דף עבודה | למידה חכמה</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-/* ===== PAGE LAYOUT ===== */
+/* ===== PAGE LAYOUT — default: input full-screen ===== */
 .work-page {
   max-width: 1200px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  display: block;
   padding-bottom: 40px;
-  align-items: start;
 }
 
-/* Each column = one unified surface */
-.work-col {
+/* Shared card surface */
+#input-col, #checklist-col {
   background: var(--bg-card);
   border: 1px solid rgba(148, 252, 196, 0.18);
   border-radius: 22px;
@@ -27,12 +24,87 @@
   box-shadow: 0 6px 32px rgba(7,11,22,0.22);
   display: flex;
   flex-direction: column;
-  gap: 28px;        /* flex gap — hidden cards don't create a gap */
+  gap: 28px;
 }
 
-/* Strip all individual card box styling inside columns */
-.work-col .card,
-.work-col .card-accent {
+/* Checklist hidden until tasks are ready */
+#checklist-col {
+  display: none;
+}
+
+/* ===== TASKS-READY: checklist full-screen, input becomes drawer ===== */
+.work-page.tasks-ready #checklist-col {
+  display: flex;
+}
+
+.work-page.tasks-ready #input-col {
+  position: fixed;
+  top: 0;
+  right: -440px;
+  width: 420px;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 300;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-right: none;
+  border-radius: 22px 0 0 22px;
+  padding: 28px 24px;
+  box-shadow: -8px 0 48px rgba(7,11,22,0.55);
+  gap: 24px;
+}
+
+.work-page.tasks-ready #input-col.drawer-open {
+  right: 0;
+}
+
+/* Drawer tab — hidden until tasks-ready activates it via JS */
+.drawer-tab {
+  display: none;
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 299;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  background: rgba(20, 40, 80, 0.92);
+  border: 1px solid rgba(148, 252, 196, 0.28);
+  border-right: none;
+  border-radius: 10px 0 0 10px;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 18px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(6px);
+}
+
+.drawer-tab:hover {
+  background: rgba(37, 99, 235, 0.45);
+  color: var(--text-bright);
+}
+
+/* Overlay behind the drawer */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 298;
+  display: none;
+  backdrop-filter: blur(2px);
+}
+
+.drawer-overlay.visible {
+  display: block;
+}
+
+/* Strip card box-styling inside both columns */
+#checklist-col .card,
+#checklist-col .card-accent,
+#input-col .card,
+#input-col .card-accent {
   background: transparent;
   border: none;
   border-radius: 0;
@@ -40,13 +112,12 @@
   box-shadow: none;
 }
 
-.work-col .card:hover { border: none; }
+#checklist-col .card:hover,
+#input-col .card:hover { border: none; }
 
 @media (max-width: 900px) {
-  .work-page {
-    grid-template-columns: 1fr;
-    max-width: 680px;
-  }
+  .work-page { grid-template-columns: 1fr; max-width: 100%; padding: 0 12px 40px; }
+  .work-page.tasks-ready #input-col { width: 90vw; right: -92vw; }
 }
 
 /* ===== FALLBACK CARD (used outside work-col if any) ===== */
@@ -413,6 +484,31 @@ input:focus {
 }
 @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(8px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
 
+/* ===== REBUILD DIALOG ===== */
+.rebuild-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 500; display: none; backdrop-filter: blur(3px);
+}
+.rebuild-overlay.visible { display: block; }
+.rebuild-dialog {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  z-index: 501; display: none; flex-direction: column; gap: 14px;
+  background: var(--bg-card); border: 1px solid rgba(148,252,196,0.28);
+  border-radius: 18px; padding: 28px; width: min(480px, 90vw);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+  transition: transform 0.2s ease;
+}
+.rebuild-dialog.visible {
+  display: flex; transform: translate(-50%, -50%) scale(1);
+}
+.rebuild-dialog textarea {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(148,163,184,0.25);
+  border-radius: 10px; color: var(--text-bright); padding: 10px 12px;
+  font-family: inherit; font-size: 0.9rem; width: 100%; box-sizing: border-box;
+}
+.rebuild-dialog textarea:focus { outline: none; border-color: rgba(148,252,196,0.5); }
+
 /* ===== STUCK COACH ===== */
 .stuck-fab {
   position: fixed; bottom: 24px; left: 24px; z-index: 999;
@@ -493,13 +589,30 @@ input:focus {
       <a href="profile.html">פרופיל</a>
       <a href="about.html">אודות</a>
     </nav>
-    <button class="cta-button" onclick="window.location.href='index.html'">דף הבית</button>
+    <button class="cta-button" id="welcomeBtn" onclick="window.location.href='index.html'">דף הבית</button>
   </header>
+  <script>
+    (function(){
+      const p = JSON.parse(localStorage.getItem('userProfile') || '{}');
+      const name = p.username || p.fullName;
+      if (name) {
+        const btn = document.getElementById('welcomeBtn');
+        btn.textContent = 'ברוך הבא: ' + name;
+        btn.onclick = function(){ window.location.href = 'profile.html'; };
+      }
+    })();
+  </script>
 
-  <div class="work-page">
+  <!-- Drawer overlay -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleInputDrawer()"></div>
 
-    <!-- ═══ עמודה שמאל: קלט ✦ סיכום ✦ משימות ═══ -->
-    <div class="work-col">
+  <!-- Side tab to open the input drawer -->
+  <button class="drawer-tab" id="drawerTab" onclick="toggleInputDrawer()">✏️ פרטי משימה</button>
+
+  <div class="work-page" id="work-page">
+
+    <!-- ═══ עמודה שמאל: קלט ✦ סיכום ✦ משימות (drawer) ═══ -->
+    <div id="input-col" class="work-col">
 
       <!-- Toggle button — shows when card is collapsed -->
       <button class="input-toggle-btn" id="inputToggleBtn" onclick="toggleInputCard()" style="display:none">
@@ -540,26 +653,40 @@ input:focus {
         <div id="summary-content"></div>
       </div>
 
-    </div><!-- /work-col left -->
+    </div><!-- /input-col drawer -->
 
-    <!-- ═══ עמודה ימין: לוח זמנים ✦ רשימת משימות ═══ -->
-    <div class="work-col">
+    <!-- ═══ עמודה ראשית: לוח זמנים ✦ רשימת משימות ═══ -->
+    <div id="checklist-col" class="work-col">
 
       <!-- Unified task + timeline + checklist -->
       <div id="checklist-card" class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(148,163,184,0.12)">
           <span class="section-title" style="margin:0;padding:0;border:none">משימות ולוח זמנים</span>
-          <button class="btn btn-outline btn-sm" onclick="rebuildTimeline()" style="margin-top:0">↺ בנה מחדש</button>
+          <button class="btn btn-outline btn-sm" onclick="openRebuildDialog()" style="margin-top:0">↺ בנה מחדש</button>
         </div>
         <div id="hierarchicalChecklist">
           <div class="timeline-empty">הזן דרישות עבודה ולחץ "נתח וצור משימות".</div>
         </div>
       </div>
 
-    </div><!-- /work-col right -->
+    </div><!-- /checklist-col -->
 
   </div><!-- /work-page -->
 </div><!-- /page -->
+
+<!-- Rebuild dialog -->
+<div class="rebuild-overlay" id="rebuildOverlay" onclick="closeRebuildDialog()"></div>
+<div class="rebuild-dialog" id="rebuildDialog" dir="rtl">
+  <h3 style="margin:0;font-size:1.05rem;color:var(--text-bright)">↺ בנה מחדש עם AI</h3>
+  <p style="margin:0;font-size:0.88rem;color:var(--text-muted)">מה לא היה טוב בתוצאה הקודמת?</p>
+  <textarea id="rebuildFeedback" rows="4"
+    placeholder="לדוגמה: המשימות היו כלליות מדי, צריך יותר פירוט על שלב המחקר, חסר שלב של עריכה..."
+    style="resize:vertical;min-height:90px"></textarea>
+  <div style="display:flex;gap:10px;justify-content:flex-end">
+    <button class="btn btn-outline btn-sm" onclick="closeRebuildDialog()">ביטול</button>
+    <button class="btn btn-sm" id="rebuildConfirmBtn" onclick="confirmRebuild()">↺ בנה מחדש</button>
+  </div>
+</div>
 
 <!-- "I'm Stuck" FAB -->
 <button class="stuck-fab" onclick="openStuck()">נתקעתי 🤔</button>
@@ -603,13 +730,80 @@ const MILESTONES = [
 let currentTimeline = [];
 let subtasks = [];
 
+function activateTasksLayout() {
+  document.getElementById('work-page').classList.add('tasks-ready');
+  document.getElementById('drawerTab').style.display = 'block';
+}
+
+function openRebuildDialog() {
+  document.getElementById('rebuildFeedback').value = '';
+  document.getElementById('rebuildOverlay').classList.add('visible');
+  document.getElementById('rebuildDialog').classList.add('visible');
+  setTimeout(() => document.getElementById('rebuildFeedback').focus(), 50);
+}
+
+function closeRebuildDialog() {
+  document.getElementById('rebuildOverlay').classList.remove('visible');
+  document.getElementById('rebuildDialog').classList.remove('visible');
+}
+
+async function confirmRebuild() {
+  const feedback = document.getElementById('rebuildFeedback').value.trim();
+  closeRebuildDialog();
+
+  const demandsText = document.getElementById('demands-input').value.trim();
+  if (!demandsText) {
+    alert('פתח את פרטי המשימה והכנס דרישות עבודה לפני הבנייה מחדש.');
+    return;
+  }
+
+  const btn = document.getElementById('rebuildConfirmBtn');
+  btn.disabled = true;
+
+  document.getElementById('hierarchicalChecklist').innerHTML = `
+    <div style="text-align:center;padding:32px 0;color:#6b7280">
+      <div style="font-size:28px;margin-bottom:10px;animation:spin 1s linear infinite;display:inline-block">⚙️</div>
+      <div style="font-size:15px;font-weight:600">ה-AI בונה מחדש לפי הערותיך...</div>
+    </div>`;
+
+  const context = {
+    subject:  document.getElementById('subject').value.trim(),
+    topic:    document.getElementById('topic').value.trim(),
+    pages:    document.getElementById('pages').value.trim(),
+    dueDate:  document.getElementById('date').value,
+    feedback,
+  };
+
+  try {
+    const result = await window.logicManager.analyzeDemandsAndCreateSubtasks(demandsText, context);
+    if (result && result.length > 0) {
+      subtasks = result;
+      rebuildTimeline();
+    } else {
+      document.getElementById('hierarchicalChecklist').innerHTML =
+        `<div style="text-align:center;padding:24px;color:#ef4444">לא הצלחנו לבנות מחדש. נסה שוב.</div>`;
+    }
+  } catch (e) {
+    console.error('שגיאה בבנייה מחדש:', e);
+    document.getElementById('hierarchicalChecklist').innerHTML =
+      `<div style="text-align:center;padding:24px;color:#ef4444">אירעה שגיאה. בדוק חיבור לאינטרנט ונסה שוב.</div>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function toggleInputDrawer() {
+  const col     = document.getElementById('input-col');
+  const overlay = document.getElementById('drawerOverlay');
+  const tab     = document.getElementById('drawerTab');
+  const isOpen  = col.classList.toggle('drawer-open');
+  overlay.classList.toggle('visible', isOpen);
+  tab.style.display = isOpen ? 'none' : 'block';
+}
+
 function toggleInputCard() {
-  const body   = document.getElementById('inputCardBody');
-  const arrow  = document.getElementById('inputCollapseArrow');
-  const miniBtn = document.getElementById('inputToggleBtn');
-  const isCollapsed = body.classList.toggle('collapsed');
-  arrow.textContent  = isCollapsed ? '▼ פתח' : '▲ סגור';
-  miniBtn.style.display = isCollapsed ? 'flex' : 'none';
+  const col = document.getElementById('input-col');
+  if (col.classList.contains('drawer-open')) toggleInputDrawer();
 }
 
 function setLoading(labelId, spinnerId, btnId, on) {
@@ -656,9 +850,8 @@ async function handleAnalyzeDemands() {
     return;
   }
 
-  // Show checklist card immediately with a loading skeleton
-  const checklistCard = document.getElementById('checklist-card');
-  checklistCard.classList.remove('hidden');
+  // Switch to tasks layout immediately — checklist expands, input becomes drawer
+  activateTasksLayout();
   document.getElementById('hierarchicalChecklist').innerHTML = `
     <div style="text-align:center;padding:32px 0;color:#6b7280">
       <div style="font-size:28px;margin-bottom:10px;animation:spin 1s linear infinite;display:inline-block">⚙️</div>
@@ -674,9 +867,6 @@ async function handleAnalyzeDemands() {
         `<div style="text-align:center;padding:24px;color:#ef4444">לא הצלחנו לנתח את הדרישות. נסה לנסח אותן בצורה ברורה יותר.</div>`;
     } else {
       rebuildTimeline(); // computes dates then calls buildChecklist
-      // Auto-collapse the input card now that tasks are generated
-      const body = document.getElementById('inputCardBody');
-      if (!body.classList.contains('collapsed')) toggleInputCard();
     }
   } catch (e) {
     console.error('שגיאה בניתוח דרישות:', e);
@@ -688,7 +878,9 @@ async function handleAnalyzeDemands() {
 }
 
 function renderSubtasks() {
-  document.getElementById('subtasks-list').innerHTML = subtasks.map((st, i) => `
+  const list = document.getElementById('subtasks-list');
+  if (!list) return;
+  list.innerHTML = subtasks.map((st, i) => `
     <div class="subtask-item">
       <button class="subtask-delete" onclick="deleteSubtask(${i})" title="מחק משימה">×</button>
       <input type="text" value="${escapeAttr(st.title)}" placeholder="שם המשימה"
@@ -716,7 +908,8 @@ function deleteSubtask(i) {
 function addSubtask() {
   subtasks.push({ id: `task-${Date.now()}`, title: '', description: '' });
   renderSubtasks();
-  document.getElementById('subtasks-card').classList.remove('hidden');
+  const card = document.getElementById('subtasks-card');
+  if (card) card.classList.remove('hidden');
   rebuildTimeline();
 }
 
@@ -1005,7 +1198,9 @@ window.addEventListener('supabase:ready', async () => {
     if (state.timeline) currentTimeline = state.timeline;
     localStorage.setItem('decompose_app_state', JSON.stringify(state));
     renderSubtasks();
-    document.getElementById('subtasks-card').classList.remove('hidden');
+    const subtasksCard = document.getElementById('subtasks-card');
+    if (subtasksCard) subtasksCard.classList.remove('hidden');
+    activateTasksLayout();
     rebuildTimeline();
     buildChecklist();
     showSaveToast('☁️ הפרויקט הקודם שלך נטען מהענן');

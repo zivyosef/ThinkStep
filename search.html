@@ -238,12 +238,24 @@
             <nav>
                 <a href="index.html">דף הבית</a>
                 <a href="HomePage.html">דף עבודה</a>
+                <a href="writing.html">כתיבה</a>
                 <a href="search.html" class="active">חיפוש</a>
                 <a href="profile.html">פרופיל</a>
                 <a href="about.html">אודות</a>
             </nav>
-            <button class="cta-button" onclick="window.location.href='index.html'">דף הבית</button>
+            <button class="cta-button" id="welcomeBtn" onclick="window.location.href='index.html'">דף הבית</button>
         </header>
+        <script>
+          (function(){
+            const p = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            const name = p.username || p.fullName;
+            if (name) {
+              const btn = document.getElementById('welcomeBtn');
+              btn.textContent = 'ברוך הבא: ' + name;
+              btn.onclick = function(){ window.location.href = 'profile.html'; };
+            }
+          })();
+        </script>
 
         <div class="search-container">
 
@@ -278,9 +290,9 @@
                             <span class="quick-icon">📋</span>
                             <span class="quick-label">דף עבודה</span>
                         </a>
-                        <a href="RecuresiveDecomposition.html" class="quick-card">
-                            <span class="quick-icon">📊</span>
-                            <span class="quick-label">התקדמות</span>
+                        <a href="writing.html" class="quick-card">
+                            <span class="quick-icon">✍️</span>
+                            <span class="quick-label">כתיבה</span>
                         </a>
                         <a href="profile.html" class="quick-card">
                             <span class="quick-icon">👤</span>
@@ -304,10 +316,10 @@
             { type: 'task',     title: 'צור משימה חדשה',          desc: 'פתח את דף העבודה ובנה משימה עם AI',           url: 'HomePage.html' },
             { type: 'task',     title: 'ניתוח דרישות עבודה',       desc: 'הדבק הנחיות מורה וקבל משימות מפורקות',        url: 'HomePage.html' },
             { type: 'task',     title: 'לוח זמנים אוטומטי',        desc: 'בנה תוכנית לימוד לפי תאריך ההגשה',            url: 'HomePage.html' },
-            { type: 'progress', title: 'מטרות שבועיות',            desc: 'הגדר ועקוב אחר יעדי השבוע שלך',               url: 'RecuresiveDecomposition.html' },
-            { type: 'progress', title: 'גרף פעילות',               desc: 'ראה את ההתקדמות שלך לאורך השבוע',             url: 'RecuresiveDecomposition.html' },
-            { type: 'progress', title: 'לוח זמנים של פרויקט',      desc: 'ראה את אבני הדרך של הפרויקט הנוכחי',          url: 'RecuresiveDecomposition.html' },
-            { type: 'tip',      title: 'טכניקת Pomodoro',          desc: 'עבוד 25 דקות, קח הפסקה של 5 דקות',            url: 'RecuresiveDecomposition.html' },
+            { type: 'progress', title: 'מטרות שבועיות',            desc: 'הגדר ועקוב אחר יעדי השבוע שלך',               url: 'profile.html' },
+            { type: 'progress', title: 'גרף פעילות',               desc: 'ראה את ההתקדמות שלך לאורך השבוע',             url: 'profile.html' },
+            { type: 'progress', title: 'לוח זמנים של פרויקט',      desc: 'ראה את אבני הדרך של הפרויקט הנוכחי',          url: 'profile.html' },
+            { type: 'tip',      title: 'טכניקת Pomodoro',          desc: 'עבוד 25 דקות, קח הפסקה של 5 דקות',            url: 'profile.html' },
             { type: 'tip',      title: 'פירוק משימות גדולות',       desc: 'חלק כל עבודה לצעדים קטנים וברי ביצוע',       url: 'HomePage.html' },
             { type: 'tip',      title: 'סדרי עדיפויות',            desc: 'התמקד במשימות החשובות ביותר תחילה',            url: 'HomePage.html' },
         ];

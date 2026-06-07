@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>טסט שליפת מקורות מידע | Tavily Test</title>
+  <style>
+    /* עיצוב נקי המותאם ל-Dark Mode של האפליקציה שלך */
+    body {
+      background-color: #0b1329;
+      color: #f8fafc;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      padding: 30px;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .test-container {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* כרטיס הזנת נתונים (תואם ל-card-accent) */
+    .card-accent {
+      background: rgba(20, 30, 55, 0.85);
+      border: 1px solid rgba(37, 99, 235, 0.35);
+      border-radius: 16px;
+      padding: 1.35rem;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.12);
+    }
+
+    /* כרטיס תצוגת תוצאות (תואם ל-card) */
+    .card {
+      background: #1c2541;
+      border: 1px solid #3a506b;
+      border-radius: 16px;
+      padding: 1.35rem;
+      box-shadow: 0 4px 16px rgba(7,11,22,0.18);
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #94a3b8;
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid rgba(148,163,184,0.2);
+      border-radius: 9px;
+      padding: 9px 12px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      box-sizing: border-box;
+      transition: all 0.2s;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      background: rgba(37,99,235,0.08);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 11px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 8px;
+      transition: all 0.25s;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(37,99,235,0.35);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* עיצוב פנימי עבור רשימת המקורות שיוחזרו מתוך sources.js */
+    #sources-view p {
+      margin: 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="test-container">
+
+  <div class="card-accent">
+    <div class="section-title">🧪 סימולטור בדיקת Tavily Sources</div>
+    
+    <div style="margin-bottom: 12px;">
+      <label for="topic">מילות מפתח לנושא (*חובה לבדיקה)</label>
+      <input type="text" id="topic" placeholder="הכנס את מילות המפתח לחיפוש">
+    </div>
+
+    <button class="btn" id="test-btn">
+      <span id="btn-label">הפעל בדיקת שליפת מקורות</span>
+    </button>
+  </div>
+
+  <div id="sources-card" class="card hidden">
+    <div class="section-title">📚 תוצאות הטסט: מקורות אקדמיים שהתקבלו</div>
+    <div id="sources-view">
+      </div>
+  </div>
+
+</div>
+
+<!-- The Tavily API key is loaded only on the local proxy server from .env, not in the frontend. -->
+<script type="module">
+  // ייבוא מודולרי ישיר מהקובץ הנפרד שלך
+  import { fetchTavilySources, renderSourcesToUI } from './Sources.js';
+
+  async function loadUserProfile() {
+    try {
+      const { getCurrentUser, getProfile } = await import('./supabase.js');
+      const user = await getCurrentUser();
+      if (!user) return null;
+      return await getProfile(user.id);
+    } catch (err) {
+      console.warn('Supabase profile lookup failed:', err);
+      return null;
+    }
+  }
+
+  document.getElementById('test-btn').addEventListener('click', async () => {
+    const topicVal = document.getElementById('topic').value.trim();
+    
+    if (!topicVal) {
+      alert("נא להזין לפחות מילת מפתח אחת כדי ש-Tavily יוכל לבצע חיפוש.");
+      return;
+    }
+
+    const btnLabel = document.getElementById('btn-label');
+    const sourcesCard = document.getElementById('sources-card');
+    const sourcesView = document.getElementById('sources-view');
+
+    // הצגת מצב טעינה זמני ב-UI
+    btnLabel.textContent = "שולח בקשה ל-Tavily API...";
+    sourcesCard.classList.remove('hidden');
+    sourcesView.innerHTML = "<p style='color: #cbd5e1;'>🔍 פונה כעת ישירות ל-Tavily ומבצע הנדסת שאילתה דינמית, אנא המתן...</p>";
+
+    // בניית אובייקט Context מדוממה (Mock) לצורך הבדיקה
+    const mockState = {
+      topic: topicVal
+    };
+
+    try {
+      const profile = await loadUserProfile();
+      // 1. הפעלת ה-Fetch ישירות מהרכיב המבודד שלך
+      const results = await fetchTavilySources(mockState, profile);
+      
+      if (!results || results.length === 0) {
+        sourcesView.innerHTML = "<p style='color: #ef4444;'>❌ לא נמצאו מקורות. וודא שהמפתח של Tavily תקין ושהפרוקסי המקומי רץ על פורט 3000.</p>";
+      } else {
+        // 2. רינדור התוצאות לתוך ה-DOM באמצעות פונקציית ה-UI של sources.js
+        renderSourcesToUI(results);
+      }
+      
+    } catch (error) {
+      console.error("שגיאה במהלך ריצת הטסט המבודד:", error);
+      sourcesView.innerHTML = "<p style='color: #ef4444;'>❌ הטסט נכשל. בדוק את ה-Console בדפדפן כדי לראות את השגיאה המלאה.</p>";
+    } finally {
+      btnLabel.textContent = "הפעל בדיקת שליפת מקורות";
+    }
+  });
+</script>
+
+</body>
+</html>
