@@ -640,7 +640,7 @@ input:focus {
 
           <label>דרישות העבודה</label>
           <textarea id="demands-input" rows="4" placeholder="הדבק כאן את הנחיות המורה / דרישות המטלה..."></textarea>
-          <button class="btn" id="analyze-btn" onclick="handleAnalyzeDemands()">
+          <button class="btn" id="analyze-btn" onclick="handleAnalyzeDemands()" disabled>
             <span id="analyze-spinner" class="spinner hidden"></span>
             <span id="analyze-label">נתח וצור משימות</span>
           </button>
@@ -714,6 +714,11 @@ input:focus {
 <script type="module" src="./supabase.js"></script>
 <script type="module" src="./aiService.js"></script>
 <script type="module" src="./logicManager.js"></script>
+<!-- Enable analyze button only after all modules are ready -->
+<script type="module">
+  await import('./logicManager.js');
+  document.getElementById('analyze-btn').disabled = false;
+</script>
 
 <script>
 /* All page logic in a plain script — functions must be global for onclick handlers */
@@ -845,7 +850,6 @@ async function handleAnalyzeDemands() {
   };
 
   if (!window.logicManager || typeof window.logicManager.analyzeDemandsAndCreateSubtasks !== 'function') {
-    alert('המערכת עדיין נטענת, נסה שוב בעוד שנייה...');
     setLoading('analyze-label', 'analyze-spinner', 'analyze-btn', false);
     return;
   }
@@ -1281,7 +1285,7 @@ window.sendStuck = async function() {
         'Content-Type':  'application/json',
         'Authorization': `Bearer ${window.OPENROUTER_API_KEY}`,
       },
-      body: JSON.stringify({ model: 'google/gemini-2.0-flash-001', messages })
+      body: JSON.stringify({ model: window.OPENROUTER_MODEL || 'google/gemini-flash-1.5', messages })
     });
     const json  = await resp.json();
     const reply = json.choices?.[0]?.message?.content || 'מצטער, לא הצלחתי להגיב.';

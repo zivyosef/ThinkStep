@@ -512,7 +512,7 @@ async function checkAndSendDailyReminder(accessToken, currentChunk) {
   if (success) {
     localStorage.setItem(CALENDAR_LAST_SENT_KEY, now.toISOString());
   }
-}ס
+}
 // ============================================================
 //  פונקציה 7: syncStateToStorage
 // ============================================================
