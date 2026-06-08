@@ -23,28 +23,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # הגדרת סביבת Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      # התקנת כל הספריות (כולל Vite, Supabase וכו')
       - name: Install dependencies
         run: npm install
 
-      # תהליך הקימפול (Build) תוך כדי הזרקת הסודות לסביבה
       - name: Build project
         run: npm run build
         env:
           VITE_OPENROUTER_API_KEY: ${{ secrets.VITE_OPENROUTER_API_KEY }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          # אפשר להוסיף כאן גם את המפתח של Gemini או Tavily במידת הצורך
+
+      # --- השלב המתוקן: ממוקם כאן ומייצר את הקובץ לתוך תיקיית dist ---
+      - name: Generate config.js with API Keys
+        run: |
+          echo "window.OPENROUTER_API_KEY = '${{ secrets.VITE_OPENROUTER_API_KEY }}';" > dist/config.js
+          echo "window.SUPABASE_URL = '${{ secrets.VITE_SUPABASE_URL }}';" >> dist/config.js
+          echo "window.SUPABASE_ANON_KEY = '${{ secrets.VITE_SUPABASE_ANON_KEY }}';" >> dist/config.js
 
       - uses: actions/configure-pages@v5
 
-      # העלאת התוצר המקומפל בלבד
       - uses: actions/upload-pages-artifact@v3
         with:
           path: './dist' 
