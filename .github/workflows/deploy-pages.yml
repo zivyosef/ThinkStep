@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy ThinkStep to GitHub Pages
 
 on:
   push:
@@ -23,17 +23,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Inject API keys into config.js
-        run: |
-          cat > legacy/config.js << 'EOF'
-          window.OPENROUTER_API_KEY = "${{ secrets.VITE_OPENROUTER_API_KEY }}";
-          EOF
+      # הגדרת סביבת Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # התקנת כל הספריות (כולל Vite, Supabase וכו')
+      - name: Install dependencies
+        run: npm install
+
+      # תהליך הקימפול (Build) תוך כדי הזרקת הסודות לסביבה
+      - name: Build project
+        run: npm run build
+        env:
+          VITE_OPENROUTER_API_KEY: ${{ secrets.VITE_OPENROUTER_API_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          # אפשר להוסיף כאן גם את המפתח של Gemini או Tavily במידת הצורך
 
       - uses: actions/configure-pages@v5
 
+      # העלאת התוצר המקומפל בלבד
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: './dist' 
 
       - uses: actions/deploy-pages@v4
         id: deployment
