@@ -1267,7 +1267,7 @@ function addStuckMsg(role, text) {
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
 }
-/*window.sendStuck = async function() {
+window.sendStuck = async function() {
   const input = document.getElementById('stuckInput');
   const btn   = document.getElementById('stuckSendBtn');
   const text  = input.value.trim();
@@ -1332,39 +1332,8 @@ function addStuckMsg(role, text) {
     btn.disabled = false;
     input.focus();
   }
-};*/
-window.sendStuck = async function() {
-  const input = document.getElementById('stuckInput');
-  const btn   = document.getElementById('stuckSendBtn');
-  const text  = input.value.trim();
-  if (!text || btn.disabled) return;
-
-  addStuckMsg('user', text);
-  input.value = '';
-  btn.disabled = true;
-
-  const typing = document.createElement('div');
-  typing.className = 'stuck-msg assistant stuck-typing';
-  typing.textContent = 'חושב...';
-  document.getElementById('stuckMessages').appendChild(typing);
-  document.getElementById('stuckMessages').scrollTop = 99999;
-
-  try {
-    // השתמשות בשירות המרכזי של aiService שכבר מיובא למעלה
-    // קריאה לפונקציה SOCRATIC_CHAT או יצירת פונקציה חדשה במיוחד לזה ב-aiService.
-    const reply = await window.aiService.sendQuery("SOCRATIC_CHAT", text, null);
-    
-    typing.remove();
-    addStuckMsg('assistant', reply || 'לא הצלחתי להבין, תוכל לנסח שוב?');
-  } catch(err) {
-    typing.remove();
-    addStuckMsg('assistant', 'לא הצלחתי להתחבר ל-AI. נסה שוב.');
-    console.error('[StuckCoach]', err);
-  } finally {
-    btn.disabled = false;
-    input.focus();
-  }
 };
+
 </script>
 
 </body>

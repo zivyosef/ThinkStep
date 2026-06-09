@@ -1,0 +1,11 @@
+[build]
+  command = "node scripts/generate-config.js"
+  publish = "legacy"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from   = "/api/tavily-sources"
+  to     = "/.netlify/functions/tavily-sources"
+  status = 200

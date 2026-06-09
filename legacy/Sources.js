@@ -1,10 +1,8 @@
 /**
  * ============================================================
- * sources.js — Tavily Direct API (ללא שרת) - גרסה מתוקנת ומאובטחת
+ * sources.js — Tavily via server proxy
  * ============================================================
  */
-
-const TAVILY_API_KEY = "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"
 
 export async function fetchTavilySources(state, profile = null) {
   if (!state || !state.topic) {
@@ -12,33 +10,19 @@ export async function fetchTavilySources(state, profile = null) {
     return [];
   }
 
-  // 1. הפקת שאילתה ממוקדת ורשימת דומיינים מותרים
-  const { query, include_domains } = generateOptimizedQuery(state, profile);
-
-  console.log(`🔍 Searching Tavily for query: "${query}"`);
+  console.log(`🔍 Searching Tavily for topic: "${state.topic}"`);
 
   try {
-    // 2. בניית גוף הבקשה ל-API
-    const requestBody = {
-      api_key: TAVILY_API_KEY,
-      query: query,
-      search_depth: "advanced", // עומק מתקדם למציאת חומרים איכותיים
-      max_results: 8,
-      include_answer: false,
-      include_raw_content: false
-    };
-
-    // הזרקת סינון דומיינים איכותיים בלבד כדי למנוע תוצאות זבל
-    if (include_domains && include_domains.length > 0) {
-      requestBody.include_domains = include_domains;
-    }
-
-    const response = await fetch("https://api.tavily.com/search", {
+    const response = await fetch("/api/tavily-sources", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        topic: state.topic,
+        subject: state.subject || '',
+        assignmentType: state.assignmentType || ''
+      })
     });
 
     if (!response.ok) {
@@ -51,7 +35,7 @@ export async function fetchTavilySources(state, profile = null) {
 
     console.log("✅ Tavily Response:", data);
 
-    return (data.results || []).map(result => ({
+    return (Array.isArray(data) ? data : data.results || []).map(result => ({
       title: result.title || "מקור מידע",
       url: result.url || "#",
       content: result.content || ""
