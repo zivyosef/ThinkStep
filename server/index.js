@@ -14,8 +14,17 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors({ origin: ['http://localhost:5173', process.env.CLIENT_URL].filter(Boolean) }));
+app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:3001', process.env.CLIENT_URL].filter(Boolean) }));
 app.use(express.json());
+
+// Serve env vars to legacy HTML pages
+app.get('/config.js', (req, res) => {
+  res.type('application/javascript');
+  res.send(`window.OPENROUTER_API_KEY = "${process.env.VITE_OPENROUTER_API_KEY}";`);
+});
+
+// Serve legacy HTML pages as static files
+app.use(express.static(path.resolve(__dirname, '../legacy')));
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));
 

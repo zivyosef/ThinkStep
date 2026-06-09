@@ -10,11 +10,10 @@ const AI_HISTORY_KEY = "my_ai_app_history";
 const MAX_HISTORY = 10;
 
 // ── OpenRouter setup (active) ─────────────────────────────────
-const _openRouterKey = window.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL = "openai/gpt-4o-mini";
 const OPENROUTER_URL   = "https://openrouter.ai/api/v1/chat/completions";
 window.OPENROUTER_MODEL = OPENROUTER_MODEL;
-console.log('🟠 [aiService] OpenRouter key loaded?', _openRouterKey ? `yes (${_openRouterKey.slice(0,12)}...)` : '❌ key not found!');
+console.log('🟠 [aiService] OpenRouter key loaded?', window.OPENROUTER_API_KEY ? `yes (${window.OPENROUTER_API_KEY.slice(0,12)}...)` : '❌ key not found!');
 
 // ── Gemini setup (commented out — restore if switching back) ──
 // const _apiKey = window.GEMINI_API_KEY || import.meta.env?.VITE_GEMINI_API_KEY;
@@ -37,7 +36,7 @@ async function openRouterRequest(prompt, systemInstruction = null) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${_openRouterKey}`,
+      "Authorization": `Bearer ${window.OPENROUTER_API_KEY}`,
     },
     body: JSON.stringify({ model: OPENROUTER_MODEL, messages }),
   });
