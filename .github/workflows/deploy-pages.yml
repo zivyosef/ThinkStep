@@ -23,17 +23,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate config.js with API Keys
-        run: |
-          echo "window.OPENROUTER_API_KEY = '${{ secrets.VITE_OPENROUTER_API_KEY }}';" > legacy/config.js
-          echo "window.SUPABASE_URL = '${{ secrets.VITE_SUPABASE_URL }}';" >> legacy/config.js
-          echo "window.SUPABASE_ANON_KEY = '${{ secrets.VITE_SUPABASE_ANON_KEY }}';" >> legacy/config.js
+      # 1. התקנת התלויות של הפרויקט
+      - name: Install dependencies
+        run: npm install
+
+      # 2. בניית הפרויקט והזרקת הסודות (מחליף את יצירת config.js)
+      - name: Build with Vite
+        env:
+          VITE_OPENROUTER_API_KEY: ${{ secrets.VITE_OPENROUTER_API_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
 
       - uses: actions/configure-pages@v5
 
+      # 3. העלאת תיקיית dist שנוצרה מהבנייה של Vite במקום legacy
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: './legacy'
+          path: './dist'
 
       - uses: actions/deploy-pages@v4
         id: deployment
