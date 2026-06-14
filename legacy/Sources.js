@@ -1,10 +1,8 @@
 /**
  * ============================================================
- * sources.js — Tavily Direct API (ללא שרת) - גרסה מתוקנת ומאובטחת
+ * sources.js — Tavily via server proxy
  * ============================================================
  */
-
-const TAVILY_API_KEY = "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"
 
 export async function fetchTavilySources(state, profile = null) {
   if (!state || !state.topic) {
@@ -12,33 +10,19 @@ export async function fetchTavilySources(state, profile = null) {
     return [];
   }
 
-  // 1. הפקת שאילתה ממוקדת ורשימת דומיינים מותרים
-  const { query, include_domains } = generateOptimizedQuery(state, profile);
-
-  console.log(`🔍 Searching Tavily for query: "${query}"`);
+  console.log(`🔍 Searching Tavily for topic: "${state.topic}"`);
 
   try {
-    // 2. בניית גוף הבקשה ל-API
-    const requestBody = {
-      api_key: TAVILY_API_KEY,
-      query: query,
-      search_depth: "advanced", // עומק מתקדם למציאת חומרים איכותיים
-      max_results: 8,
-      include_answer: false,
-      include_raw_content: false
-    };
-
-    // הזרקת סינון דומיינים איכותיים בלבד כדי למנוע תוצאות זבל
-    if (include_domains && include_domains.length > 0) {
-      requestBody.include_domains = include_domains;
-    }
-
-    const response = await fetch("https://api.tavily.com/search", {
+    const response = await fetch("/api/tavily-sources", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        topic: state.topic,
+        subject: state.subject || '',
+        assignmentType: state.assignmentType || ''
+      })
     });
 
     if (!response.ok) {
@@ -51,7 +35,7 @@ export async function fetchTavilySources(state, profile = null) {
 
     console.log("✅ Tavily Response:", data);
 
-    return (data.results || []).map(result => ({
+    return (Array.isArray(data) ? data : data.results || []).map(result => ({
       title: result.title || "מקור מידע",
       url: result.url || "#",
       content: result.content || ""
@@ -74,40 +58,12 @@ export function generateOptimizedQuery(state, profile) {
   if (subject) queryParts.push(subject);
   
   const cleanQuery = queryParts.join(' ').trim().replace(/\s+/g, ' ');
-
-  // הגדרת רשימת דומיינים מבוקרים ואיכותיים למניעת מקורות לא רלוונטיים
-  let include_domains = [];
-
-  if (mainLanguage === 'he') {
-    if (educationLevel === 'college' || educationLevel === 'university') {
-      // דומיינים אקדמיים ישראליים מובילים לסטודנטים
-      include_domains = [
-        "he.wikipedia.org", "wikipedia.org", "tau.ac.il", "huji.ac.il", 
-        "technion.ac.il", "bgu.ac.il", "biu.ac.il", "haifa.ac.il", 
-        "openu.ac.il", "nli.org.il", "researchgate.net"
-      ];
-    } else {
-      // אתרי תוכן לימודי, מפוקח ומהימן לתלמידי בתי ספר ותיכון בישראל
-      include_domains = [
-        "he.wikipedia.org", "wikipedia.org", "cet.ac.il", "snunit.k12.il", 
-        "edu.gov.il", "nli.org.il", "yadvashem.org"
-      ];
-    }
-  } else {
-    // הגדרות ברירת מחדל למשתמשי אנגלית
-    if (educationLevel === 'college' || educationLevel === 'university') {
-      include_domains = ["wikipedia.org", "britannica.com", "ncbi.nlm.nih.gov", "researchgate.net", "jstor.org"];
-    } else {
-      include_domains = ["wikipedia.org", "britannica.com", "khanacademy.org", "history.com"];
-    }
-  }
-
   // החזרת אובייקט מסודר עם השאילתה המנוקה והדומיינים הרלוונטיים
   return {
     query: cleanQuery,
-    include_domains: include_domains
   };
 }
+
 
 export function renderSourcesToUI(sources) {
   const container = document.getElementById('sources-view');

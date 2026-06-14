@@ -14,8 +14,7 @@ exports.handler = async function (event) {
   if (!apiKey)
     return { statusCode: 500, body: JSON.stringify({ error: 'Tavily key not configured' }) };
 
-  const query = `"${topic}" reliable academic sources bibliography ${subject} ${assignmentType}`
-    .trim().replace(/\s+/g, ' ');
+  const query = topic.trim();
 
   try {
     const r = await fetch('https://api.tavily.com/search', {
