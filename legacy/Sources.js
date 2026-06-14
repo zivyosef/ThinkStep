@@ -58,40 +58,12 @@ export function generateOptimizedQuery(state, profile) {
   if (subject) queryParts.push(subject);
   
   const cleanQuery = queryParts.join(' ').trim().replace(/\s+/g, ' ');
-
-  // הגדרת רשימת דומיינים מבוקרים ואיכותיים למניעת מקורות לא רלוונטיים
-  let include_domains = [];
-
-  if (mainLanguage === 'he') {
-    if (educationLevel === 'college' || educationLevel === 'university') {
-      // דומיינים אקדמיים ישראליים מובילים לסטודנטים
-      include_domains = [
-        "he.wikipedia.org", "wikipedia.org", "tau.ac.il", "huji.ac.il", 
-        "technion.ac.il", "bgu.ac.il", "biu.ac.il", "haifa.ac.il", 
-        "openu.ac.il", "nli.org.il", "researchgate.net"
-      ];
-    } else {
-      // אתרי תוכן לימודי, מפוקח ומהימן לתלמידי בתי ספר ותיכון בישראל
-      include_domains = [
-        "he.wikipedia.org", "wikipedia.org", "cet.ac.il", "snunit.k12.il", 
-        "edu.gov.il", "nli.org.il", "yadvashem.org"
-      ];
-    }
-  } else {
-    // הגדרות ברירת מחדל למשתמשי אנגלית
-    if (educationLevel === 'college' || educationLevel === 'university') {
-      include_domains = ["wikipedia.org", "britannica.com", "ncbi.nlm.nih.gov", "researchgate.net", "jstor.org"];
-    } else {
-      include_domains = ["wikipedia.org", "britannica.com", "khanacademy.org", "history.com"];
-    }
-  }
-
   // החזרת אובייקט מסודר עם השאילתה המנוקה והדומיינים הרלוונטיים
   return {
     query: cleanQuery,
-    include_domains: include_domains
   };
 }
+
 
 export function renderSourcesToUI(sources) {
   const container = document.getElementById('sources-view');

@@ -1,6 +1,9 @@
 [build]
   publish = "legacy"
 
+[build.processing]
+  skip_processing = true
+
 [[redirects]]
   from   = "/api/openrouter"
   to     = "/.netlify/functions/openrouter-proxy"
