@@ -1,6 +1,36 @@
 import { create } from 'zustand';
 import { supabase, saveTaskState, loadTaskState } from '../services/supabase';
 
+const LS_REACT_KEY  = 'react_task_state';
+const LS_LEGACY_KEY = 'decompose_app_state';
+
+function saveToLS(tasks, projectMeta) {
+  try {
+    localStorage.setItem(LS_REACT_KEY, JSON.stringify({ tasks, projectMeta }));
+    const chunks = tasks.map(t => ({
+      id: t.id,
+      title: t.title,
+      description: t.children?.map(c => c.title).join(' | ') || '',
+    }));
+    localStorage.setItem(LS_LEGACY_KEY, JSON.stringify({
+      chunks,
+      topic:   projectMeta.title   || '',
+      subject: projectMeta.subject || '',
+      dueDate: projectMeta.dueDate || '',
+    }));
+  } catch (_) {}
+}
+
+function loadFromLS() {
+  try {
+    const raw = localStorage.getItem(LS_REACT_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (_) {}
+  return null;
+}
+
+const _saved = typeof window !== 'undefined' ? loadFromLS() : null;
+
 function buildHierarchy(decomposed, dueDate) {
   const start = new Date();
   const end = new Date(dueDate);
@@ -69,8 +99,8 @@ function updateNodeCompleted(tasks, id) {
 }
 
 export const useTaskStore = create((set, get) => ({
-  tasks: [],
-  projectMeta: { title: '', dueDate: '', studentName: '' },
+  tasks: _saved?.tasks || [],
+  projectMeta: _saved?.projectMeta || { title: '', dueDate: '', studentName: '' },
   loading: false,
   realtimeChannel: null,
 
@@ -79,11 +109,13 @@ export const useTaskStore = create((set, get) => ({
   setTasksFromDecomposition: (decomposed, projectMeta) => {
     const tasks = buildHierarchy(decomposed, projectMeta.dueDate);
     set({ tasks, projectMeta });
+    saveToLS(tasks, projectMeta);
   },
 
   toggleComplete: (id) => {
     const tasks = updateNodeCompleted(get().tasks, id);
     set({ tasks });
+    saveToLS(tasks, get().projectMeta);
     const user = get()._user;
     if (user) saveTaskState(user.id, tasks, get().projectMeta);
   },

@@ -468,13 +468,14 @@ input.field-error {
 .hl-btn-row {
   display: flex; gap: 10px; margin-top: 16px;
 }
-.hl-save-btn {
+.hl-writing-btn {
   flex: 1; padding: 14px;
   background: linear-gradient(135deg,#7c3aed,#2563eb); color: white;
   border: none; border-radius: 11px; font-size: 0.95rem; font-weight: 800;
   font-family: inherit; cursor: pointer; transition: all 0.2s ease;
+  text-decoration: none; display: flex; align-items: center; justify-content: center;
 }
-.hl-save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
+.hl-writing-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
 .hl-compile-btn {
   flex: 1; padding: 14px;
   background: linear-gradient(135deg,#059669,#0284c7); color: white;
@@ -1088,7 +1089,7 @@ function buildChecklist() {
     </div>
     <div class="hl-list">${tasksHtml}</div>
     <div class="hl-btn-row">
-      <button class="hl-save-btn"    onclick="window.saveProgress()">💾 שמור התקדמות</button>
+      <a class="hl-writing-btn" href="writing.html">✏️ עבור לדף העבודה</a>
       <button class="hl-compile-btn" onclick="window.compileReport()">📄 הורד דוח</button>
     </div>`;
 
@@ -1104,11 +1105,27 @@ function buildChecklist() {
   localStorage.setItem('decompose_app_state', JSON.stringify(appState));
 }
 
+let _autoSaveTimer = null;
+async function _autoSave() {
+  if (!window.supabaseHelpers) return;
+  try {
+    const user = await window.supabaseHelpers.getCurrentUser();
+    if (!user) return;
+    const appState = JSON.parse(localStorage.getItem('decompose_app_state') || '{}');
+    if (appState.chunks?.length) {
+      await window.supabaseHelpers.saveTaskState(user.id, appState);
+      showSaveToast('✓ נשמר אוטומטית');
+    }
+  } catch (_) {}
+}
+
 window.toggleHL = function(id, checked) {
   const state = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
   state[id] = checked;
   localStorage.setItem(CHECKLIST_KEY, JSON.stringify(state));
   buildChecklist();
+  clearTimeout(_autoSaveTimer);
+  _autoSaveTimer = setTimeout(_autoSave, 1500);
 };
 
 window.compileReport = function() {

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
+const SOURCES_LS_KEY = 'saved_sources';
 
 function SourceItem({ source }) {
   const [open, setOpen] = useState(false);
@@ -39,6 +40,17 @@ export default function SourcesPage() {
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(SOURCES_LS_KEY);
+      if (saved) {
+        const { results: r, topic: t } = JSON.parse(saved);
+        if (r) setResults(r);
+        if (t)  setTopic(t);
+      }
+    } catch (_) {}
+  }, []);
+
   async function handleSearch(e) {
     e.preventDefault();
     const trimmed = topic.trim();
@@ -61,7 +73,9 @@ export default function SourcesPage() {
       }
 
       const data = await res.json();
-      setResults(Array.isArray(data) ? data : []);
+      const arr = Array.isArray(data) ? data : [];
+      setResults(arr);
+      try { localStorage.setItem(SOURCES_LS_KEY, JSON.stringify({ results: arr, topic: trimmed })); } catch (_) {}
     } catch (err) {
       setError(err.message || 'שגיאה בשליפת המקורות. ודא שהשרת פועל על פורט 3001.');
     } finally {
@@ -124,6 +138,14 @@ export default function SourcesPage() {
             )}
           </div>
         )}
+
+        {/* Navigate to writing page */}
+        <a
+          href="/writing.html"
+          className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl text-sm text-center hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-600/30 transition-all block"
+        >
+          ✏️ עבור לעמוד הכתיבה
+        </a>
 
       </div>
     </div>
