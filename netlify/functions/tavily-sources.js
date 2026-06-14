@@ -10,7 +10,7 @@ exports.handler = async function (event) {
   if (!topic)
     return { statusCode: 400, body: JSON.stringify({ error: 'Missing topic' }) };
 
-  const apiKey = process.env.VITE_TAVILY_API_KEY;
+  const apiKey = process.env.TAVILY_API_KEY;
   if (!apiKey)
     return { statusCode: 500, body: JSON.stringify({ error: 'Tavily key not configured' }) };
 
