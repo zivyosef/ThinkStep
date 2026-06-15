@@ -58,6 +58,7 @@ export function generateOptimizedQuery(state, profile) {
   if (subject) queryParts.push(subject);
   
   const cleanQuery = queryParts.join(' ').trim().replace(/\s+/g, ' ');
+
   // החזרת אובייקט מסודר עם השאילתה המנוקה והדומיינים הרלוונטיים
   return {
     query: cleanQuery,
