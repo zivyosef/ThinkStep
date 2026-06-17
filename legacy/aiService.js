@@ -4,8 +4,6 @@
  * ============================================================
  */
 
-// ✅ No SDK import needed — uses OpenRouter REST API directly
-
 const AI_HISTORY_KEY = "my_ai_app_history";
 const MAX_HISTORY = 10;
 
