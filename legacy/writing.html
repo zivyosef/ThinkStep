@@ -837,7 +837,7 @@ async function callCoach(userText) {
     const resp = await fetch('/api/openrouter', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: window.OPENROUTER_MODEL || 'google/gemini-flash-1.5', messages }),
+      body: JSON.stringify({ model: 'openai/gpt-4o-mini', messages }),
     });
 
     const json  = await resp.json();
