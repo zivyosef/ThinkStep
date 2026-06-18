@@ -834,7 +834,7 @@ async function callCoach(userText) {
     );
     messages.push({ role: 'user', content: userText });
 
-    const resp = await fetch('/.netlify/functions/openrouter-proxy', {
+    const resp = await fetch('/api/openrouter', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: window.OPENROUTER_MODEL || 'google/gemini-flash-1.5', messages }),
